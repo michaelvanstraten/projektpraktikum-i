@@ -119,6 +119,12 @@ class FiniteDifference:
             If no analytic derivative was provided by the user.
         """
 
+        if not self.__d_f or not self.__dd_f:
+            raise ValueError(
+                "Analytic derivatives `d_f` and `dd_f` are required.\n"
+                "Provide callable functions for them when initializing `FiniteDifference`."
+            )
+
         norm = infinity_norm(a, b, p)
 
         return norm(self.compute_dh_right_f(), self.__d_f), norm(
