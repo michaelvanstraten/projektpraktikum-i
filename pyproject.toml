@@ -1,7 +1,7 @@
 [project]
-name = "projektpraktikum-1"
+name = "projektpraktikum-i"
 version = "0.1.0"
-description = "Add your description here"
+description = "Praxisübung NLA - Projektpraktikum I - WiSe24/25"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
