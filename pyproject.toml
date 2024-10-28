@@ -6,8 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "manim>=0.18.1",
+    "matplotlib>=3.9.2",
     "numpy>=1.26.4",
 ]
+
+[project.scripts]
+derivative-approximation = "projektpraktikum_i.derivative_approximation:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -21,4 +25,5 @@ addopts = [
 [tool.uv]
 dev-dependencies = [
     "pytest>=8.3.3",
+    "ruff>=0.7.1",
 ]
