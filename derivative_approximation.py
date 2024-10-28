@@ -1,11 +1,7 @@
 from typing import Callable
 
-from manim.camera.mapping_camera import math
 from numpy.typing import NDArray
 import numpy as np
-
-from projektpraktikum_1.utils import is_vectorized
-
 
 def is_vectorized(func: Callable, input_data: NDArray) -> bool:
     try:
@@ -24,10 +20,10 @@ def infinity_norm(start: float, end: float, num_intervals: int) -> Callable:
     points = np.linspace(start, end, num_intervals)
 
     def approximation(f, g):
-        if not is_vectorized(f, points) or not is_vectorized(g, points):
-            raise ValueError(
-                "Both functions must support vectorized input using NumPy arrays."
-            )
+        if not is_vectorized(f, points): 
+            f = np.vectorize(f)
+        if not is_vectorized(g, points):
+            g = np.vectorize(g)
 
         return np.max(np.abs(f(points) - g(points)))
 
@@ -61,18 +57,9 @@ class FiniteDifference:
 
     def __init__(self, h, f, d_f=None, dd_f=None):
         self.__h = h
-        if not is_vectorized(f, np.linspace(0, 1)):
-            self.__f = np.vectorize(f)
-        else:
-            self.__f = f
-        if d_f and not is_vectorized(d_f, np.linspace(0, 1)):
-            self.__d_f = np.vectorize(d_f)
-        else:
-            self.__d_f = d_f
-        if dd_f and not is_vectorized(dd_f, np.linspace(0, 1)):
-            self.__dd_f = np.vectorize(dd_f)
-        else:
-            self.__dd_f = dd_f
+        self.__f = f
+        self.__d_f = d_f
+        self.__dd_f = dd_f
 
     def compute_dh_right_f(self):
         """
@@ -137,52 +124,3 @@ class FiniteDifference:
         return norm(self.compute_dh_right_f(), self.__d_f), norm(
             self.compute_ddh_f(), self.__dd_f
         )
-
-
-from manim import *
-
-
-class LogScalingExample(Scene):
-    def construct(self):
-        ax = Axes(
-            x_range=[-24, 24],
-            y_range=[-1.2, 1.2],
-            axis_config={"include_numbers": True})
-
-        h = ValueTracker(12)
-
-        d_f_approximation = ax.plot(
-            lambda x: x,
-            use_vectorized=True,
-        )
-
-        f = lambda x: np.sin(x) / x
-        d_f = lambda x: (x * np.cos(x) - np.sin(x)) / x**2
-        dd_f = lambda x: -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / x**3
-
-        d_f_approximation.add_updater(
-            lambda old_graph: old_graph.become(
-                ax.plot(
-                    FiniteDifference(h.get_value(), f, d_f, dd_f).compute_dh_right_f(),
-                    use_vectorized=True,
-                )
-            )
-        )
-
-
-        d_f_h_pi =                 ax.plot(
-                    FiniteDifference(math.pi/10, f, d_f, dd_f).compute_dh_right_f(),
-                    use_vectorized=True,
-                )
-
-
-        d_f_plot = ax.plot(
-            d_f,
-            use_vectorized=True,
-            color=RED
-        )
-
-
-        self.add(ax, d_f_approximation, d_f_plot, d_f_h_pi)
-
-        self.play(h.animate.set_value(0.0001), run_time=5)
