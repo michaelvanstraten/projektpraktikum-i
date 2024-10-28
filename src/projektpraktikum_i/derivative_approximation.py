@@ -3,6 +3,7 @@ from typing import Callable
 from numpy.typing import NDArray
 import numpy as np
 
+
 def is_vectorized(func: Callable, input_data: NDArray) -> bool:
     try:
         # Attempt to apply the function to an array
@@ -20,7 +21,7 @@ def infinity_norm(start: float, end: float, num_intervals: int) -> Callable:
     points = np.linspace(start, end, num_intervals)
 
     def approximation(f, g):
-        if not is_vectorized(f, points): 
+        if not is_vectorized(f, points):
             f = np.vectorize(f)
         if not is_vectorized(g, points):
             g = np.vectorize(g)
@@ -85,7 +86,9 @@ class FiniteDifference:
         """
         return (
             lambda x: (
-                self.__f(x + self.__h) - 2 * self.__f(x) + self.__f(x - self.__h)
+                self.__f(x + self.__h)
+                - 2 * self.__f(x)
+                + self.__f(x - self.__h)
             )
             / self.__h
         )
