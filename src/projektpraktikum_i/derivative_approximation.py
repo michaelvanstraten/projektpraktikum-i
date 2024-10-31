@@ -237,8 +237,8 @@ def main():
     """Main function to execute the plotting of functions and errors."""
     # Define the function and its analytical derivatives
     f = lambda x: np.sinc(x / np.pi)
-    df = lambda x: (np.cos(x) - np.sinc(x)) / x
-    ddf = lambda x: (-2 * np.cos(x) + x * np.sin(x) + 2 * np.sinc(x)) / x**2
+    df = lambda x: (x * np.cos(x) - np.sin(x)) / x**2
+    ddf = lambda x: -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / (x**3)
 
     # Define interval and discretization parameters
     params = (np.pi, 3 * np.pi, 1000)
