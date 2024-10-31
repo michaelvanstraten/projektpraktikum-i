@@ -1,8 +1,9 @@
-from typing import Callable
-
-from numpy.typing import NDArray
 import matplotlib.pyplot as plt
 import numpy as np
+
+from math import log10
+from numpy.typing import NDArray
+from typing import Callable
 
 
 def is_vectorized(func: Callable, input_data: NDArray) -> bool:
@@ -189,7 +190,7 @@ def plot_functions(f, df, ddf, f_d, params):
     plt.legend()
 
 
-def plot_errors(f_ds, h_values, params):
+def plot_errors(f_ds, h_values, params, padding=0.1):
     """Plot the errors in finite difference approximations."""
     a, b, p = params
     e_f_1_right, e_f_1_central, e_f_1_left, e_f_2 = zip(
@@ -216,6 +217,15 @@ def plot_errors(f_ds, h_values, params):
             linestyle=linestyle,
             linewidth=2,
         )
+
+    error_values = np.concatenate([e_f_1_right, e_f_1_central, e_f_1_left])
+    min_error = np.min(error_values)
+    max_error = np.max(error_values)
+    shift = 10 ** (padding * (log10(max_error) - log10(min_error)))
+    plt.ylim(
+        bottom=min_error / shift,
+        top=max_error * shift,
+    )
 
     plt.xlabel("$h$")
     plt.ylabel("Error")
