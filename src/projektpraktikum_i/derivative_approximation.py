@@ -171,18 +171,24 @@ class FiniteDifference:
 def plot_functions(f, df, ddf, f_d, params):
     """Plot the function f, its analytical derivatives df, ddf, and finite difference derivatives."""
     inputs = np.linspace(*params)
-    values = {
-        "$f(x)$": (f(inputs), "red"),
-        "$f'(x)$": (df(inputs), "orange"),
-        "$f''(x)$": (ddf(inputs), "green"),
-        "$D_h^+ f(x)$": (f_d.compute_dh_right_f()(inputs), "purple", "dashed"),
-        "$D_h^2 f(x)$": (f_d.compute_ddh_f()(inputs), "blue", "dashed"),
-    }
 
     plt.figure(figsize=(10, 6))
-    for label, (value, color, *style) in values.items():
-        linestyle = style[0] if style else "solid"
-        plt.plot(inputs, value, label=label, color=color, linestyle=linestyle)
+
+    plot = lambda *args, **kwargs: plt.plot(inputs, *args, **kwargs)
+    plot(f(inputs), label="$f(x)$", color="red")
+    plot(df(inputs), label="$f'(x)$", color="orange")
+    plot(
+        f_d.compute_dh_right_f()(inputs),
+        label="$D_h^+ f(x)$",
+        color="purple",
+        linestyle="dashed",
+    )
+    plot(
+        f_d.compute_ddh_f()(inputs),
+        label="$D_h^2 f(x)$",
+        color="blue",
+        linestyle="dashed",
+    )
 
     plt.xlabel("x")
     plt.ylabel("Function values")
@@ -197,26 +203,14 @@ def plot_errors(f_ds, h_values, params, padding=0.1):
         *[f_d.compute_errors(a, b, p) for f_d in f_ds]
     )
 
-    error_values = {
-        "Error in $D_h^+ f$": (e_f_1_right, "green"),
-        "Error in $D_h^c f$": (e_f_1_central, "blue"),
-        "Error in $D_h^- f$": (e_f_1_left, "red"),
-        "Error in $D_h^2 f$": (e_f_2, "orange"),
-        "$O(h)$": (h_values, "grey", "dashed"),
-        "$O(h^2)$": ([h**2 for h in h_values], "black", "dashed"),
-    }
-
     plt.figure(figsize=(10, 6))
-    for label, (value, color, *style) in error_values.items():
-        linestyle = style[0] if style else "solid"
-        plt.loglog(
-            h_values,
-            value,
-            label=label,
-            color=color,
-            linestyle=linestyle,
-            linewidth=2,
-        )
+
+    plot = lambda *args, **kwargs: plt.loglog(h_values, *args, **kwargs)
+    plot(e_f_1_right, label="Error in $D_h^+ f$", color="green", linewidth=4)
+    plot(e_f_1_central, label="Error in $D_h^c f$", color="blue")
+    plot(e_f_1_left, label="Error in $D_h^- f$", color="red")
+    plot(h_values, label="$O(h)$", color="grey", linestyle="dashed")
+    plot(h_values**2, label="$O(h^2)$", color="grey", linestyle="dashed")
 
     error_values = np.concatenate([e_f_1_right, e_f_1_central, e_f_1_left])
     min_error = np.min(error_values)
