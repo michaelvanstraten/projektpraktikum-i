@@ -250,7 +250,7 @@ def main():
     plot_functions(f, df, ddf, f_d, params)
     plot_errors(f_ds, h_values, params)
 
-    plt.grid(True)
+    plt.grid(True, alpha=0.5)
     plt.show()
 
 
