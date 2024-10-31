@@ -244,8 +244,7 @@ def main():
     params = (np.pi, 3 * np.pi, 1000)
 
     # Define step sizes and create finite difference objects
-    h1, h2, p2 = -9, -1, 20
-    h_values = np.logspace(h1, h2, p2)
+    h_values = np.logspace(10, -25, 1000, base=10)
     f_ds = [FiniteDifference(h, f, df, ddf) for h in h_values]
 
     # Initialize a FiniteDifference instance for plotting functions
