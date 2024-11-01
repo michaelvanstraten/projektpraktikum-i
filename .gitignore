@@ -3,3 +3,13 @@
 .ruff_cache
 # Python bytecode cache
 __pycache__
+# Latexmk/Latex Files
+*.aux
+*.pdf
+*.fls
+*.log
+*.out
+*.gz
+*.toc
+*.fdb_latexmk
+
