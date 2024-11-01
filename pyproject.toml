@@ -1,11 +1,29 @@
 [project]
-name = "projektpraktikum-1"
+name = "projektpraktikum-i"
 version = "0.1.0"
-description = "Add your description here"
+description = "Praxisübung NLA - Projektpraktikum I - WiSe24/25"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "manim>=0.18.1",
+    "matplotlib>=3.9.2",
     "numpy>=1.26.4",
 ]
 
+[project.scripts]
+derivative-approximation = "projektpraktikum_i.derivative_approximation:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.3.3",
+    "ruff>=0.7.1",
+]
