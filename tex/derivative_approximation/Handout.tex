@@ -39,8 +39,8 @@
 \theoremstyle{remark}
 \newtheorem*{bemerkung}{Bemerkung}
 
-\parskip = \baselineskip
-\parindent = 0pt
+\parskip=\baselineskip%
+\parindent=0pt
 
 \addbibresource{handout.bib}
 
@@ -50,7 +50,7 @@
 % generating the table of contents (requires to run pdflatex twice!)
 \tableofcontents
 % start a new page
-\cleardoublepage
+\cleardoublepage%
 
 \section{Einleitung und Motivation}
 Finite Differenzen sind ein grundlegendes Werkzeug der numerischen Mathematik,
@@ -61,7 +61,7 @@ und ersetzt den Grenzwert durch einen diskreten, meistens sehr kleinen, Wert.
 Diese finiten Differenzen können benutzt werden um gewöhnliche, wie auch
 partielle Differenzialgleichung numerisch zu lösen. Dadurch finden finite
 Differenzen Anwendung in vielen Fachbereichen wie zum Beispiel der Physik oder
-dem Ingenieurswesen. \cite{FiniteDifferenzen}
+dem Ingenieurswesen.\ \cite{FiniteDifferenzen}
 
 \section{Theorie}
 
@@ -81,7 +81,7 @@ und damit
     = f^\prime(x) + \sum_{n=2}^\infty \frac{f^n(x)}{n!} h^n
     = f^\prime(x) + \BigO(h)
 \]
-bzw. für \(x - h \in [a,b]\)
+bzw.\ für \(x - h \in [a,b]\)
 \begin{equation} \label{theory:eq:2}
     f(x - h)
     = \sum_{n=0}^\infty \frac{f^n(x)}{n!} {(-h)}^n
@@ -108,7 +108,7 @@ und die Subtraktion von \autoref{theory:eq:2} von \autoref{theory:eq:1} führt
     \coloneq \frac{f(x + h) - f(x - h)}{2h}
     = f^\prime(x) + \frac{f^{\prime\prime\prime}(x)}{6} h^2
     = f^\prime(x) + \BigO(h^2).
-\] \cite{NumericalDifferentiation}
+\]~\cite{NumericalDifferentiation}
 
 \(D_{h, r}^{(1)} f(x)\), \(D_{h, l}^{(1)} f(x)\) und \(D_{h, c}^{(1)} f(x)\)
 bezeichnen die erste rechtsseitige, linksseitige und zentrale finite Differenz von \(f\).
@@ -196,8 +196,9 @@ befassen und vergleichen, ob sie auch mit der Theorie übereinstimmen.
           Verhalten wie die beiden anderen ersten finiten Differenzen auf und
           wird ab ungefähr denselben Werten konstant, fängt jedoch bereits ab
           einem Wert von \(h \approx PLACEHOLDER\) an von der erwarten
-          Fehlerabschätzung \(\BigO(h^{2})\) abzuweichen. \item
-          %%TO DO ADD SECOND FINITE DIFFERENCE HERE
+          Fehlerabschätzung \(\BigO(h^2)\) abzuweichen.
+
+    \item %%TO DO ADD SECOND FINITE DIFFERENCE HERE
 \end{itemize}
 
 Dieses von der Theorie abweichende Verhalten erklären wir uns mithilfe der
@@ -205,7 +206,7 @@ Auslöschung von Computerzahlen. Für sehr kleine Werte von h sind \(f(x + h)\),
 \(f(x - h)\) und \(f(x)\) Betrags-weiße in etwa gleich groß und daher wird die
 Differenzen dieser einen relativ großen Fehler aufweisen.
 
-Da man in den finiten Differenzen durch \(h\) bzw. \(h^2\) teilt, passiert
+Da man in den finiten Differenzen durch \(h\) bzw.\ \(h^2\) teilt, passiert
 etwas Ähnliches, wenn man diesen Wert groß genug wählt, und zwar, werden diese
 dann auf 0 abgerundet, weshalb der Fehler auch dort konstant wird.
 
@@ -230,5 +231,5 @@ zweite finite Differenz beobachtet. Außerhalb dieser Intervalle entsprach der
 Fehler nicht mehr der Theorie, was an der Computerarithmetik und dem Phänomen
 der Auslöschung liegt.
 
-\printbibliography
+\printbibliography%
 \end{document}
