@@ -134,6 +134,13 @@
                   binPath = "${virtualenv}/bin/python -m pylint";
                 };
               };
+              # Markdown and YAML
+              prettier = {
+                enable = true;
+                settings = {
+                  prose-wrap = "always";
+                };
+              };
             };
           };
         };
@@ -157,6 +164,7 @@
           {
             default = pkgs.mkShell {
               packages = pre-commit-check.enabledPackages ++ [
+                pkgs.uv
                 self.formatter.${system}
                 virtualenv
               ];
