@@ -1,13 +1,16 @@
 \documentclass{scrartcl}
 
+\usepackage{csquotes}
 \usepackage[ngerman]{babel}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{biblatex}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{hyperref}
 \usepackage{mathtools}
+\usepackage{svg}
 
 \subject{Bericht Handout}
 \titlehead{%
@@ -65,7 +68,7 @@ dem Ingenieurswesen.\ \cite{FiniteDifferenzen}
 
 \section{Theorie}
 
-\subsection{Finite Differenzen} %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE FOR THEORETICAL PART RIGHT HERE
+\subsection{Finite Differenzen}
 Sei \(f\) auf einem Intervall \([a,b]\) unendlich oft differenzierbar. Dann
 gilt für \(x \in (a,b)\) und \(h > 0\) mit \(x + h \in [a,b]\) mithilfe der
 Taylorentwicklung:
@@ -122,11 +125,9 @@ mit \(p \in \nats\) und
 durch
 \[
     e_f^k(h) \coloneq \max_{i = 0, \dots p} \abs*{f^{(k)}(x_i) - D_h^{(k)} f(x_i)}
-\] %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE HERE AS WELL
+\]~\cite{PPI_FiniteDifferences}
 
 \subsection{Computerarithmetik}
-
-%%TO DOCITE VL_ewr_2024 in PPI MOODLE COURSE
 
 Computer stellen Zahlen mithilfe von Bits dar, die entweder den Zustand 0 oder
 1 annehmen. Daher werden reelle Zahlen auf Computern in binär dargestellt. Da
@@ -137,9 +138,12 @@ sein, dass die Addition zweier Maschinenzahlen keine Maschinenzahl ist, und
 deshalb vom Computer zur nächstgelegenen Maschinenzahl gerundet wird.
 Subtrahiert man zwei betragsmäßig ungefähr gleich große Zahlen kommt es daher
 zu einem hohen relativen Fehler des Ergebnisses. Dieses Phänomen wird
-Auslöschung genannt.
+Auslöschung genannt.\ \cite{VL_ewr_2024}
+
+\pagebreak
 
 \section{Experimente}
+
 Für unsere Experimente haben wir uns die Funktion
 \[
     f(x) \coloneq \frac{\sin(x)}{x}
@@ -151,60 +155,103 @@ auf dem Intervall \(I \coloneq [\pi, 3 \pi]\) angeschaut. Offensichtlich ist
 Einerseits haben wir die Graphen der exakten ersten und zweiten Ableitung mit
 den Graphen der Approximationen für verschiedene Werte von \(h\) verglichen.
 
-%%TODO ADD FIGURE
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includesvg[width=\textwidth]{figures/compare-first-right.svg}
+        \caption{Vergleich der ersten rechtsseitigen finiten Differenz mit der exakten Ableitung.}
+        \label{fig:first-right} % chktex 24
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includesvg[width=\textwidth]{figures/compare-first-left.svg}
+        \caption{Vergleich der ersten linksseitigen finiten Differenz mit der exakten Ableitung.}
+        \label{fig:first-left} % chktex 24
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includesvg[width=\textwidth]{figures/compare-first-central.svg}
+        \caption{Vergleich der ersten zentralen finiten Differenz mit der exakten Ableitung.}
+        \label{fig:first-central} % chktex 24
+    \end{subfigure}
+    \begin{subfigure}{0.45\textwidth}
+        \includesvg[width=\textwidth]{figures/compare-second.svg}
+        \caption{Vergleich der zweiten finiten Differenz mit der exakten Ableitung.}
+        \label{fig:second} % chktex 24
+    \end{subfigure}
+    \caption{Vergleich der finiten Differenzenmethoden mit den exakten Ableitungen für verschiedene Werte von \(h\).}
+    \label{fig:finite-differences} % chktex 24
+\end{figure}
+
+\pagebreak
 
 Was wir uns ebenfalls angeschaut haben, ist der Approximationsfehler
 \(e_{f}^{(k)}(h)\) für die verschiedenen finiten Differenz, indem wir den
 Fehler, für ein Intervall was von sehr kleinen bis zu sehr großen Werten von
 \(h\) reicht, geplottet haben.
 
-%%TODO ADD FIGURE
+\begin{figure}[h]
+    \centering
+    \includesvg[width=\textwidth]{figures/errors.svg}
+    \caption{Approximationsfehler der finiten Differenzen für verschiedene Werte von \(h\).}
+    \label{fig:errors} % chktex 24
+\end{figure}
 
-%%TODO ADD BEOBACHTUNGEN
+\subsection{Beobachtungen}
+
+In \autoref{fig:finite-differences} sind die Vergleiche der analytischen
+Ableitungen mit den finiten Differenzen dargestellt. Wie man sehen kann, nähert
+sich die Approximation für kleinere Werte von \(h\) zunehmend der analytischen
+Ableitung an.
+
+In \autoref{fig:errors} ist der Approximationsfehler dargestellt. Wie erwartet,
+gilt für Werte \(h \le 1\), dass der Fehler der ersten rechts- und
+linksseitigen finiten Differenz proportional zu \(h\) ist, was der
+Fehlerabschätzung von \(\BigO(h)\) entspricht. Der Fehler der zentralen und
+zweiten finiten Differenz ist proportional zu \(h^2\), was der Theorie
+entspricht. Für \(h\) Werte \(\le 10^{-3}\) weicht das Verhalten jedoch ab, was
+auf numerische Probleme wie Auslöschung zurückzuführen ist.
 
 \section{Auswertung}
 Im folgenden Abschnitt wollen wir uns mit der Auswertung unserer Experimente
 befassen und vergleichen, ob sie auch mit der Theorie übereinstimmen.
 
-%%TO DO IM GRAPHEN WERTE ABLESEN UND FÜR "PLACEHOLDER" EINFÜGEN
-
 \begin{itemize}
-    \item %%TO DO ADD SHORT SENTENCE FOR GRAPHICAL COMPARISONS OFF FINITE DIFFERENCES AND DERIVATIVES
+    \item Der grafische Vergleich in \autoref{fig:finite-differences} zeigt,
+          dass die finiten Differenzen für kleinere Werte von \(h\) immer
+          besser mit der exakten Ableitung übereinstimmen.
 
-    \item Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{
-          PLACEHOLDER } \) so sieht man, dass der Fehler für die erste linke
-          und rechte finite Differenz, parallel zu \(h \mapsto h\) liegt, und
-          damit der Theorie und der Fehlerabschätzung von \(\BigO(h)\)
-          entspricht.
+    \item Liegt \(h\) zwischen \(10^{-8}\) und \(1\), so sieht man, dass der
+          Fehler für die erste linke und rechte finite Differenz parallel zu
+          \(h \mapsto h\) verläuft und somit der Theorie mit der
+          Fehlerabschätzung von \(\BigO(h)\) entspricht.
 
-          Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{
-          PLACEHOLDER } \) so ist der Fehler der ersten zentralen finiten
-          Differenz parallel zu \(h \mapsto h^2\) und entspricht damit der in
-          der Theorie vorhergesagten Fehlerabschätzung von \(\BigO(h^2)\).
+          Liegt \(h\) zwischen \(10^{-5}\) und \(1\), so ist der Fehler der
+          ersten zentralen finiten Differenz parallel zu \(h \mapsto h^2\) und
+          entspricht damit der in der Theorie vorhergesagten Fehlerabschätzung
+          von \(\BigO(h^2)\).
 
-          Auch für die zweite finite Differenz ist zwischen \(10^{ PLACEHOLDER
-          } \text{ und } 10^{ PLACEHOLDER }\) das erwartete Verhalten, also
-          Parallelität zu \(h \mapsto h^2\) zu sehen und entspricht damit der
-          theoretischen Fehlerabschätzung \(\BigO(h^2)\).
+          Für die zweite finite Differenz ist zwischen \(10^{-3}\) und \(1\)
+          das erwartete Verhalten, also Parallelität zu \(h \mapsto h^2\), zu
+          sehen und entspricht damit der theoretischen Fehlerabschätzung
+          \(\BigO(h^2)\).
 
-    \item Für \(h > 10^{ PLACEHOLDER } \) werden die Approximationsfehler von
-          \(D_{h, r}^{(1)}f(x), D_{h, l}^{(1)}f(x)\) konstant und für \(h <
-          10^{ PLACEHOLDER } \) steigen beide wieder an und werden ab \(h
-          \approx PLACEHOLDER \) ebenfalls konstant.
+    \item Für \(h \ge 1\) werden die Approximationsfehler von \(D_h^- f(x),
+          D_h^+ f(x)\) konstant und für \(h \le 10^{-8}\) steigen beide wieder
+          an und werden ab \(h \approx 10^{-15}\) ebenfalls konstant.
 
-          Der Approximationsfehler \(D_{h, c}^{(1)}f(x)\) weist ähnliches
-          Verhalten wie die beiden anderen ersten finiten Differenzen auf und
-          wird ab ungefähr denselben Werten konstant, fängt jedoch bereits ab
-          einem Wert von \(h \approx PLACEHOLDER\) an von der erwarten
+          Der Approximationsfehler \(D_h^c f(x)\) weist ähnliches Verhalten wie
+          die beiden anderen ersten finiten Differenzen auf und wird ab
+          ungefähr denselben Werten konstant, fängt jedoch bereits ab einem
+          Wert von \(h \approx 10^{-5}\) an von der erwarteten
           Fehlerabschätzung \(\BigO(h^2)\) abzuweichen.
 
-    \item %%TO DO ADD SECOND FINITE DIFFERENCE HERE
+    \item Auch für die zweite finite Differenz ist ein ähnliches Verhalten wie
+          für die zentralen finiten Differenzen zu beobachten.
 \end{itemize}
 
 Dieses von der Theorie abweichende Verhalten erklären wir uns mithilfe der
 Auslöschung von Computerzahlen. Für sehr kleine Werte von h sind \(f(x + h)\),
-\(f(x - h)\) und \(f(x)\) Betrags-weiße in etwa gleich groß und daher wird die
-Differenzen dieser einen relativ großen Fehler aufweisen.
+\(f(x - h)\) und \(f(x)\) betragsmäßig in etwa gleich groß und daher wird die
+Differenz dieser einen relativ großen Fehler aufweisen.
 
 Da man in den finiten Differenzen durch \(h\) bzw.\ \(h^2\) teilt, passiert
 etwas Ähnliches, wenn man diesen Wert groß genug wählt, und zwar, werden diese
@@ -217,19 +264,18 @@ Untersucht wurde die Funktion
 \]
 auf dem Intervall \(I = [\pi, 3\pi]\). Zuerst haben wir die tatsächlichen
   Ableitungen grafisch mit den finiten Differenzen verglichen. Wie theoretisch
-  vorhersagt haben wir gesehen, dass die Graphen der finiten Differenzen, für
-  kleiner werdende Werte von h, immer mehr dem Graphen der jeweiligen
+  vorhergesagt haben wir gesehen, dass die Graphen der finiten Differenzen, für
+  kleiner werdende Werte von \(h\), immer mehr dem Graphen der jeweiligen
   tatsächlichen Ableitung entsprechen.
 
 Außerdem haben wir eine Näherung des Approximationsfehlers betrachtet und in
 einem doppelt logarithmisch skalierten Plot für Werte von h zwischen
-%%TO DO HIER KLEINSTER UND GRÖSSTER WERT VON h EINFÜGEN
-geplottet. Für gewisse Intervalle wurden die, in der Theorie, vorhergesagten
-Fehlerabschätzungen von \(\BigO(h)\) für die erste rechtsseitige und
-linksseitige finite Differenz bzw. \(\BigO(h^2)\) für die erste zentrale und
-zweite finite Differenz beobachtet. Außerhalb dieser Intervalle entsprach der
-Fehler nicht mehr der Theorie, was an der Computerarithmetik und dem Phänomen
-der Auslöschung liegt.
+\(10^{-18}\) und \(10^2\) geplottet. Für gewisse Intervalle wurden die, in der
+Theorie, vorhergesagten Fehlerabschätzungen von \(\BigO(h)\) für die erste
+rechtsseitige und linksseitige finite Differenz bzw. \(\BigO(h^2)\) für die
+erste zentrale und zweite finite Differenz beobachtet. Außerhalb dieser
+Intervalle entsprach der Fehler nicht mehr der Theorie, was an der
+Computerarithmetik und dem Phänomen der Auslöschung liegt.
 
 \printbibliography%
 \end{document}

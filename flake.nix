@@ -98,16 +98,15 @@
             name = "derivative_approximation-handout";
             filename = "Handout.tex";
             SOURCE_DATE_EPOCH = "${toString self.lastModified}";
-            src =
-              with pkgs.lib.fileset;
-              toSource {
-                root = ./tex/derivative_approximation;
-                fileset = unions [
-                  ./tex/derivative_approximation/Handout.tex
-                  ./tex/derivative_approximation/handout.bib
-                ];
-              };
-            buildInputs = [ pkgs.texliveFull ];
+            XDG_CACHE_HOME = "$(mktemp -d)";
+            XDG_CONFIG_HOME = "$(mktemp -d)";
+            XDG_DATA_HOME = "$(mktemp -d)";
+            extraOptions = [ "--shell-escape" ];
+            src = ./tex/derivative_approximation;
+            buildInputs = [
+              pkgs.texliveFull
+              pkgs.inkscape
+            ];
           };
         };
 
