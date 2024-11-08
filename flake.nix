@@ -134,6 +134,13 @@
                   binPath = "${virtualenv}/bin/python -m pylint";
                 };
               };
+              # Markdown and YAML
+              prettier = {
+                enable = true;
+                settings = {
+                  prose-wrap = "always";
+                };
+              };
             };
           };
         };
