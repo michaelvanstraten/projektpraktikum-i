@@ -6,6 +6,17 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    pyproject-nix = {
+      url = "github:nix-community/pyproject.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    uv2nix = {
+      url = "github:adisbladis/uv2nix";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     latix = {
       url = "github:michaelvanstraten/latix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,6 +33,8 @@
       self,
       flake-utils,
       nixpkgs,
+      uv2nix,
+      pyproject-nix,
       latix,
       git-hooks,
       ...
@@ -31,13 +44,60 @@
       let
         pkgs = import nixpkgs { inherit system; };
         inherit (latix.lib.${system}) buildLatexmkProject;
+
+        workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
+
+        overlay = workspace.mkPyprojectOverlay {
+          sourcePreference = "wheel";
+        };
+
+        hacks = pkgs.callPackage pyproject-nix.build.hacks { };
+
+        pyprojectOverrides = final: prev: {
+          pycairo = prev.pycairo.overrideAttrs (old: {
+            buildInputs = (old.buildInputs or [ ]) ++ [
+              pkgs.pkg-config
+              pkgs.cairo
+            ];
+            nativeBuildInputs =
+              (old.nativeBuildInputs or [ ])
+              ++ final.resolveBuildSystem {
+                meson-python = [ ];
+              };
+          });
+          srt = prev.srt.overrideAttrs (old: {
+            nativeBuildInputs =
+              (old.nativeBuildInputs or [ ])
+              ++ final.resolveBuildSystem {
+                setuptools = [ ];
+              };
+          });
+          manimpango = hacks.nixpkgsPrebuilt {
+            from = pkgs.python312Packages.manimpango;
+            prev = prev.manimpango;
+          };
+          scipy = hacks.nixpkgsPrebuilt {
+            from = pkgs.python312Packages.scipy;
+            prev = prev.scipy;
+          };
+        };
+
+        python = pkgs.python312;
+
+        pythonSet =
+          (pkgs.callPackage pyproject-nix.build.packages {
+            inherit python;
+          }).overrideScope
+            (pkgs.lib.composeExtensions overlay pyprojectOverrides);
+
+        virtualenv = pythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
       in
       {
         packages = {
           "derivative_approximation/handout" = buildLatexmkProject {
             name = "derivative_approximation-handout";
             filename = "Handout.tex";
-            extraOptions = [ "" ];
+            SOURCE_DATE_EPOCH = "${toString self.lastModified}";
             src =
               with pkgs.lib.fileset;
               toSource {
@@ -58,7 +118,9 @@
           pre-commit-check = git-hooks.lib.${system}.run {
             src = ./.;
             hooks = {
+              # Nix
               nixfmt-rfc-style.enable = true;
+              # LaTeX
               latexindent = {
                 enable = true;
                 settings = {
@@ -66,6 +128,13 @@
                 };
               };
               chktex.enable = true;
+              # Python
+              pylint = {
+                enable = true;
+                settings = {
+                  binPath = "${virtualenv}/bin/python -m pylint";
+                };
+              };
             };
           };
         };
@@ -74,15 +143,36 @@
         devShells =
           let
             pre-commit-check = self.checks.${system}.pre-commit-check;
+            pre-commit-check-shell-hook = pre-commit-check.shellHook;
+
+            editableOverlay = workspace.mkEditablePyprojectOverlay {
+              root = "$REPO_ROOT";
+            };
+
+            editablePythonSet = pythonSet.overrideScope editableOverlay;
+
+            virtualenv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-env" {
+              projektpraktikum-i = [ ];
+            };
           in
           {
             default = pkgs.mkShell {
               packages = pre-commit-check.enabledPackages ++ [
                 self.formatter.${system}
-                # Add other dependencies here
+                virtualenv
               ];
-              inherit (pre-commit-check) shellHook;
+
+              shellHook =
+                pre-commit-check-shell-hook
+                # bash
+                + ''
+                  # Undo dependency propagation by nixpkgs.
+                  unset PYTHONPATH
+                  # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
+                  export REPO_ROOT=$(git rev-parse --show-toplevel)
+                '';
             };
           };
       }
     );
+}
