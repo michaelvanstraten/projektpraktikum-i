@@ -1,12 +1,30 @@
+"""
+Module providing finite difference approximations and error analysis for numerical differentiation.
+
+This module defines functions and a class to approximate the first and second derivatives of a
+function using finite difference methods. It also supports error analysis for these approximations.
+
+Functions:
+- plot_errors: Plot errors in finite difference approximations.
+
+Classes:
+- FiniteDifference: Calculate first and second order finite difference approximations.
+"""
+
+# pylint: disable=unnecessary-lambda-assignment
+
+from math import log10
+from typing import Callable
+
+from numpy.typing import NDArray
 import matplotlib.pyplot as plt
 import numpy as np
 
-from math import log10
-from numpy.typing import NDArray
-from typing import Callable
-
 
 def is_vectorized(func: Callable, input_data: NDArray) -> bool:
+    """
+    Check if a function is vectorized by applying it to an array and checking the output shape.
+    """
     try:
         # Attempt to apply the function to an array
         result = func(np.array(input_data))
@@ -15,11 +33,14 @@ def is_vectorized(func: Callable, input_data: NDArray) -> bool:
             isinstance(result, np.ndarray)
             and result.shape == np.array(input_data).shape
         )
-    except Exception:
+    except TypeError:
         return False
 
 
 def infinity_norm(start: float, end: float, num_intervals: int) -> Callable:
+    """
+    Return a function to compute the infinity norm of the difference between two functions.
+    """
     points = np.linspace(start, end, num_intervals)
 
     def approximation(f, g):
@@ -88,11 +109,9 @@ class FiniteDifference:
         """
         return (
             lambda x: (
-                self.__f(x + self.__h)
-                - 2 * self.__f(x)
-                + self.__f(x - self.__h)
+                self.__f(x + self.__h) - 2 * self.__f(x) + self.__f(x - self.__h)
             )
-            / self.__h
+            / self.__h**2
         )
 
     def compute_dh_left_f(self):
@@ -103,7 +122,7 @@ class FiniteDifference:
         Returns
         -------
         callable
-            Calculates the approximation of the second derivative for a given x.
+            Calculates the approximation of the first derivative for a given x.
         """
 
         return lambda x: (self.__f(x) - self.__f(x - self.__h)) / self.__h
@@ -116,7 +135,7 @@ class FiniteDifference:
         Returns
         -------
         callable
-            Calculates the approximation of the second derivative for a given x.
+            Calculates the approximation of the first derivative for a given x.
         """
 
         return lambda x: (self.__f(x + self.__h) - self.__f(x - self.__h)) / (
@@ -167,54 +186,113 @@ class FiniteDifference:
             norm(self.compute_ddh_f(), self.__dd_f),
         )
 
+    def plot(self, interval, dtype=None):
+        """
+        Plot the function f, its analytical derivatives df, ddf, and finite difference derivatives.
 
-def plot_functions(f, df, ddf, f_d, params):
-    """Plot the function f, its analytical derivatives df, ddf, and finite difference derivatives."""
-    inputs = np.linspace(*params)
+        Parameters
+        ----------
+        interval : tuple
+            The interval over which to plot.
+        dtype : type, optional
+            The data type of the linspace.
+        """
 
-    plt.figure(figsize=(10, 6))
+        inputs = np.linspace(*interval, dtype=dtype)
 
-    plot = lambda *args, **kwargs: plt.plot(inputs, *args, **kwargs)
-    plot(f(inputs), label="$f(x)$", color="red")
-    plot(df(inputs), label="$f'(x)$", color="orange")
-    plot(
-        f_d.compute_dh_right_f()(inputs),
-        label="$D_h^+ f(x)$",
-        color="purple",
-        linestyle="dashed",
-    )
-    plot(
-        f_d.compute_ddh_f()(inputs),
-        label="$D_h^2 f(x)$",
-        color="blue",
-        linestyle="dashed",
-    )
+        plt.figure(figsize=(10, 6))
 
-    plt.xlabel("x")
-    plt.ylabel("Function values")
-    plt.title("Function and its Derivatives")
-    plt.legend()
+        plot = lambda *args, **kwargs: plt.plot(inputs, *args, **kwargs)
+        plot(self.__f(inputs), label="$f(x)$", color="red")
+        plot(self.__d_f(inputs), label="$f'(x)$", color="orange")
+        plot(self.__dd_f(inputs), label="$f''(x)$", color="green")
+        plot(
+            self.compute_dh_right_f()(inputs),
+            label="$D_h^+ f(x)$",
+            color="purple",
+            linestyle="dashed",
+        )
+        plot(
+            self.compute_dh_central_f()(inputs),
+            label="$D_h^c f(x)$",
+            color="blue",
+            linestyle="dashed",
+        )
+        plot(
+            self.compute_dh_right_f()(inputs),
+            label="$D_h^- f(x)$",
+            color="green",
+            linestyle="dashed",
+        )
+        plot(
+            self.compute_ddh_f()(inputs),
+            label="$D_h^2 f(x)$",
+            color="cyan",
+            linestyle="dashed",
+        )
+
+        plt.xlabel("x")
+        plt.ylabel("Function values")
+        plt.title("Function and its Derivatives")
+
+        # Add text with h value
+        plt.text(
+            0.90,
+            0.95,
+            f"$h = {self.__h}$",
+            transform=plt.gca().transAxes,
+            fontsize=12,
+            verticalalignment="top",
+            bbox={
+                "facecolor": "black",
+                "edgecolor": "white",
+                "boxstyle": "round,pad=0.5",
+            },
+        )
+
+        plt.legend()
 
 
-def plot_errors(f_ds, h_values, params, padding=0.1):
-    """Plot the errors in finite difference approximations."""
-    a, b, p = params
-    e_f_1_right, e_f_1_central, e_f_1_left, e_f_2 = zip(
-        *[f_d.compute_errors(a, b, p) for f_d in f_ds]
+def plot_errors(h_values, f, d_f, dd_f, interval):  # pylint: disable=too-many-arguments
+    """
+    Plot the errors in finite difference approximations.
+    """
+
+    errors_right, errors_central, errors_left, errors_second = zip(
+        *[FiniteDifference(h, f, d_f, dd_f).compute_errors(*interval) for h in h_values]
     )
 
     plt.figure(figsize=(10, 6))
 
     plot = lambda *args, **kwargs: plt.loglog(h_values, *args, **kwargs)
-    plot(e_f_1_right, label="Error in $D_h^+ f$", color="green", linewidth=4)
-    plot(e_f_1_central, label="Error in $D_h^c f$", color="blue")
-    plot(e_f_1_left, label="Error in $D_h^- f$", color="red")
-    plot(h_values, label="$O(h)$", color="grey", linestyle="dashed")
-    plot(h_values**2, label="$O(h^2)$", color="grey", linestyle="dashed")
 
-    error_values = np.concatenate([e_f_1_right, e_f_1_central, e_f_1_left])
+    plot(errors_right, label="Error in $D_h^+ f(x)$", color="magenta", linewidth=2)
+    plot(errors_central, label="Error in $D_h^c f(x)$", color="cyan", linewidth=2)
+    plot(
+        errors_left,
+        label="Error in $D_h^- f(x)$",
+        color="lime",
+        linewidth=2,
+        linestyle="dotted",
+    )
+    plot(errors_second, label="Error in $D_h^2 f(x)$", color="orange", linewidth=2)
+
+    plot(h_values, label="$O(h)$", color="yellow", linestyle="dashed", linewidth=1.5)
+    plot(
+        h_values**2,
+        label="$O(h^2)$",
+        color="deepskyblue",
+        linestyle="dashed",
+        linewidth=1.5,
+    )
+
+    # Adjust limits to have padding
+    error_values = np.concatenate(
+        [errors_right, errors_central, errors_left, errors_second]
+    )
     min_error = np.min(error_values)
     max_error = np.max(error_values)
+    padding = 0.1
     shift = 10 ** (padding * (log10(max_error) - log10(min_error)))
     plt.ylim(
         bottom=min_error / shift,
@@ -228,27 +306,27 @@ def plot_errors(f_ds, h_values, params, padding=0.1):
 
 
 def main():
-    """Main function to execute the plotting of functions and errors."""
-    # Define the function and its analytical derivatives
-    f = lambda x: np.sinc(x / np.pi)
-    df = lambda x: (x * np.cos(x) - np.sin(x)) / x**2
-    ddf = lambda x: -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / (x**3)
-
-    # Define interval and discretization parameters
-    params = (np.pi, 3 * np.pi, 1000)
-
-    # Define step sizes and create finite difference objects
-    h_values = np.logspace(10, -25, 1000, base=10)
-    f_ds = [FiniteDifference(h, f, df, ddf) for h in h_values]
-
-    # Initialize a FiniteDifference instance for plotting functions
-    h = 0.1
-    f_d = FiniteDifference(h, f, df, ddf)
-
+    """
+    Main function to execute the plotting of functions and errors.
+    """
     # Set plot style and generate plots
     plt.style.use("dark_background")
-    plot_functions(f, df, ddf, f_d, params)
-    plot_errors(f_ds, h_values, params)
+
+    # Define the function and its analytical derivatives
+    f = lambda x: np.sinc(x / np.pi)
+    d_f = lambda x: (x * np.cos(x) - np.sin(x)) / x**2
+    dd_f = lambda x: -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / (x**3)
+
+    # Define interval and discretization parameters
+    interval = (np.pi, 3 * np.pi, 1000)
+
+    # Initialize a FiniteDifference instance for plotting functions
+    h = 0.5
+    FiniteDifference(h, f, d_f, dd_f).plot(interval)
+
+    # Define step sizes and create finite difference objects
+    h_values = np.logspace(-18, 2, 1000, base=10)
+    plot_errors(h_values, f, d_f, dd_f, interval)
 
     plt.grid(True, alpha=0.5)
     plt.show()
