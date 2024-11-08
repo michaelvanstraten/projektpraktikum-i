@@ -54,7 +54,7 @@
 % of contents'
 \usepackage[ngerman]{babel}
 
-
+\usepackage{mathtools}
 %%% MATH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % amsmath provides commands for type-setting mathematical formulas
 \usepackage{amsmath}
@@ -165,17 +165,17 @@
 %%% BEGIN OF CONTENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Einleitung und Motivation}
 Finite Differenzen sind ein grundlegendes Werkzeug der numerischen Mathematik, denn sie bieten die 
-Möglichkeit Ableitungen erster und höherer Ordnung durch diskrete Punkte zu approximieren. 
+Möglichkeit Ableitungen erster und höherer Ordnung durch diskrete Punkte zu approximieren.
+Diese Methode beruht auf der Idee, dass Ableitungen als Grenzwert von Differenzenquotienten dargestellt werden
+können und ersetzt den Grenzwert durch eineN diskreten, meistens sehr kleinen, Wert.
 Diese Finiten Differenzen können benutzt werden um gewöhnliche, wie auch partielle Differentialgleichung 
 numerisch zu lösen. Dadurch finden finite Differenzen Anwendung in vielen Fachbereichen wie zum Beispiel der 
 Physik oder dem Ingenieurswesen. \cite{FiniteDifferenzen} 
 
 
-
-
-%%TODO CITE PPI MOODLE COURSE FOR THEORETICAL PART
 \section{Theorie}
-Sei \(f\) auf einem Intervall \([a,b]\) unendlich oft differenzierbar. Dann gilt für \(x \in (a,b)\) und \(h > 0 \) mit \(x + h \in [a,b]\):
+\subsection{Finite Differenzen} %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE FOR THEORETICAL PART RIGHT HERE
+Sei \(f\) auf einem Intervall \([a,b]\) unendlich oft differenzierbar. Dann gilt für \(x \in (a,b)\) und \(h > 0 \) mit \(x + h \in [a,b]\) mit Hilfe der Taylorentwicklung:
 \begin{equation}
   f(x + h) = \sum_{n=0}^{\infty}\frac{f^{n}(x)}{n!}h^{n} = f(x) + f^{\prime}(x)h + \sum_{n=2}^{\infty}\frac{f^{n}(x)}{n!}h^{n}
 \end{equation}
@@ -187,40 +187,91 @@ bzw. für \(x - h \in [a,b]\)
 \end{equation}
 folgt
 \[ D_{h, l}^{(1)}f(x) := \frac{f(x) - f(x - h)}{h} = f^{\prime}(x) - \sum_{n=2}^{\infty}\frac{f^{n}(x)}{n!}(-h)^{n} = f^{\prime}(x) + \mathcal{O}(h)\]
-Die Subtraktion von (2) von (1) führt zu
-\[ D_{h, c}^{(1)}f(x) := \frac{f(x + h) - f(x - h)}{2h} = f^{\prime}(x) + \frac{f^{\prime\prime\prime}(x)}{6}h^{2} = f^{\prime}(x) + \mathcal{O}(h^{2})\]
-und die Addition von (1) und (2) zu
+Die Addition von (1) und (2) zu
 \[ D_{h}^{(2)}f(x) := \frac{f(x + h) -2f(x) + f(x - h)}{h^2} = f^{\prime\prime}(x) + \frac{f^{(4)}(x)h^{2}}{3 \cdot 4} = f^{\prime}(x) + \mathcal{O}(h^{2})\]
+und die Subtraktion von (2) von (1) führt zu
+\[ D_{h, c}^{(1)}f(x) := \frac{f(x + h) - f(x - h)}{2h} = f^{\prime}(x) + \frac{f^{\prime\prime\prime}(x)}{6}h^{2} = f^{\prime}(x) + \mathcal{O}(h^{2})\] \cite{NumericalDifferentiation}
+
 
 \(D_{h, r}^{(1)}f(x), D_{h, l}^{(1)}f(x) \text{ und } D_{h, c}^{(1)}f(x)\) bezeichen die erste rechtsseitige, linksseitige und zentrale finite Differenz von \(f\).
 \(D_{h}^{(2)}f(x)\) bezeichnet die zweite finite Differenz von \(f\).
 
 Damit erhält man eine Näherung des Approximationsfehlers in der Maximumsnorm mit \(p \in \mathbb{N} \text{ und } x_{i} := a + i\cdot\frac{|(b - a)|}{p}\) durch
-\[e_{f}^{k}(h) := \underset{i = 0, \dots p}{max}|(f^{(k)}(x_{i}) - D_{h}^{(k)}f(x_{i}))|\]
+\[e_{f}^{k}(h) := \underset{i = 0, \dots p}{max}|(f^{(k)}(x_{i}) - D_{h}^{(k)}f(x_{i}))|\] %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE HERE AS WELL
+
+\subsection{Computerarithmetik}
+
+%%TO DOCITE VL_ewr_2024 in PPI MOODLE COURSE
+
+Computer stellen Zahlen mit Hilfe von Bits dar, die entweder den Zustand 0 oder 1 annehmen. Daher werden reelle Zahlen auf Computern in binär dargestellt.
+Da die zur Verfügung stehende Anzahl an Bits je nach Datentyp variieren und beschränkt sind kann nur eine Teilmenge \(\mathcal{M} \subset \mathbb{R}\), die Menge der Maschinenzahlen,
+von Computern dargestellt werden. Daher kann es sein, dass die Addition zweier Maschinenzahlen keine Maschinenzahl ist, und deshalb vom Computer zur nächstgelegenen 
+Maschinenzahl gerundet wird. Subtrahiert man zwei betragsmäßig ungefähr gleich große Zahlen kommt es daher zu einem hohen relativen Fehler des Ergebnisses. Dieses Phänomen wird
+Auslöschung genannt.
 
 \section{Experimente}
-Für unsere Experimente haben wir uns die Funktion \(f(x) = \frac{sin(x)}{x}\) auf dem Intervall \(I :=[\pi, 3\pi]\) angeschaut. Offensichtlich is \(f\) auf \(I\) differenzierbar, also
+Für unsere Experimente haben wir uns die Funktion \(f(x) \coloneq \frac{sin(x)}{x}\) auf dem Intervall \(I \coloneq [\pi, 3\pi]\) angeschaut. Offensichtlich ist \(f\) auf \(I\) unendlich oft differenzierbar, also
 lassen sich die im Theorie Teil dargestellten Methoden hier nutzen.
 
 Einerseits haben wir die Graphen der exakten ersten und zweiten Ableitung mit den Graphen der Approximationen für verschiedene Werte von \(h\) verglichen.
 
 %%TODO ADD FIGURE
 
-Was wir uns ebenfalls angeschaut haben, ist der Approximationsfehler \(e_{f}^{k}(h)\) für die verschiedenen finiten Differenz, indem wir den Fehler, für ein Intervall
+Was wir uns ebenfalls angeschaut haben, ist der Approximationsfehler \(e_{f}^{(k)}(h)\) für die verschiedenen finiten Differenz, indem wir den Fehler, für ein Intervall
 was von sehr kleinen bis zu sehr großen Werten von \(h\) reicht, geplottet haben.
 
 %%TODO ADD FIGURE
 
-
+%%TODO ADD BEOBACHTUNGEN
 
 
 \section{Auswertung}
+Im folgenden Abschnitt wollen wir uns mit der Auswertung unserer Experimente
+befassen und vergleichen, ob sie auch mit der Theorie übereinstimmen.
+
+
+%%TO DO IM GRAPHEN WERTE ABLESEN UND FÜR "PLACEHOLDER" EINFÜGEN
+
+\begin{itemize}
+
+  \item %%TO DO ADD SHORT SENTENCE FOR GRAPHICAL COMPARISONS OFF FINITE DIFFERENCES AND DERIVATIVES
+ 
+  \item Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{ PLACEHOLDER } \)
+        so sieht man, dass der Fehler für die erste linke und rechte Finite Differenz, parallel zu \(h \mapsto h\)
+        liegt, und damit der Theorie und der Fehlerabschätzung von \(\mathcal{O}(h)\) entspricht. \\
+        Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{ PLACEHOLDER } \) 
+        so ist der Fehler der ersten zentralen finiten Differenz parallel zu \(h \mapsto h^{2}\) und enspricht damit der in der Theorie vorhergesagten
+        Fehlerabschätzung von \(\mathcal{O}(h^{2})\). \\
+        Auch für die zweite finite Differenz ist zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{ PLACEHOLDER }\) das erwartete Verhalten, also Parallelität zu
+        \(h \mapsto h^{2}\) zu sehen und entspricht damit der theoretischen Fehlerabschätzung \(\mathcal{O}(h^{2})\) .
+  \item Für \(h > 10^{ PLACEHOLDER } \) werden die Approximationsfehler von \(D_{h, r}^{(1)}f(x), D_{h, l}^{(1)}f(x)\)  konstant und für 
+        \(h < 10^{ PLACEHOLDER } \) steigen beide wieder an und werden ab \(h \approx  PLACEHOLDER \) ebenfalls konstant. \\
+        Der Approximationsfehler \(D_{h, c}^{(1)}f(x)\) weist ähnliches Verhalten wie die beiden anderen ersten finiten Differenzen auf und wird ab ungefähr denselben
+        Werten konstant, fängt jedoch bereits ab einem Wert von \(h \approx PLACEHOLDER\) an von der erwarten Fehlerabschätzung \(\mathcal{O}(h^{2})\) abzuweichen.
+  \item
+        %%TO DO ADD SECOND FINITE DIFFERENCE HERE
+
+\end{itemize}
+Dieses von der Theorie abweichende Verhalten erklären wir uns mit Hilfe der Auslöschung von Computerzahlen. Für sehr kleine Werte von h sind
+\(f(x + h)\), \(f(x - h)\) und \(f(x)\) betragsweiße in etwa gleich groß und daher wird die Differenzen dieser einen relativ großen Fehler aufweisen. \\
+Da man in den finiten Differenzen durch \(h\) bzw \(h^{2}\) teilt, passiert etwas ähnliches wenn man diesen Wert groß genug wählt und zwar, werden diese dann auf 0 abgerundet,
+weshalb der Fehler auch dort konstant wird.
 
 
 
 \section{Zusammenfassung}
+Untersucht wurde die Funktion \(f(x) = \frac{sin(x)}{x}\) auf dem Intervall \(I = [\pi, 3\pi]\).
+Zuerst haben wir die tatsächlichen Ableitungen graphisch mit den Finiten Differenzen verglichen. Wie theoretisch vorhersagt 
+haben wir gesehen, dass die Graphen der finiten Differenzen, für kleiner werdende Werte von h, immer mehr dem Graphen
+der jeweiligen tasächlichen Ableitung entsprechen.
 
-
+Außerdem haben wir eine Näherung des Approximationsfehlers betrachtet und in einem doppelt logarithmisch skalierten Plot für 
+Werte von h zwischen 
+%%TO DO HIER KLEINSTER UND GRÖSSTER WERT VON h EINFÜGEN
+geplottet. Für gewisse Intervalle wurden die, in der Theorie, vorhergesagten Fehlerabschätzungen von \(\mathcal{O}(h)\) für die erste rechtsseitige und linksseitige finite Differenz bzw.
+\(\mathcal{O}(h^{2})\) für die erste zentrale und zweite finite Differenz beobachtet.
+Außerhalb dieser Intervalle entsprach der Fehler nicht mehr der Theorie, was an der Computerarithmetik und dem Phänomen
+der Auslöschung liegt.
 
 
 \printbibliography
