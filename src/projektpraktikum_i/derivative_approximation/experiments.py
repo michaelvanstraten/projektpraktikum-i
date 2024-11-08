@@ -31,7 +31,7 @@ def cli(ctx, save_path):
     """
     ctx.ensure_object(dict)
     ctx.obj["SAVE_PATH"] = save_path
-    plt.style.use("dark_background")
+    # plt.style.use("dark_background")
 
 
 # Input interval option decorator
@@ -82,10 +82,10 @@ def plot_compare_command(ctx, approximation_type, input_interval):
     # Plot true derivative based on the selected approximation type
     if approximation_type == "second":
         analytical_values = dd_f(x_values)
-        analytical_label = "$g''(x)$"
+        analytical_label = "$f''(x)$"
     else:
         analytical_values = d_f(x_values)
-        analytical_label = "$g'(x)$"
+        analytical_label = "$f'(x)$"
     plt.plot(x_values, analytical_values, label=analytical_label, color="grey")
 
     # Plot finite difference approximations for each step size
