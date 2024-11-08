@@ -1,8 +1,10 @@
 # pytest test run cache
 .pytest_cache
 .ruff_cache
+
 # Python bytecode cache
 __pycache__
+
 # Latexmk/Latex Files
 *.aux
 *.pdf
