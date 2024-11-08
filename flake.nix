@@ -157,6 +157,7 @@
           {
             default = pkgs.mkShell {
               packages = pre-commit-check.enabledPackages ++ [
+                pkgs.uv
                 self.formatter.${system}
                 virtualenv
               ];
