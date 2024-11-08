@@ -1,159 +1,50 @@
 \documentclass{scrartcl}
-\usepackage{scrhack}  % resolves deprecated warnings in context of float and KOMA
 
-%%% GENERAL PACKAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% inputenc allows the usage of non-ascii characters in the LaTeX source code
-\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{biblatex}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{mathtools}
 
-
-%%% KOMA OPTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\KOMAoptions{
-  % font size in pt
-  fontsize=12,
-  % parameter for size of type area, cf. KOMA script documentation
-  DIV=13,
-  % option for two-sided documents : false, semi, true
-  twoside=false,
-  % option for paragraph skip :
-  %   false - indent, without vertical space between two paragraphs
-  %   true  - vertical space between two paragraphs, without indent
-  parskip=true,
-  % print 'chapter' before the chapter number
-  chapterprefix=true,
-  % option to generate a draft version
-  draft=false
-}
-
-
-%%% TITLEPAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% general description of the type of the document
 \subject{Bericht Handout}
-% head line of the title page, here with department and logo
 \titlehead{%
-  \begin{minipage}{.7\textwidth}%
-  Humboldt-Universit\"at zu Berlin\\
-  Mathematisch-Naturwissenschaftliche Fakult\"at\\
-  Institut f\"ur Mathematik
+  \begin{minipage}{.7\textwidth}
+  Humboldt-Universität zu Berlin\\
+  Mathematisch-Naturwissenschaftliche Fakultät\\
+  Institut für Mathematik
   \end{minipage}
 }
-% title of the document
-\title{Fehleranalyse der Finiten Differenzen Methode zum Approximieren der ersten und zweiten Ableitung}
-% optional subtitle
-%\subtitle{Draft from~\today}
-% information about the author
+\title{Fehleranalyse der finiten Differenzen Methode zum Approximieren der ersten und zweiten Ableitung}
 \author{%
-  Eingereicht von Autor, M. van Straten und P. Merz
+  eingereicht von Autor, M. van Straten und P. Merz
 }
-% date of submission
 \date{\today}
 
+\newcommand{\BigO}{\mathcal{O}}
+\newcommand{\field}[1]{\mathbb{#1}}
+\newcommand{\nats}{\field{N}}
+\newcommand{\reals}{\field{R}}
 
+\DeclareMathOperator{\Span}{Span}
 
-%%% LANGUAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% babel provides hyphenation patterns and translations of keywords like 'table
-% of contents'
-\usepackage[ngerman]{babel}
+\DeclarePairedDelimiterXPP{\abs}[1]
+    {}
+    {\lvert}{\rvert}
+    {}
+    {\ifblank{#1}{\anyarg}{#1}}
 
-\usepackage{mathtools}
-%%% MATH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% amsmath provides commands for type-setting mathematical formulas
-\usepackage{amsmath}
-% amssymb provides additional symbols
-\usepackage{amssymb}
-% HINT
-% Use http://detexify.kirelabs.org/classify.html to find unknown symbols!
-
-\usepackage{cite}
-
-%%% MATH ENVIRONMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% amsthm provides environments for typical math text structure
-\usepackage{amsthm}
 \theoremstyle{remark}
 \newtheorem*{bemerkung}{Bemerkung}
 
+\parskip = \baselineskip
+\parindent = 0pt
 
-%%% COLORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% define own colors and use colored text
-\usepackage[pdftex,svgnames,hyperref]{xcolor}
+\addbibresource{handout.bib}
 
-
-%%% FONT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% choose latin modern font (a good general purpose font)
-\usepackage{lmodern}
-% fontenc and microtype improve the appearance of the font
-\usepackage[T1]{fontenc}
-\usepackage{microtype}
-
-
-%%% HYPERLINKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% automatic generation of hyperlinks for references and URIs
-\usepackage{hyperref}
-
-
-%%% GRAPHICAL ELEMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% provides commands to include graphics
-\usepackage{graphicx}
-
-
-%%% TABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% provides commands for good-looking tables
-\usepackage{booktabs}
-
-%%%% more fonts: e.g. fraktur
-\usepackage{yfonts}
-
-%%% Code Listings %%%%%%%%%%%%%%%%
-% provides commands for including code (python, latex, ...)
-\usepackage{listings}
-\definecolor{keywords}{RGB}{255,0,90}
-\definecolor{comments}{RGB}{0,0,113}
-\definecolor{red}{RGB}{160,0,0}
-\definecolor{green}{RGB}{0,150,0}
-\lstset{language=Python, 
-        basicstyle=\ttfamily\small, 
-        keywordstyle=\color{keywords},
-        commentstyle=\color{comments},
-        stringstyle=\color{red},
-        showstringspaces=false,
-        identifierstyle=\color{green},
-        }
-
-%%%% Grafiken zeichnen mit tikz
-\usepackage{tikz}
-% Definitionen f\"ur das Flowchart
-\usetikzlibrary{shapes.geometric, arrows, shapes.multipart}
-\tikzstyle{startstop} = [ellipse, minimum width=2.5cm, minimum height=0.8cm, 
-	align = left,text centered, draw=black, fill=red!30]
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110,
-	minimum width=2.5cm, minimum height=0.8cm, align = left, text centered, 
-	draw=black, fill=blue!30]
-\tikzstyle{process} = [rectangle, minimum width=2.5cm, minimum height=0.8cm, 
-	align = left, text centered, draw=black, fill=gray!30]
-\tikzstyle{err} = [rectangle, minimum width=2.5cm, minimum height=0.8cm, 
-	align = left, text centered, draw=black, fill=red!10,text width=3cm]
-\tikzstyle{subrout} = [rectangle split,rectangle split horizontal,
-	minimum width=2.5cm, minimum height=0.8cm,align = left, text centered, 
-	draw=black, fill=orange!30,rectangle split parts=3]
-\tikzstyle{decision} = [diamond,shape aspect=2.5, minimum width=2.5cm, 
-	minimum height=0.8cm, align = left, text centered, draw=black, 
-	fill=green!30]
-\tikzstyle{arrow} = [thick,->,>=stealth]
-
-
-
-
-%%% MY USER-DEFINED COMMANDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% define your own commands and abbreviations with \newcommand
-% or \DeclareMathOperator
-% e.g. try \R and \Span in math mode
-\newcommand\R{\mathbb R}
-\DeclareMathOperator\Span{span}
-
-
-%%% BEGIN OF DOCUMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% the type-setting of the document starts here
 \begin{document}
-
 % generating the title page
 \maketitle
 % generating the table of contents (requires to run pdflatex twice!)
@@ -161,118 +52,183 @@
 % start a new page
 \cleardoublepage
 
-
-%%% BEGIN OF CONTENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Einleitung und Motivation}
-Finite Differenzen sind ein grundlegendes Werkzeug der numerischen Mathematik, denn sie bieten die 
-Möglichkeit Ableitungen erster und höherer Ordnung durch diskrete Punkte zu approximieren.
-Diese Methode beruht auf der Idee, dass Ableitungen als Grenzwert von Differenzenquotienten dargestellt werden
-können und ersetzt den Grenzwert durch eineN diskreten, meistens sehr kleinen, Wert.
-Diese Finiten Differenzen können benutzt werden um gewöhnliche, wie auch partielle Differentialgleichung 
-numerisch zu lösen. Dadurch finden finite Differenzen Anwendung in vielen Fachbereichen wie zum Beispiel der 
-Physik oder dem Ingenieurswesen. \cite{FiniteDifferenzen} 
-
+Finite Differenzen sind ein grundlegendes Werkzeug der numerischen Mathematik,
+denn sie bieten die Möglichkeit Ableitungen erster und höherer Ordnung durch
+diskrete Punkte zu approximieren. Diese Methode beruht auf der Idee, dass
+Ableitungen als Grenzwert von Differenzenquotienten dargestellt werden können
+und ersetzt den Grenzwert durch einen diskreten, meistens sehr kleinen, Wert.
+Diese finiten Differenzen können benutzt werden um gewöhnliche, wie auch
+partielle Differenzialgleichung numerisch zu lösen. Dadurch finden finite
+Differenzen Anwendung in vielen Fachbereichen wie zum Beispiel der Physik oder
+dem Ingenieurswesen. \cite{FiniteDifferenzen}
 
 \section{Theorie}
+
 \subsection{Finite Differenzen} %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE FOR THEORETICAL PART RIGHT HERE
-Sei \(f\) auf einem Intervall \([a,b]\) unendlich oft differenzierbar. Dann gilt für \(x \in (a,b)\) und \(h > 0 \) mit \(x + h \in [a,b]\) mit Hilfe der Taylorentwicklung:
-\begin{equation}
-  f(x + h) = \sum_{n=0}^{\infty}\frac{f^{n}(x)}{n!}h^{n} = f(x) + f^{\prime}(x)h + \sum_{n=2}^{\infty}\frac{f^{n}(x)}{n!}h^{n}
+Sei \(f\) auf einem Intervall \([a,b]\) unendlich oft differenzierbar. Dann
+gilt für \(x \in (a,b)\) und \(h > 0\) mit \(x + h \in [a,b]\) mithilfe der
+Taylorentwicklung:
+\begin{equation} \label{theory:eq:1}
+    f(x + h)
+    = \sum_{n=0}^{\infty} \frac{f^n(x)}{n!} h^n
+    = f(x) + f^\prime(x) h + \sum_{n=2}^\infty \frac{f^n(x)}{n!} h^n
 \end{equation}
 und damit
-\[ D_{h, r}^{(1)}f(x) := \frac{f(x + h) - f(x)}{h} = f^{\prime}(x) + \sum_{n=2}^{\infty}\frac{f^{n}(x)}{n!}h^{n} = f^{\prime}(x) + \mathcal{O}(h)\]
+\[
+    D_{h, r}^{(1)} f(x)
+    \coloneq \frac{f(x + h) - f(x)}{h}
+    = f^\prime(x) + \sum_{n=2}^\infty \frac{f^n(x)}{n!} h^n
+    = f^\prime(x) + \BigO(h)
+\]
 bzw. für \(x - h \in [a,b]\)
-\begin{equation}
-  f(x - h) = \sum_{n=0}^{\infty}\frac{f^{n}(x)}{n!}(-h)^{n} = f(x) - f^{\prime}(x)h + \sum_{n=2}^{\infty}\frac{f^{n}(x)}{n!}(-h)^{n}
+\begin{equation} \label{theory:eq:2}
+    f(x - h)
+    = \sum_{n=0}^\infty \frac{f^n(x)}{n!} {(-h)}^n
+    = f(x) - f^{\prime}(x)h + \sum_{n=2}^\infty \frac{f^n(x)}{n!} {(-h)}^n
 \end{equation}
 folgt
-\[ D_{h, l}^{(1)}f(x) := \frac{f(x) - f(x - h)}{h} = f^{\prime}(x) - \sum_{n=2}^{\infty}\frac{f^{n}(x)}{n!}(-h)^{n} = f^{\prime}(x) + \mathcal{O}(h)\]
-Die Addition von (1) und (2) zu
-\[ D_{h}^{(2)}f(x) := \frac{f(x + h) -2f(x) + f(x - h)}{h^2} = f^{\prime\prime}(x) + \frac{f^{(4)}(x)h^{2}}{3 \cdot 4} = f^{\prime}(x) + \mathcal{O}(h^{2})\]
-und die Subtraktion von (2) von (1) führt zu
-\[ D_{h, c}^{(1)}f(x) := \frac{f(x + h) - f(x - h)}{2h} = f^{\prime}(x) + \frac{f^{\prime\prime\prime}(x)}{6}h^{2} = f^{\prime}(x) + \mathcal{O}(h^{2})\] \cite{NumericalDifferentiation}
+\[
+    D_{h, l}^{(1)} f(x)
+    \coloneq \frac{f(x) - f(x - h)}{h}
+    = f^\prime(x) - \sum_{n=2}^\infty \frac{f^n(x)}{n!} {(-h)}^n
+    = f^\prime(x) + \BigO(h).
+\]
+Die Addition von \autoref{theory:eq:1} und \autoref{theory:eq:2} zu
+\[
+    D_h^{(2)} f(x)
+    \coloneq \frac{f(x + h) - 2 \cdot f(x) + f(x - h)}{h^2}
+    = f^{\prime\prime}(x) + \frac{f^{(4)}(x) h^2}{3 \cdot 4}
+    = f^\prime(x) + \BigO(h^2)
+\]
+und die Subtraktion von \autoref{theory:eq:2} von \autoref{theory:eq:1} führt
+  zu
+\[
+    D_{h, c}^{(1)} f(x)
+    \coloneq \frac{f(x + h) - f(x - h)}{2h}
+    = f^\prime(x) + \frac{f^{\prime\prime\prime}(x)}{6} h^2
+    = f^\prime(x) + \BigO(h^2).
+\] \cite{NumericalDifferentiation}
 
+\(D_{h, r}^{(1)} f(x)\), \(D_{h, l}^{(1)} f(x)\) und \(D_{h, c}^{(1)} f(x)\)
+bezeichnen die erste rechtsseitige, linksseitige und zentrale finite Differenz von \(f\).
+\(D_{h}^{(2)} f(x)\) bezeichnet die zweite finite Differenz von \(f\).
 
-\(D_{h, r}^{(1)}f(x), D_{h, l}^{(1)}f(x) \text{ und } D_{h, c}^{(1)}f(x)\) bezeichen die erste rechtsseitige, linksseitige und zentrale finite Differenz von \(f\).
-\(D_{h}^{(2)}f(x)\) bezeichnet die zweite finite Differenz von \(f\).
-
-Damit erhält man eine Näherung des Approximationsfehlers in der Maximumsnorm mit \(p \in \mathbb{N} \text{ und } x_{i} := a + i\cdot\frac{|(b - a)|}{p}\) durch
-\[e_{f}^{k}(h) := \underset{i = 0, \dots p}{max}|(f^{(k)}(x_{i}) - D_{h}^{(k)}f(x_{i}))|\] %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE HERE AS WELL
+Damit erhält man eine Näherung des Approximationsfehlers in der Maximumsnorm
+mit \(p \in \nats\) und
+\[
+    x_{i} \coloneq a + i \cdot \frac{\abs{(b - a)}}{p}
+\]
+durch
+\[
+    e_f^k(h) \coloneq \max_{i = 0, \dots p} \abs*{f^{(k)}(x_i) - D_h^{(k)} f(x_i)}
+\] %%TO DO CITE PPI _FD.pdf in PPI MOODLE COURSE HERE AS WELL
 
 \subsection{Computerarithmetik}
 
 %%TO DOCITE VL_ewr_2024 in PPI MOODLE COURSE
 
-Computer stellen Zahlen mit Hilfe von Bits dar, die entweder den Zustand 0 oder 1 annehmen. Daher werden reelle Zahlen auf Computern in binär dargestellt.
-Da die zur Verfügung stehende Anzahl an Bits je nach Datentyp variieren und beschränkt sind kann nur eine Teilmenge \(\mathcal{M} \subset \mathbb{R}\), die Menge der Maschinenzahlen,
-von Computern dargestellt werden. Daher kann es sein, dass die Addition zweier Maschinenzahlen keine Maschinenzahl ist, und deshalb vom Computer zur nächstgelegenen 
-Maschinenzahl gerundet wird. Subtrahiert man zwei betragsmäßig ungefähr gleich große Zahlen kommt es daher zu einem hohen relativen Fehler des Ergebnisses. Dieses Phänomen wird
+Computer stellen Zahlen mithilfe von Bits dar, die entweder den Zustand 0 oder
+1 annehmen. Daher werden reelle Zahlen auf Computern in binär dargestellt. Da
+die zur Verfügung stehende Anzahl an Bits je nach Datentyp variieren und
+beschränkt sind kann nur eine Teilmenge \(\mathcal{M} \subset \reals\), die
+Menge der Maschinenzahlen, von Computern dargestellt werden. Daher kann es
+sein, dass die Addition zweier Maschinenzahlen keine Maschinenzahl ist, und
+deshalb vom Computer zur nächstgelegenen Maschinenzahl gerundet wird.
+Subtrahiert man zwei betragsmäßig ungefähr gleich große Zahlen kommt es daher
+zu einem hohen relativen Fehler des Ergebnisses. Dieses Phänomen wird
 Auslöschung genannt.
 
 \section{Experimente}
-Für unsere Experimente haben wir uns die Funktion \(f(x) \coloneq \frac{sin(x)}{x}\) auf dem Intervall \(I \coloneq [\pi, 3\pi]\) angeschaut. Offensichtlich ist \(f\) auf \(I\) unendlich oft differenzierbar, also
-lassen sich die im Theorie Teil dargestellten Methoden hier nutzen.
+Für unsere Experimente haben wir uns die Funktion
+\[
+    f(x) \coloneq \frac{\sin(x)}{x}
+\]
+auf dem Intervall \(I \coloneq [\pi, 3 \pi]\) angeschaut. Offensichtlich ist
+  \(f\) auf \(I\) unendlich oft differenzierbar, also lassen sich die im
+  Theorie Teil dargestellten Methoden hier nutzen.
 
-Einerseits haben wir die Graphen der exakten ersten und zweiten Ableitung mit den Graphen der Approximationen für verschiedene Werte von \(h\) verglichen.
+Einerseits haben wir die Graphen der exakten ersten und zweiten Ableitung mit
+den Graphen der Approximationen für verschiedene Werte von \(h\) verglichen.
 
 %%TODO ADD FIGURE
 
-Was wir uns ebenfalls angeschaut haben, ist der Approximationsfehler \(e_{f}^{(k)}(h)\) für die verschiedenen finiten Differenz, indem wir den Fehler, für ein Intervall
-was von sehr kleinen bis zu sehr großen Werten von \(h\) reicht, geplottet haben.
+Was wir uns ebenfalls angeschaut haben, ist der Approximationsfehler
+\(e_{f}^{(k)}(h)\) für die verschiedenen finiten Differenz, indem wir den
+Fehler, für ein Intervall was von sehr kleinen bis zu sehr großen Werten von
+\(h\) reicht, geplottet haben.
 
 %%TODO ADD FIGURE
 
 %%TODO ADD BEOBACHTUNGEN
 
-
 \section{Auswertung}
 Im folgenden Abschnitt wollen wir uns mit der Auswertung unserer Experimente
 befassen und vergleichen, ob sie auch mit der Theorie übereinstimmen.
 
-
 %%TO DO IM GRAPHEN WERTE ABLESEN UND FÜR "PLACEHOLDER" EINFÜGEN
 
 \begin{itemize}
+    \item %%TO DO ADD SHORT SENTENCE FOR GRAPHICAL COMPARISONS OFF FINITE DIFFERENCES AND DERIVATIVES
 
-  \item %%TO DO ADD SHORT SENTENCE FOR GRAPHICAL COMPARISONS OFF FINITE DIFFERENCES AND DERIVATIVES
- 
-  \item Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{ PLACEHOLDER } \)
-        so sieht man, dass der Fehler für die erste linke und rechte Finite Differenz, parallel zu \(h \mapsto h\)
-        liegt, und damit der Theorie und der Fehlerabschätzung von \(\mathcal{O}(h)\) entspricht. \\
-        Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{ PLACEHOLDER } \) 
-        so ist der Fehler der ersten zentralen finiten Differenz parallel zu \(h \mapsto h^{2}\) und enspricht damit der in der Theorie vorhergesagten
-        Fehlerabschätzung von \(\mathcal{O}(h^{2})\). \\
-        Auch für die zweite finite Differenz ist zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{ PLACEHOLDER }\) das erwartete Verhalten, also Parallelität zu
-        \(h \mapsto h^{2}\) zu sehen und entspricht damit der theoretischen Fehlerabschätzung \(\mathcal{O}(h^{2})\) .
-  \item Für \(h > 10^{ PLACEHOLDER } \) werden die Approximationsfehler von \(D_{h, r}^{(1)}f(x), D_{h, l}^{(1)}f(x)\)  konstant und für 
-        \(h < 10^{ PLACEHOLDER } \) steigen beide wieder an und werden ab \(h \approx  PLACEHOLDER \) ebenfalls konstant. \\
-        Der Approximationsfehler \(D_{h, c}^{(1)}f(x)\) weist ähnliches Verhalten wie die beiden anderen ersten finiten Differenzen auf und wird ab ungefähr denselben
-        Werten konstant, fängt jedoch bereits ab einem Wert von \(h \approx PLACEHOLDER\) an von der erwarten Fehlerabschätzung \(\mathcal{O}(h^{2})\) abzuweichen.
-  \item
-        %%TO DO ADD SECOND FINITE DIFFERENCE HERE
+    \item Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{
+          PLACEHOLDER } \) so sieht man, dass der Fehler für die erste linke
+          und rechte finite Differenz, parallel zu \(h \mapsto h\) liegt, und
+          damit der Theorie und der Fehlerabschätzung von \(\BigO(h)\)
+          entspricht.
 
+          Liegt \(h\) zwischen \(10^{ PLACEHOLDER } \text{ und } 10^{
+          PLACEHOLDER } \) so ist der Fehler der ersten zentralen finiten
+          Differenz parallel zu \(h \mapsto h^2\) und entspricht damit der in
+          der Theorie vorhergesagten Fehlerabschätzung von \(\BigO(h^2)\).
+
+          Auch für die zweite finite Differenz ist zwischen \(10^{ PLACEHOLDER
+          } \text{ und } 10^{ PLACEHOLDER }\) das erwartete Verhalten, also
+          Parallelität zu \(h \mapsto h^2\) zu sehen und entspricht damit der
+          theoretischen Fehlerabschätzung \(\BigO(h^2)\).
+
+    \item Für \(h > 10^{ PLACEHOLDER } \) werden die Approximationsfehler von
+          \(D_{h, r}^{(1)}f(x), D_{h, l}^{(1)}f(x)\) konstant und für \(h <
+          10^{ PLACEHOLDER } \) steigen beide wieder an und werden ab \(h
+          \approx PLACEHOLDER \) ebenfalls konstant.
+
+          Der Approximationsfehler \(D_{h, c}^{(1)}f(x)\) weist ähnliches
+          Verhalten wie die beiden anderen ersten finiten Differenzen auf und
+          wird ab ungefähr denselben Werten konstant, fängt jedoch bereits ab
+          einem Wert von \(h \approx PLACEHOLDER\) an von der erwarten
+          Fehlerabschätzung \(\BigO(h^{2})\) abzuweichen. \item
+          %%TO DO ADD SECOND FINITE DIFFERENCE HERE
 \end{itemize}
-Dieses von der Theorie abweichende Verhalten erklären wir uns mit Hilfe der Auslöschung von Computerzahlen. Für sehr kleine Werte von h sind
-\(f(x + h)\), \(f(x - h)\) und \(f(x)\) betragsweiße in etwa gleich groß und daher wird die Differenzen dieser einen relativ großen Fehler aufweisen. \\
-Da man in den finiten Differenzen durch \(h\) bzw \(h^{2}\) teilt, passiert etwas ähnliches wenn man diesen Wert groß genug wählt und zwar, werden diese dann auf 0 abgerundet,
-weshalb der Fehler auch dort konstant wird.
 
+Dieses von der Theorie abweichende Verhalten erklären wir uns mithilfe der
+Auslöschung von Computerzahlen. Für sehr kleine Werte von h sind \(f(x + h)\),
+\(f(x - h)\) und \(f(x)\) Betrags-weiße in etwa gleich groß und daher wird die
+Differenzen dieser einen relativ großen Fehler aufweisen.
 
+Da man in den finiten Differenzen durch \(h\) bzw. \(h^2\) teilt, passiert
+etwas Ähnliches, wenn man diesen Wert groß genug wählt, und zwar, werden diese
+dann auf 0 abgerundet, weshalb der Fehler auch dort konstant wird.
 
 \section{Zusammenfassung}
-Untersucht wurde die Funktion \(f(x) = \frac{sin(x)}{x}\) auf dem Intervall \(I = [\pi, 3\pi]\).
-Zuerst haben wir die tatsächlichen Ableitungen graphisch mit den Finiten Differenzen verglichen. Wie theoretisch vorhersagt 
-haben wir gesehen, dass die Graphen der finiten Differenzen, für kleiner werdende Werte von h, immer mehr dem Graphen
-der jeweiligen tasächlichen Ableitung entsprechen.
+Untersucht wurde die Funktion
+\[
+    f(x) = \frac{\sin(x)}{x}
+\]
+auf dem Intervall \(I = [\pi, 3\pi]\). Zuerst haben wir die tatsächlichen
+  Ableitungen grafisch mit den finiten Differenzen verglichen. Wie theoretisch
+  vorhersagt haben wir gesehen, dass die Graphen der finiten Differenzen, für
+  kleiner werdende Werte von h, immer mehr dem Graphen der jeweiligen
+  tatsächlichen Ableitung entsprechen.
 
-Außerdem haben wir eine Näherung des Approximationsfehlers betrachtet und in einem doppelt logarithmisch skalierten Plot für 
-Werte von h zwischen 
+Außerdem haben wir eine Näherung des Approximationsfehlers betrachtet und in
+einem doppelt logarithmisch skalierten Plot für Werte von h zwischen
 %%TO DO HIER KLEINSTER UND GRÖSSTER WERT VON h EINFÜGEN
-geplottet. Für gewisse Intervalle wurden die, in der Theorie, vorhergesagten Fehlerabschätzungen von \(\mathcal{O}(h)\) für die erste rechtsseitige und linksseitige finite Differenz bzw.
-\(\mathcal{O}(h^{2})\) für die erste zentrale und zweite finite Differenz beobachtet.
-Außerhalb dieser Intervalle entsprach der Fehler nicht mehr der Theorie, was an der Computerarithmetik und dem Phänomen
+geplottet. Für gewisse Intervalle wurden die, in der Theorie, vorhergesagten
+Fehlerabschätzungen von \(\BigO(h)\) für die erste rechtsseitige und
+linksseitige finite Differenz bzw. \(\BigO(h^2)\) für die erste zentrale und
+zweite finite Differenz beobachtet. Außerhalb dieser Intervalle entsprach der
+Fehler nicht mehr der Theorie, was an der Computerarithmetik und dem Phänomen
 der Auslöschung liegt.
-
 
 \printbibliography
 \end{document}
