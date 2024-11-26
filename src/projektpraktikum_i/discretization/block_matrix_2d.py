@@ -26,7 +26,10 @@ class BlockMatrix:
 
     def __init__(self, n):
         if n < 2:
-            raise ValueError("n muss mindestens 2 sein")
+            raise ValueError(
+                "The parameter `n` must be at least 2. "
+                "Please provide a value `n > 1` when initializing `BlockMatrix`."
+            )
         self.n = n
 
     def get_sparse(self):
