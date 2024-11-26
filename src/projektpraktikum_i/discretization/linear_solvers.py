@@ -1,7 +1,8 @@
 import numpy as np
 
+
 def solve_lu(p, l, u, b):
-    """ Solves the linear system Ax = b via forward and backward substitution
+    """Solves the linear system Ax = b via forward and backward substitution
     given the decomposition A = p * l * u.
 
     Parameters
@@ -45,12 +46,8 @@ def solve_lu(p, l, u, b):
     return x
 
 
-
-
-def solve_sor(A, b, x0,
-              params=dict(eps=1e-8, max_iter=1000, var_x=1e-4),
-              omega=1.5):
-    """ Solves the linear system Ax = b via the successive over relaxation method.
+def solve_sor(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4), omega=1.5):
+    """Solves the linear system Ax = b via the successive over relaxation method.
 
     Parameters
     ----------
@@ -93,9 +90,8 @@ def solve_sor(A, b, x0,
     """
 
 
-def solve_gs(A, b, x0,
-             params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
-    """ Solves the linear system Ax = b via the Jacobi method.
+def solve_gs(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+    """Solves the linear system Ax = b via the Jacobi method.
 
     Parameters
     ----------
@@ -136,7 +132,7 @@ def solve_gs(A, b, x0,
 
 
 def solve_es(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
-    """ Solves the linear system Ax = b via the Gauss-Seidel method.
+    """Solves the linear system Ax = b via the Gauss-Seidel method.
 
     Parameters
     ----------
@@ -176,9 +172,8 @@ def solve_es(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
     """
 
 
-def solve_cg(A, b, x0,
-             params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
-    """ Solves the linear system Ax = b via the conjugated gradient method.
+def solve_cg(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+    """Solves the linear system Ax = b via the conjugated gradient method.
 
     Parameters
     ----------
