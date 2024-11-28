@@ -1,5 +1,9 @@
 import numpy as np
 
+from projektpraktikum_i.derivative_approximation.finite_difference import (
+    is_vectorized,
+    infinity_norm,
+)
 
 def idx(nx, n):
     """Calculates the number of an equation in the Poisson problem for
@@ -18,8 +22,8 @@ def idx(nx, n):
         Number of the corresponding equation in the Poisson problem.
     """
 
-    j, k = nx
-    return (k - 1) * (n - 1) + j
+    i, j = nx
+    return (j - 1) * (n - 1) + i
 
 
 def inv_idx(m, n):
@@ -39,9 +43,9 @@ def inv_idx(m, n):
         Coordinates of the corresponding discretization point, multiplied by n.
     """
 
+    i = (m - 1) % (n - 1) + 1
     j = (m - 1) // (n - 1) + 1
-    k = (m - 1) % (n - 1) + 1
-    return [j, k]
+    return [i, j]
 
 
 def rhs(n, f):
@@ -68,18 +72,15 @@ def rhs(n, f):
     """
 
     if n < 2:
-        raise ValueError
+        raise ValueError("TODO: better error message")
 
-    b = np.empty((n - 1) ** 2)
-    for i in range(1, n):
-        for j in range(1, n):
-            b[idx((i, j), n) - 1] = (1 / n) ** 2 * f(i / n, j / n)
+    x_1 = np.arange(1, n)
+    x = np.dstack(np.meshgrid(x_1, x_1)).reshape(-1, 2)
 
-    return b
+    if not is_vectorized(f, x):
+        f = np.vectorize(f, signature="(2)->()")
 
-
-f = lambda x, y: x * np.sin(np.pi * x) * y * np.sin(np.pi * y)
-print(rhs(5, f))
+    return f(x / n)
 
 
 def compute_error(n, hat_u, u):
@@ -103,3 +104,4 @@ def compute_error(n, hat_u, u):
     float
         maximal absolute error at the discretization points
     """
+    return np.max(np.abs(rhs(n, u), hat_u))

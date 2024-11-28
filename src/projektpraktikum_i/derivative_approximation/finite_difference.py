@@ -33,7 +33,7 @@ def is_vectorized(func: Callable, input_data: NDArray) -> bool:
             isinstance(result, np.ndarray)
             and result.shape == np.array(input_data).shape
         )
-    except TypeError:
+    except (TypeError, IndexError):
         return False
 
 
