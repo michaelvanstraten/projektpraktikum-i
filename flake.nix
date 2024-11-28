@@ -82,7 +82,7 @@
           "derivative_approximation/handout" = buildLatexmkProject {
             name = "derivative_approximation-handout";
             filename = "Handout.tex";
-            SOURCE_DATE_EPOCH = "${toString self.lastModified}";
+            SOURCE_DATE_EPOCH = toString self.lastModified;
             XDG_CACHE_HOME = "$(mktemp -d)";
             XDG_CONFIG_HOME = "$(mktemp -d)";
             XDG_DATA_HOME = "$(mktemp -d)";
@@ -99,6 +99,7 @@
         formatter = pkgs.nixfmt-rfc-style;
 
         checks = {
+          inherit (pythonSet.projektpraktikum-i.passthru.tests) pytest;
           pre-commit-hooks =
             let
               devVirtualEnv = pythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
