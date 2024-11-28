@@ -562,6 +562,7 @@ dependencies = [
     { name = "click" },
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "scipy" },
 ]
 
 [package.dev-dependencies]
@@ -585,6 +586,7 @@ requires-dist = [
     { name = "click", specifier = ">=8.1.7" },
     { name = "matplotlib", specifier = ">=3.9.2" },
     { name = "numpy", specifier = ">=1.26.4" },
+    { name = "scipy", specifier = ">=1.14.1" },
 ]
 
 [package.metadata.requires-dev]
