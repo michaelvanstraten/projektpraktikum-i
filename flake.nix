@@ -144,7 +144,7 @@
 
               editablePythonSet = pythonSet.overrideScope editableOverlay;
 
-              virtualEnv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-venv-dev" workspace.deps.all;
+              virtualEnv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
 
               preCommitHooks = self.checks.${system}.pre-commit-hooks;
             in
