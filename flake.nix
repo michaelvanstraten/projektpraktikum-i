@@ -1,5 +1,5 @@
 {
-  description = "Hello world flake using uv2nix";
+  description = "Projektpraktikum I assignments";
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
