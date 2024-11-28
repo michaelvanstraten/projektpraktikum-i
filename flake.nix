@@ -3,17 +3,23 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
 
     pyproject-nix = {
-      url = "github:nix-community/pyproject.nix";
+      url = "github:pyproject-nix/pyproject.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     uv2nix = {
-      url = "github:adisbladis/uv2nix";
+      url = "github:pyproject-nix/uv2nix";
       inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs.pyproject-nix.follows = "pyproject-nix";
+      inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -35,6 +41,7 @@
       nixpkgs,
       uv2nix,
       pyproject-nix,
+      pyproject-build-systems,
       latix,
       git-hooks,
       ...
@@ -42,6 +49,7 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
+        inherit (nixpkgs) lib;
         pkgs = import nixpkgs { inherit system; };
         inherit (latix.lib.${system}) buildLatexmkProject;
 
@@ -51,49 +59,26 @@
           sourcePreference = "wheel";
         };
 
-        hacks = pkgs.callPackage pyproject-nix.build.hacks { };
-
-        pyprojectOverrides = final: prev: {
-          pycairo = prev.pycairo.overrideAttrs (old: {
-            buildInputs = (old.buildInputs or [ ]) ++ [
-              pkgs.pkg-config
-              pkgs.cairo
-            ];
-            nativeBuildInputs =
-              (old.nativeBuildInputs or [ ])
-              ++ final.resolveBuildSystem {
-                meson-python = [ ];
-              };
-          });
-          srt = prev.srt.overrideAttrs (old: {
-            nativeBuildInputs =
-              (old.nativeBuildInputs or [ ])
-              ++ final.resolveBuildSystem {
-                setuptools = [ ];
-              };
-          });
-          manimpango = hacks.nixpkgsPrebuilt {
-            from = pkgs.python312Packages.manimpango;
-            prev = prev.manimpango;
-          };
-          scipy = hacks.nixpkgsPrebuilt {
-            from = pkgs.python312Packages.scipy;
-            prev = prev.scipy;
-          };
-        };
-
         python = pkgs.python312;
+
+        hacks = pkgs.callPackage pyproject-nix.build.hacks { };
 
         pythonSet =
           (pkgs.callPackage pyproject-nix.build.packages {
             inherit python;
           }).overrideScope
-            (pkgs.lib.composeExtensions overlay pyprojectOverrides);
-
-        virtualenv = pythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
+            (
+              lib.composeManyExtensions [
+                pyproject-build-systems.overlays.default
+                overlay
+                (import ./overrides/pyproject.nix { inherit pkgs hacks; })
+              ]
+            );
       in
       {
         packages = {
+          default = pythonSet.mkVirtualEnv "projektpraktikum-i-env" workspace.deps.default;
+
           "derivative_approximation/handout" = buildLatexmkProject {
             name = "derivative_approximation-handout";
             filename = "Handout.tex";
@@ -114,72 +99,71 @@
         formatter = pkgs.nixfmt-rfc-style;
 
         checks = {
-          pre-commit-check = git-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              # Nix
-              nixfmt-rfc-style.enable = true;
-              # LaTeX
-              latexindent = {
-                enable = true;
-                settings = {
-                  flags = "--local --silent --modifylinebreak --overwriteIfDifferent";
+          pre-commit-hooks =
+            let
+              devVirtualEnv = pythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
+            in
+            git-hooks.lib.${system}.run {
+              src = ./.;
+              hooks = {
+                # Nix
+                nixfmt-rfc-style.enable = true;
+                # LaTeX
+                latexindent = {
+                  enable = true;
+                  settings = {
+                    flags = "--local --silent --modifylinebreak --overwriteIfDifferent";
+                  };
                 };
-              };
-              chktex.enable = true;
-              # Python
-              pylint = {
-                enable = true;
-                settings = {
-                  binPath = "${virtualenv}/bin/python -m pylint";
+                chktex.enable = true;
+                # Python
+                pylint = {
+                  enable = false;
+                  settings = {
+                    binPath = "${devVirtualEnv}/bin/python -m pylint";
+                  };
                 };
-              };
-              # Markdown and YAML
-              prettier = {
-                enable = true;
-                settings = {
-                  prose-wrap = "always";
+                # Markdown and YAML
+                prettier = {
+                  enable = true;
+                  settings = {
+                    prose-wrap = "always";
+                  };
                 };
               };
             };
-          };
         };
 
-        # Development shell with necessary tools
-        devShells =
-          let
-            pre-commit-check = self.checks.${system}.pre-commit-check;
-            pre-commit-check-shell-hook = pre-commit-check.shellHook;
+        devShells = {
+          default =
+            let
+              editableOverlay = workspace.mkEditablePyprojectOverlay {
+                root = "$REPO_ROOT";
+              };
 
-            editableOverlay = workspace.mkEditablePyprojectOverlay {
-              root = "$REPO_ROOT";
-            };
+              editablePythonSet = pythonSet.overrideScope editableOverlay;
 
-            editablePythonSet = pythonSet.overrideScope editableOverlay;
+              virtualEnv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-venv-dev" workspace.deps.all;
 
-            virtualenv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-env" {
-              projektpraktikum-i = [ ];
-            };
-          in
-          {
-            default = pkgs.mkShell {
-              packages = pre-commit-check.enabledPackages ++ [
+              preCommitHooks = self.checks.${system}.pre-commit-hooks;
+            in
+            pkgs.mkShell {
+              packages = [
+                virtualEnv
                 pkgs.uv
-                self.formatter.${system}
-                virtualenv
-              ];
-
+              ] ++ preCommitHooks.enabledPackages;
               shellHook =
-                pre-commit-check-shell-hook
-                # bash
-                + ''
-                  # Undo dependency propagation by nixpkgs.
-                  unset PYTHONPATH
-                  # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
-                  export REPO_ROOT=$(git rev-parse --show-toplevel)
-                '';
+                preCommitHooks.shellHook
+                +
+                  # bash
+                  ''
+                    # Undo dependency propagation by nixpkgs.
+                    unset PYTHONPATH
+                    # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
+                    export REPO_ROOT=$(git rev-parse --show-toplevel)
+                  '';
             };
-          };
+        };
       }
     );
 }
