@@ -25,16 +25,16 @@ def solve_lu(p, l, u, b):
     # Using p^T = p^(-1)
     b_hat = np.matmul(np.transpose(p), b)
 
-    # Solving Lz = b_hat with Rx = z
+    # Solving Lz = b_hat with forward substitution
     z = np.empty(len(b))
     z[0] = b_hat[0] / l[0, 0]
     for i in range(1, len(b)):
         sum = 0
-        for j in range(1, i + 1):
-            sum += l[i, j - 1] * z[j - 1]
+        for j in range(i):
+            sum += l[i, j] * z[j]
         z[i] = (b_hat[i] - sum) / l[i, i]
 
-    # Solving Rx = z
+    # Solving Rx = z with backward substitution
     x = np.empty(len(b))
     x[len(b) - 1] = z[len(b) - 1] / u[len(b) - 1, len(b) - 1]
     for i in range(len(b) - 2, -1, -1):

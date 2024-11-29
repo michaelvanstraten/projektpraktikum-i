@@ -99,6 +99,16 @@ class BlockMatrix:
         float
             Relative number of non-zeros
         """
+        P, L, U = self.get_lu()
+        L_neu = np.tril(L, -1)
+        LU = L_neu + U
+        nze = np.count_nonzero(LU)
+        sparsity = nze / (self.n - 1)**4
+
+        return nze, sparsity
+    
+    
+
 
     def get_cond(self):
         """Computes the condition number of the represented matrix.
@@ -110,26 +120,46 @@ class BlockMatrix:
         """
 
 
+
+# Aufgabenteil 2.4a) und 2.4b)
 def plot_sparse_vs_full(n: int):
     if n < 2:
         raise ValueError
-    n_werte = np.arange(2, n)
+    n_werte = np.arange(2, n + 1)
 
-    sparse_einträge = 3 * (5 * n_werte**2 - 14 * n_werte + 9)
+    sparse_einträge = (5 * n_werte**2 - 14 * n_werte + 9)
+    sparse_speicherplatz = 3 * sparse_einträge
     vollbesetzt = (n_werte - 1) ** 4
+
 
     plt.figure(figsize=(10, 6))
     plt.yscale("log")
     plt.xscale("log")
-    plt.plot(n_werte, sparse_einträge, label="Sparse Matrix", color="blue")
+    plt.plot(n_werte, sparse_speicherplatz, label="Sparse Matrix", color="blue")
     plt.plot(
-        n_werte, vollbesetzt, label="Vollbesetzte Matrix", color="red", linestyle="--"
+        n_werte, vollbesetzt, label="Vollbesetzte Matrix", color="red"
     )
     plt.xlabel("n")
     plt.ylabel("Speicherplatz")
     plt.legend()
     plt.title("Vergleich des Speicherplatzbedarfs (Sparse vs Vollbesetzt) von A")
     plt.grid(True)
+
+
+
+    plt.figure(figsize=(10, 6))
+    plt.yscale("log")
+    plt.xscale("log")
+    plt.plot(n_werte, sparse_einträge, label="Einträge ungleich Null in A", color="blue")
+    plt.plot(
+        n_werte, vollbesetzt, label="Einträge in vollbesetzten A", color="red"
+    )
+    plt.xlabel("n")
+    plt.ylabel("Anzahl an Einträgen")
+    plt.legend()
+    plt.title("Vergleich der nichtnull Einträge und Gesamteinträge von A")
+    plt.grid(True)
+
     plt.show()
 
 
@@ -138,12 +168,16 @@ def main():
     block_matrix = BlockMatrix(n)
 
     A = block_matrix.get_sparse()
-    print("Matrix A:")
+    print("Matrix A(sparse):")
     print(A)
+    print("Matrix A(vollbesetzt):")
+    print(A.toarray())
 
     nze, relative_sparsity = block_matrix.eval_sparsity()
     print(f"Absolute Anzahl der nicht-Null-Einträge: {nze}")
     print(f"Relative Anzahl der nicht-Null-Einträge: {relative_sparsity}")
+
+    plot_sparse_vs_full(100)
 
 
 if __name__ == "__main__":

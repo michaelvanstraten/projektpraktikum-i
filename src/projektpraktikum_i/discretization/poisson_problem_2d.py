@@ -1,5 +1,6 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
+import itertools
 
 def idx(nx, n):
     """Calculates the number of an equation in the Poisson problem for
@@ -19,7 +20,7 @@ def idx(nx, n):
     """
 
     j, k = nx
-    return (k - 1) * (n - 1) + j
+    return int((k - 1) * (n - 1) + j)
 
 
 def inv_idx(m, n):
@@ -39,8 +40,8 @@ def inv_idx(m, n):
         Coordinates of the corresponding discretization point, multiplied by n.
     """
 
-    j = (m - 1) // (n - 1) + 1
-    k = (m - 1) % (n - 1) + 1
+    j = (m - 1) % (n - 1) + 1
+    k = (m - 1) // (n - 1) + 1
     return [j, k]
 
 
@@ -71,15 +72,21 @@ def rhs(n, f):
         raise ValueError
 
     b = np.empty((n - 1) ** 2)
-    for i in range(1, n):
-        for j in range(1, n):
-            b[idx((i, j), n) - 1] = (1 / n) ** 2 * f(i / n, j / n)
+    x = np.linspace(1/n, 1 - 1/n, n - 1)
+    X = list(itertools.product(x, x))
+    for y in X:
+        t = np.array(y)*n
+        b[int(idx(t, n)) - 1] = (1 / n) ** 2 * f(np.array(y))
 
     return b
 
-
-f = lambda x, y: x * np.sin(np.pi * x) * y * np.sin(np.pi * y)
-print(rhs(5, f))
+#k = 3
+#def f(x):
+    #x_1, x_2 = x
+    #f = 2 * k * np.pi * (x_2 * np.cos(k * np.pi * x_1) * np.sin(k * np.pi * x_2) + 
+                                    #x_1 * np.sin(k * np.pi * x_1) * np.cos(k * np.pi * x_2) - x_1 * x_2 * np.sin(k* np.pi * x_1) * np.sin(k * np.pi * x_2))
+    #return f
+#print(rhs(5, f))
 
 
 def compute_error(n, hat_u, u):
@@ -103,3 +110,29 @@ def compute_error(n, hat_u, u):
     float
         maximal absolute error at the discretization points
     """
+    u_exakt = np.empty((n - 1)**2)
+    x = np.linspace(1/n, 1 - 1/n, n - 1)
+    X = list(itertools.product(x, x))
+    for y in X:
+        t = np.array(y)*n
+        u_exakt[int(idx(t, n)) - 1] = u(np.array(y))
+    max_error = 0
+    for i in np.arange((n - 1)**2):
+        if np.abs(u_exakt[i] - hat_u[i]) > max_error:
+            max_error = np.abs(u_exakt[i] - hat_u[i])
+    return max_error
+
+def plot_max_error(n, hat_u, u):
+    n_werte = np.arange(2, n + 1)
+    N_werte = n_werte**2
+    error_werte = compute_error(N_werte, hat_u, u)
+
+    plt.figure(figsize=(10, 6))
+    plt.yscale("log")
+    plt.xscale("log")
+    plt.plot(N_werte, error_werte, label="Maximaler Fehler", color="blue")
+    plt.xlabel("N")
+    plt.ylabel("Maximaler Fehler")
+    plt.legend()
+    plt.title("")
+    plt.grid(True)
