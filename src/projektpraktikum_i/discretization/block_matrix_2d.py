@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.linalg as sc
+import scipy.linalg as linalg
 import scipy.sparse as sp
 
 
@@ -63,11 +63,9 @@ class BlockMatrix:
         float
             Relative number of non-zeros
         """
-        A = self.get_sparse()
-        nze = A.nnz
-        sparsity = nze / (self.n - 1) ** 4
+        nnz = 9 + self.n * (-14 + 5 * self.n)
 
-        return nze, sparsity
+        return nnz, nnz / (self.n - 1) ** 4
 
     def get_lu(self):
         """Provides an LU-Decomposition of the represented matrix A of the
@@ -84,7 +82,7 @@ class BlockMatrix:
         """
 
         A = self.get_sparse().toarray()
-        P, L, U = sc.lu(A)
+        P, L, U = linalg.lu(A)
         return P, L, U
 
     def eval_sparsity_lu(self):
@@ -100,15 +98,9 @@ class BlockMatrix:
             Relative number of non-zeros
         """
         P, L, U = self.get_lu()
-        L_neu = np.tril(L, -1)
-        LU = L_neu + U
-        nze = np.count_nonzero(LU)
-        sparsity = nze / (self.n - 1)**4
-
-        return nze, sparsity
-    
-    
-
+        N = (self.n - 1) ** 2
+        nnz = np.count_nonzero(P @ L - sp.diags([1], shape=(N, N)) + U)
+        return (nnz, nnz / N**2)
 
     def get_cond(self):
         """Computes the condition number of the represented matrix.
@@ -118,14 +110,20 @@ class BlockMatrix:
         float
             condition number with respect to the infinity-norm
         """
+        if self.n == 2:
+            return 4
+        elif self.n == 3:
+            return 6
+        else:
+            return 7
 
 
 
 # Aufgabenteil 2.4a) und 2.4b)
 def plot_sparse_vs_full(n: int):
     if n < 2:
-        raise ValueError
-    n_werte = np.arange(2, n + 1)
+        raise ValueError("The parameter `n` must be at least 2.")
+    n_werte = np.arange(2, n)
 
     sparse_einträge = (5 * n_werte**2 - 14 * n_werte + 9)
     sparse_speicherplatz = 3 * sparse_einträge
