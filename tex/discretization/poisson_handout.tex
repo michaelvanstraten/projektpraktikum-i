@@ -162,7 +162,12 @@
 
 %%% BEGIN OF CONTENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Einleitung und Motivation}
-
+Die Poisson-Gleichung, benannt nach Siméon Denis Poisson, ist eine elliptische partielle Differentialgleichung, 
+die in vielen Bereichen des Ingenieurswesens und der Physik, wie zum Beispiel in der Gravitationstheorie, der Elektrostatik oder 
+der Fluiddynamik, Anwendung findet.\cite{Poisson} Aufgrund der Tatsache, dass es oftmals sehr schwer ist solche Differentialgleichungen analytisch zu lösen
+und dass wir in der letzten Aufgabenreihe die Approximation von Ableitungen erster und zweiter Ordnung betrachtet haben, möchten wir für
+feste vorgegebene Randbedingungen numerisch eine Approximation der Lösung der Poisson-Gleichung bestimmen und mit der analytischen Lösung
+vergleichen.
 
 
 \section{Theorie}
@@ -174,17 +179,87 @@ Das Poisson-Problem beschreibt die Suche nach einer Funktion \(u \in C^{2}(\math
 -\Delta u &= f \text{       in } \Omega  \\
         u &= g \text{       auf } \partial \Omega
 \end{align*}
+wobei \(\Delta u = \frac{\partial^{2}u}{\partial x_{1}^{2}} + \frac{\partial^{2}u}{\partial x_{2}^{2}}\) den Laplace-Operator für
+\(u\) bezeichnet. \cite{PPI_Poisson} \\
+In diesem Handout werden wir den Fall \(\Omega = (0, 1)^{2}\) und \(g = 0\) betrachten.
 
 
-\subsection{Diskretisierung und Ordnung}
-Um \(\Omega = (0,1)^{2}\) zu diskretisieren teilen wir dieses in ein Gitter von Punkten.
+
+\subsection{Diskretisierung von \(\Omega\)}
+Um \(\Omega = (0,1)^{2}\) zu diskretisieren teilen wir dieses in ein Gitter von Punkten auf.
 Hierfür zerlege man das Intervall \((0,1)\) in \(n\) gleich lange Teilintervalle der Länge \(\frac{1}{n}\)
 und erhält die Menge \(X_{1} = \{\frac{j}{n}: 1 \leqslant j \leqslant n - 1\} \).
 Die Gitterpunkte, also Diskretisierungspunkte ergeben sich dann wie folgt:
-\[X = X_{1} \times X_{1} = \{(\frac{j}{n}, \frac{k}{n}): 1 \leqslant j,k \leqslant n - 1\} \]
+\[X = X_{1} \times X_{1} = \{(\frac{j}{n}, \frac{k}{n}): 1 \leqslant j,k \leqslant n - 1\} \] \cite{PPI_Poisson}
 
 
+\subsection{Diskretisierung des Laplace-Operators}
+Mithilfe von finiten Differenzen, die bereits im ersten Hausaufgabenteil bearbeitet wurden, lassen sich die zweiten partiellen Ableitungen 
+nach einer Variable dann wie folgt approximieren:
+\begin{align*}
+  \frac{\partial^{2}u}{\partial x_{1}^{2}}(v, w) &\approx \frac{u(v + h, w) - 2u(v, w) + u(v - h, w)}{h^{2}} \\
+  \frac{\partial^{2}u}{\partial x_{1}^{2}}(v, w) &\approx \frac{u(v, w + h) - 2u(v, w) + u(v, w - h)}{h^{2}}
+\end{align*}
+Für \(h = \frac{1}{n}\) mit \(n \in \mathbb{N}^{+}\) und \((v, w) \in X\). \\
+Also lässt sich der Laplace-Operator wie folgt approximieren
+\begin{align*}
+  \Delta u &= \frac{\partial^{2}u}{\partial x_{1}^{2}} + \frac{\partial^{2}u}{\partial x_{2}^{2}} \\
+           &\approx \frac{u(v + h, w) + u(v, w + h) - 4u(v, w) + u(v - h, w) + u(v, w - h)}{h^2}
+\end{align*}
+Dieser diskrete Laplace-Operator von \(u\) wird mit \(\Delta_{h}u\) bezeichnet
+\subsection{Aufstellen des linearen Gleichungssystems}
+Gesucht ist nun eine Lösung \(\hat{u}\) der diskretisierten partiellen Differentialgleichung
+\begin{align*}
+  -\Delta_{h} u(x) &= f \text{       für } x \in X   \\
+              u(x) &= 0 \text{       auf } \partial \Omega
+\end{align*}
+an den \(N\) Gitterpunkten. Somit erhält man \(N\) Gleichungen, die zu lösen sind. Um diese Gleichungen zu ordnen
+haben wir für \(x = (x_{1}, x_{2}), y = (y_{1}, y_{2} \in X)\) die Ordnung
+\[x <_{X} y \iff x_{1}n + x_{2}n^{2} < y_{1}n + y_{2}n^{2}\]
+verwendet. Diese Ordnung induziert eine Bijektion
+\begin{align*}
+  idx: \{1, \cdots ,n - 1\}^{2} &\longrightarrow \{1, \cdots ,N \} \\ 
+                          (j, k)&\longmapsto (k - 1)(n - 1) + j
+\end{align*}
+die wir benutzt haben um einem Diskretisierungspunkt seine Gleichungsnummer zuzuweisen. Die Matrix, die das Gleichungssystem beschreibt ist dann
+\(h^{-2}A\), wobei
+\[
+  A \coloneq \begin{bmatrix}
+  C & -I & 0 & \cdots & 0 \\
+  -I & C & -I & \cdots & 0 \\
+  0 & \ddots & \ddots & \ddots & \vdots \\
+  \vdots & \ddots & \ddots & \ddots & -I \\
+  0 & \cdots & 0 & -I & C
+  \end{bmatrix}
+  \in \mathbb{R}^{N \times N}.
+  \]
+  und
 
+\[
+  C \coloneq \begin{bmatrix}
+  4 & -1 & 0 & \cdots & 0 \\
+  -1 & 4 & -1 & \cdots & 0 \\
+  0 & \ddots & \ddots & \ddots & \vdots \\
+  \vdots & \ddots & \ddots & \ddots & -1 \\
+  0 & \cdots & 0 & -1 & 4
+  \end{bmatrix}
+  \in \mathbb{R}^{(n-1) \times (n-1)},
+  \] \cite{PPI_Poisson} 
+
+\subsection{LU-Zerlegung einer Matrix}
+Sei \(A \in \mathbb{R}^{n \times n}\), dann existieren \(P, L, U \in \mathbb{R}^{n \times n}\), 
+wobei \(P\) eine Permutationsmatrix, \(L\) eine linke untere Dreiecksmatrix und \(U\) eine rechte obere
+Dreiecksmatrix ist mit \(A = PLU\).  \cite{LU}
+Da \(P\) Permutationsmatrix ist, ist \(P^{-1} = P^{T}\).
+Liegt nun ein lineares Gleichungssystem \(Ax = b\) vor, so gilt:
+\begin{align*}
+  Ax &= b \\
+  \iff PLUx &= b \\
+  \iff LUx  &= P^{T}b
+\end{align*}
+Mit der Substitution \(Ux = z\) lässt sich \(Lz = P^{T}b\) nach \(z\) mittels Vorwärtssubstitution in \(\mathcal{O}(n^{2})\) lösen.
+Danach kann man \(Ux = z\) mittels Rückwärtssubstitution nach \(x\) in \(\mathcal{O}(n^{2})\) lösen und erhält damit die Lösung des
+ursprünglichen Gleichungssystems.
 
 \subsection{Vergleich: Vollbesetzte und Sparse Matrizen}
 Die Matrix \(A\) besitzt viele Nulleinträge; für größere Werte von \(n\) wird das Speichern
@@ -196,7 +271,7 @@ der Matrix. Für einen nicht-Nulleintrag werden also drei Einträge gespeichert.
 
 Wie zu sehen ist, benötigt man schon ab \(n = 5\) mehr Speicherplatz für vollbesetzte Matrizen als für Sparse-Matrizen, 
 weshalb eine Implementation von \(A\) als Sparse-Matrix sinnvoll ist.
-\subsection{Lösen eines linearen Gleichungssystems mittels LU-Verfahren}
+
 
 
 \section{Experimente}
