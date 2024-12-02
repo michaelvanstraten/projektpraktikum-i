@@ -18,6 +18,11 @@ Example:
 import matplotlib.pyplot as plt
 import numpy as np
 
+# We need to import dill here first so we can hash lambda functions
+import dill as pickle
+from joblib import Memory
+
+
 from projektpraktikum_i.discretization import linear_solvers
 from projektpraktikum_i.discretization.block_matrix_2d import BlockMatrix
 
@@ -31,6 +36,8 @@ __all__ = [
     "example_u",
     "plot_error",
 ]
+
+memory = Memory(location=".cache")
 
 
 def get_evaluation_points(n):
@@ -139,6 +146,7 @@ def compute_error(n, hat_u, u):
     return np.max(np.abs(u(get_evaluation_points(n)).flatten() - hat_u))
 
 
+@memory.cache
 def solve_via_lu_decomposition(n, f):
     """Solves the Poisson problem using LU decomposition.
 
