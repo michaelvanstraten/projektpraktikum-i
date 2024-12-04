@@ -141,7 +141,7 @@ class BlockMatrix:
             return 7
 
 
-def plot_compare_theoretical_memory_usage(interval):
+def plot_compare_theoretical_memory_usage(interval, save_to):
     """Plots the theoretical memory usage comparison between raw format and CRS format.
 
     Parameters
@@ -177,10 +177,14 @@ def plot_compare_theoretical_memory_usage(interval):
     ax2.set_yscale("log")
     ax2.legend()
 
-    plt.show()
+    # Save or display plot
+    if save_to:
+        plt.savefig(save_to)
+    else:
+        plt.show()
 
 
-def plot_non_zero_entries(interval):
+def plot_non_zero_entries(interval, save_to):
     """Plots the number of non-zero entries in $A$ as a function of $n$ and $N$,
     and compares it with the number of entries in a fully populated matrix.
 
@@ -231,10 +235,14 @@ def plot_non_zero_entries(interval):
     ax2.grid(True)
     ax2.legend()
 
-    plt.show()
+    # Save or display plot
+    if save_to:
+        plt.savefig(save_to)
+    else:
+        plt.show()
 
 
-def plot_non_zero_entries_lu(interval):
+def plot_non_zero_entries_lu(interval, save_to):
     """Plots the number of non-zero entries in the matrix $A$ and its LU decomposition
     as a function of $N$.
 
@@ -268,7 +276,11 @@ def plot_non_zero_entries_lu(interval):
     ax.grid(True)
     ax.legend()
 
-    plt.show()
+    # Save or display plot
+    if save_to:
+        plt.savefig(save_to)
+    else:
+        plt.show()
 
 
 def main():

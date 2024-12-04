@@ -27,7 +27,7 @@ from projektpraktikum_i.discretization import linear_solvers
 from projektpraktikum_i.discretization.block_matrix_2d import BlockMatrix
 
 __all__ = [
-    "idx",
+    "get_evaluation_points" "idx",
     "inv_idx",
     "rhs",
     "compute_error",
@@ -216,7 +216,7 @@ def example_u(x, k=3):
     return (x[0] * np.sin(k * np.pi * x[0])) * (x[1] * np.sin(k * np.pi * x[1]))
 
 
-def plot_error(f, analytic_u, solver, interval):
+def plot_error(f, analytic_u, solver, interval, save_to):
     """Plots the error of the numerical solution for different values of n.
 
     Parameters
@@ -241,7 +241,12 @@ def plot_error(f, analytic_u, solver, interval):
     plt.yscale("log")
     plt.grid(True)
     plt.legend()
-    plt.show()
+
+    # Save or display plot
+    if save_to:
+        plt.savefig(save_to)
+    else:
+        plt.show()
 
 
 def main():
