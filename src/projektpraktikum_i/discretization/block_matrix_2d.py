@@ -25,12 +25,19 @@ import os
 import scipy.linalg as linalg
 import scipy.sparse as sp
 
+# We need to import dill here first so we can hash lambda functions
+import dill as pickle
+from joblib import Memory
+
+
 __all__ = [
     "BlockMatrix",
     "plot_compare_theoretical_memory_usage",
     "plot_non_zero_entries",
     "plot_non_zero_entries_lu",
 ]
+
+memory = Memory(location=".cache")
 
 
 class BlockMatrix:
@@ -57,6 +64,7 @@ class BlockMatrix:
         if n < 2:
             raise ValueError("The parameter `n` must be at least 2.")
         self.n = n
+        self.get_lu = memory.cache(self.get_lu)
 
     def get_sparse(self):
         """Returns the block matrix as a sparse matrix.

@@ -1,6 +1,13 @@
 import numpy as np
 
+# We need to import dill here first so we can hash lambda functions
+import dill as pickle
+from joblib import Memory
 
+memory = Memory(location=".cache")
+
+
+@memory.cache
 def solve_lu(p, l, u, b):
     """Solves the linear system Ax = b via forward and backward substitution
     given the decomposition A = p * l * u.
