@@ -135,7 +135,7 @@ def compute_error(n, hat_u, u):
     n : int
         Number of intersections in each dimension.
     hat_u : array_like of 'numpy'
-        Finite difference approximation of the solution of the Poisson problem 
+        Finite difference approximation of the solution of the Poisson problem
         at the discretization points.
     u : callable
         Solution of the Poisson problem. The calling signature is 'u(x)'.

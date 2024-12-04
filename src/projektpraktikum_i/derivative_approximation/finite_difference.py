@@ -204,6 +204,7 @@ class FiniteDifference:
 
         def plot(*args, **kwargs):
             return plt.plot(inputs, *args, **kwargs)
+
         plot(self.__f(inputs), label="$f(x)$", color="red")
         plot(self.__d_f(inputs), label="$f'(x)$", color="orange")
         plot(self.__dd_f(inputs), label="$f''(x)$", color="green")
@@ -317,10 +318,12 @@ def main():
     # Define the function and its analytical derivatives
     def f(x):
         return np.sinc(x / np.pi)
+
     def d_f(x):
-        return (x * np.cos(x) - np.sin(x)) / x ** 2
+        return (x * np.cos(x) - np.sin(x)) / x**2
+
     def dd_f(x):
-        return -((x ** 2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / x ** 3
+        return -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / x**3
 
     # Define interval and discretization parameters
     interval = (np.pi, 3 * np.pi, 1000)

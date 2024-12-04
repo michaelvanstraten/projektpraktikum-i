@@ -10,6 +10,7 @@ from projektpraktikum_i.discretization.poisson_problem_2d import (
     rhs,
 )
 
+
 # Example function for rhs
 def f(x):
     return x[0] * np.sin(np.pi * x[0]) * x[1] * np.sin(np.pi * x[1])
