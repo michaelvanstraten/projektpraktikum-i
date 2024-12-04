@@ -14,8 +14,8 @@ dependencies = [
 ]
 
 [project.scripts]
-derivative-approximation = "projektpraktikum_i.derivative_approximation.finite_difference:main"
 derivative-approximation-experiments = "projektpraktikum_i.derivative_approximation.experiments:cli"
+discretization-experiements = "projektpraktikum_i.discretization.experiments_lu:cli"
 
 [build-system]
 requires = ["hatchling"]
