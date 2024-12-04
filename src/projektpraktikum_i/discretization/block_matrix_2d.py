@@ -1,8 +1,7 @@
-"""
-Module providing classes and functions for analyzing block matrices
-arising from finite difference approximations of the Laplace operator.
-The module includes methods for creating sparse representations,
-evaluating sparsity patterns, and analyzing LU decomposition.
+"""Module providing classes and functions for analyzing block matrices arising
+from finite difference approximations of the Laplace operator. The module
+includes methods for creating sparse representations, evaluating sparsity
+patterns, and analyzing LU decomposition.
 
 Classes:
 --------
@@ -19,14 +18,15 @@ Usage:
 Run the module directly to see example plots for various functions and analyses.
 """
 
+import os
+
+from scipy import linalg
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import scipy.linalg as linalg
 import scipy.sparse as sp
 
 # We need to import dill here first so we can hash lambda functions
-import dill as pickle
+import dill as pickle  # pylint: disable=unused-import
 from joblib import Memory
 
 
@@ -74,17 +74,21 @@ class BlockMatrix:
         scipy.sparse.csr_matrix
             The block matrix in a sparse data format.
         """
-        n = self.n
-        C = sp.diags([4, -1, -1], [0, -1, 1], shape=(n - 1, n - 1))
-        C_diag = sp.block_diag([C] * (n - 1))
-        I_diag = sp.diags([-1, -1], [n - 1, -(n - 1)], shape=C_diag.shape)
+        num_intervals = self.n
+        central_diag = sp.diags(
+            [4, -1, -1], [0, -1, 1], shape=(num_intervals - 1, num_intervals - 1)
+        )
+        block_diag = sp.block_diag([central_diag] * (num_intervals - 1))
+        off_diag = sp.diags(
+            [-1, -1], [num_intervals - 1, -(num_intervals - 1)], shape=block_diag.shape
+        )
 
-        return C_diag + I_diag
+        return block_diag + off_diag
 
     def eval_sparsity(self):
-        """Returns the absolute and relative numbers of non-zero elements of
-        the matrix. The relative quantities are with respect to the total
-        number of elements of the represented matrix.
+        """Returns the absolute and relative numbers of non-zero elements of the
+        matrix. The relative quantities are with respect to the total number of
+        elements of the represented matrix.
 
         Returns
         -------
@@ -98,27 +102,27 @@ class BlockMatrix:
         total_elements = (n - 1) ** 4
         return nnz, nnz / total_elements
 
-    def get_lu(self):
-        """Provides an LU-Decomposition of the represented matrix A of the
-        form A = p * l * u
+    def get_lu(self):  # pylint: disable=method-hidden
+        """Provides an LU-Decomposition of the represented matrix A of the form
+        A = P * L * U.
 
         Returns
         -------
-        p : numpy.ndarray
+        P : numpy.ndarray
             Permutation matrix of LU-decomposition
-        l : numpy.ndarray
+        L : numpy.ndarray
             Lower triangular unit diagonal matrix of LU-decomposition
-        u : numpy.ndarray
+        U : numpy.ndarray
             Upper triangular matrix of LU-decomposition
         """
-        A = self.get_sparse().toarray()
-        P, L, U = linalg.lu(A)
-        return P, L, U
+        matrix_a = self.get_sparse().toarray()
+        matrix_p, matrix_l, matrix_u = linalg.lu(matrix_a)  # pylint: disable=unbalanced-tuple-unpacking
+        return matrix_p, matrix_l, matrix_u
 
     def eval_sparsity_lu(self):
-        """Returns the absolute and relative numbers of non-zero elements of
-        the LU-Decomposition. The relative quantities are with respect to the
-        total number of elements of the represented matrix.
+        """Returns the absolute and relative numbers of non-zero elements of the
+        LU-Decomposition. The relative quantities are with respect to the total
+        number of elements of the represented matrix.
 
         Returns
         -------
@@ -127,10 +131,10 @@ class BlockMatrix:
         float
             Relative number of non-zeros
         """
-        P, L, U = self.get_lu()
-        N = (self.n - 1) ** 2
-        nnz = np.count_nonzero(P @ L + U)
-        total_elements = N**2
+        matrix_p, matrix_l, matrix_u = self.get_lu()
+        number_of_grid_point = (self.n - 1) ** 2
+        nnz = np.count_nonzero(matrix_p @ matrix_l + matrix_u)
+        total_elements = number_of_grid_point**2
         return nnz, nnz / total_elements
 
     def get_cond(self):
@@ -143,14 +147,14 @@ class BlockMatrix:
         """
         if self.n == 2:
             return 4
-        elif self.n == 3:
+        if self.n == 3:
             return 6
-        else:
-            return 7
+        return 7
 
 
 def plot_compare_theoretical_memory_usage(interval, save_to=None):
-    """Plots the theoretical memory usage comparison between raw format and CRS format.
+    """Plots the theoretical memory usage comparison between raw format and CRS
+    format.
 
     Parameters
     ----------
@@ -161,7 +165,7 @@ def plot_compare_theoretical_memory_usage(interval, save_to=None):
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
     # Calculate memory usage for raw and CRS formats
     raw_memory = (values_for_n - 1) ** 4
@@ -207,7 +211,7 @@ def plot_non_zero_entries(interval, save_to=None):
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
     # Calculate non-zero entries and fully populated matrix entries
     nnz_values = [BlockMatrix(n).eval_sparsity()[0] for n in values_for_n]
@@ -255,8 +259,8 @@ def plot_non_zero_entries(interval, save_to=None):
 
 
 def plot_non_zero_entries_lu(interval, save_to=None):
-    """Plots the number of non-zero entries in the matrix $A$ and its LU decomposition
-    as a function of $N$.
+    """Plots the number of non-zero entries in the matrix $A$ and its LU
+    decomposition as a function of $N$.
 
     Parameters
     ----------
@@ -267,21 +271,17 @@ def plot_non_zero_entries_lu(interval, save_to=None):
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Calculate non-zero entries for A and LU decomposition
-    nnz_A_values = [BlockMatrix(n).eval_sparsity()[0] for n in values_for_n]
-    nnz_LU_values = [BlockMatrix(n).eval_sparsity_lu()[0] for n in values_for_n]
+    _, ax = plt.subplots(figsize=(10, 6))
 
     # Plot for non-zero entries vs discretization points
     ax.plot(
         (values_for_n - 1) ** 2,
-        nnz_A_values,
+        [BlockMatrix(n).eval_sparsity()[0] for n in values_for_n],
         label="Non-zero entries in $A$",
     )
     ax.plot(
         (values_for_n - 1) ** 2,
-        nnz_LU_values,
+        [BlockMatrix(n).eval_sparsity_lu()[0] for n in values_for_n],
         label="Non-zero entries in LU decomposition",
     )
     ax.set_title("Non-zero Entries vs Number of Discretization Points ($N$)")
@@ -298,6 +298,7 @@ def plot_non_zero_entries_lu(interval, save_to=None):
 
 
 def main():
+    """Show example plots for various functions and analyses of this module"""
     print("Demonstrating block_matrix_2d.py ...")
 
     # Set numpy print options to fit the terminal width
@@ -320,10 +321,10 @@ def main():
     print(f"Relative number of non-zero elements: {rel_nnz:.4f}")
 
     # Get LU decomposition
-    P, L, U = bm.get_lu()
-    print(f"Permutation matrix P for n = {n}:\n{P}")
-    print(f"Lower triangular matrix L for n = {n}:\n{L}")
-    print(f"Upper triangular matrix U for n = {n}:\n{U}")
+    matrix_p, matrix_l, matrix_u = bm.get_lu()
+    print(f"Permutation matrix P for n = {n}:\n{matrix_p}")
+    print(f"Lower triangular matrix L for n = {n}:\n{matrix_l}")
+    print(f"Upper triangular matrix U for n = {n}:\n{matrix_u}")
 
     # Evaluate sparsity of LU decomposition
     nnz_lu, rel_nnz_lu = bm.eval_sparsity_lu()

@@ -1,25 +1,23 @@
-"""
-Module for solving the Poisson problem using finite difference methods and LU decomposition.
+"""Module for solving the Poisson problem using finite difference methods and LU
+decomposition.
 
-This module provides functions to discretize the Poisson problem, compute the right-hand side vector,
-solve the problem using LU decomposition, and compute the error of the numerical solution. It also
-includes example functions for the right-hand side and the analytic solution of the Poisson problem,
-as well as a function to plot the error of the numerical solution for different values of n.
+This module provides functions to discretize the Poisson problem, compute the
+right-hand side vector, solve the problem using LU decomposition, and compute
+the error of the numerical solution. It also includes example functions for
+the right-hand side and the analytic solution of the Poisson problem, as well as
+a function to plot the error of the numerical solution for different values of n.
 
 Usage:
-To use this module, import the necessary functions and call them with appropriate arguments.
-For example, to solve the Poisson problem and plot the error, run the main function.
-
-Example:
-    from projektpraktikum_i.discretization import poisson_problem_2d
-    poisson_problem_2d.plot_error(example_f, example_u, solve_via_lu_decomposition, (2, 20, 10))
+To use this module, import the necessary functions and call them with appropriate
+arguments. For example, to solve the Poisson problem and plot the error, run the
+main function.
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 # We need to import dill here first so we can hash lambda functions
-import dill as pickle
+import dill as pickle  # pylint: disable=unused-import
 from joblib import Memory
 
 
@@ -27,7 +25,8 @@ from projektpraktikum_i.discretization import linear_solvers
 from projektpraktikum_i.discretization.block_matrix_2d import BlockMatrix
 
 __all__ = [
-    "get_evaluation_points" "idx",
+    "get_evaluation_points",
+    "idx",
     "inv_idx",
     "rhs",
     "compute_error",
@@ -59,7 +58,8 @@ def get_evaluation_points(n):
 
 
 def idx(nx, n):
-    """Calculates the number of an equation in the Poisson problem for a given discretization point.
+    """Calculates the number of an equation in the Poisson problem for a given
+    discretization point.
 
     Parameters
     ----------
@@ -78,7 +78,8 @@ def idx(nx, n):
 
 
 def inv_idx(m, n):
-    """Calculates the coordinates of a discretization point for a given equation number of the Poisson problem.
+    """Calculates the coordinates of a discretization point for a given equation
+    number of the Poisson problem.
 
     Parameters
     ----------
@@ -126,14 +127,16 @@ def rhs(n, f):
 
 
 def compute_error(n, hat_u, u):
-    """Computes the error of the numerical solution of the Poisson problem with respect to the infinity-norm.
+    """Computes the error of the numerical solution of the Poisson problem with
+    respect to the infinity-norm.
 
     Parameters
     ----------
     n : int
         Number of intersections in each dimension.
     hat_u : array_like of 'numpy'
-        Finite difference approximation of the solution of the Poisson problem at the discretization points.
+        Finite difference approximation of the solution of the Poisson problem 
+        at the discretization points.
     u : callable
         Solution of the Poisson problem. The calling signature is 'u(x)'.
         Here 'x' is an array_like of 'numpy'. The return value is a scalar.
@@ -216,7 +219,7 @@ def example_u(x, k=3):
     return (x[0] * np.sin(k * np.pi * x[0])) * (x[1] * np.sin(k * np.pi * x[1]))
 
 
-def plot_error(f, analytic_u, solver, interval, save_to):
+def plot_error(f, analytic_u, solver, interval, save_to=None):
     """Plots the error of the numerical solution for different values of n.
 
     Parameters
@@ -250,6 +253,8 @@ def plot_error(f, analytic_u, solver, interval, save_to):
 
 
 def main():
+    "Example usage of module"
+
     plot_error(example_f, example_u, solve_via_lu_decomposition, (2, 20, 10))
 
 

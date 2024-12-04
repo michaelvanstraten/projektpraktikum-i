@@ -1,3 +1,5 @@
+"""Experiments for the Poisson problem."""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import click
@@ -10,7 +12,6 @@ from projektpraktikum_i.discretization.poisson_problem_2d import example_u, exam
 @click.group()
 def cli():
     """Experiments for the Poisson problem."""
-    pass
 
 
 def get_solutions(n):
@@ -21,18 +22,6 @@ def get_solutions(n):
         n, example_f
     ).reshape((n - 1, n - 1))
     return evalutation_points, analytical_solution, numeric_solution
-
-
-def plot_3d_surface(
-    ax, x, y, z, title, cmap, xlabel="$X_1$", ylabel="$X_2$", zlabel="$u(X)$"
-):
-    """Plot a 3D surface."""
-    surf = ax.plot_surface(x, y, z, cmap=cmap, edgecolor="none")
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_zlabel(zlabel)
-    ax.set_title(title)
-    return surf
 
 
 @cli.command()
@@ -47,24 +36,23 @@ def plot_solutions(n):
     )
 
     # Analytical solution
-    surf1 = plot_3d_surface(
-        ax1,
-        *evalutation_points,
-        analytical_solution,
-        "Analytical Solution $u(X)$",
-        "viridis",
+    surf1 = ax1.plot_surface(
+        *evalutation_points, analytical_solution, cmap="viridis", edgecolor="none"
     )
+    ax1.set_xlabel("$X_1$")
+    ax1.set_ylabel("$X_2$")
+    ax1.set_zlabel("$u(X)$")
+    ax1.set_title("Analytical Solution $u(X)$")
     fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=10)
 
     # Numerical solution
-    surf2 = plot_3d_surface(
-        ax2,
-        *evalutation_points,
-        numeric_solution,
-        r"Numerical Solution $\^{u}(X)$",
-        "coolwarm",
-        zlabel=r"$\^{u}(X)$",
+    surf2 = ax2.plot_surface(
+        *evalutation_points, numeric_solution, cmap="coolwarm", edgecolor="none"
     )
+    ax2.set_xlabel("$X_1$")
+    ax2.set_ylabel("$X_2$")
+    ax2.set_zlabel(r"$\^{u}(X)$")
+    ax2.set_title(r"Numerical Solution $\^{u}(X)$")
     fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=10)
 
     # Show plots
@@ -75,7 +63,8 @@ def plot_solutions(n):
 @cli.command()
 @click.option("-n", default=100, help="Number of intervals in each dimension.")
 def plot_difference(n):
-    """Plot the difference between analytical and numerical solutions of the Poisson problem in 2D."""
+    """Plot the difference between analytical and numerical solutions of the
+    Poisson problem in 2D."""
     evalutation_points, analytical_solution, numeric_solution = get_solutions(n)
 
     # Compute the difference between numerical and analytical solutions
@@ -86,14 +75,13 @@ def plot_difference(n):
 
     # 3D plot of the error
     ax1 = fig.add_subplot(1, 2, 1, projection="3d")
-    surf1 = plot_3d_surface(
-        ax1,
-        *evalutation_points,
-        difference,
-        "3D Plot of Absolute Error",
-        "coolwarm",
-        zlabel="Absolute Error",
+    surf1 = ax1.plot_surface(
+        *evalutation_points, difference, cmap="coolwarm", edgecolor="none"
     )
+    ax1.set_xlabel("$X_1$")
+    ax1.set_ylabel("$X_2$")
+    ax1.set_zlabel("Absolute Error")
+    ax1.set_title("3D Plot of Absolute Error")
     fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=10)
 
     # Heatmap of the error

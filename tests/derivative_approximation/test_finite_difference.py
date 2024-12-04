@@ -1,6 +1,10 @@
+# pylint: disable=missing-function-docstring,missing-module-docstring
+
 import pytest
 
-from projektpraktikum_i.derivative_approximation import FiniteDifference
+from projektpraktikum_i.derivative_approximation.finite_difference import (
+    FiniteDifference,
+)
 
 
 def sample_function(x):
