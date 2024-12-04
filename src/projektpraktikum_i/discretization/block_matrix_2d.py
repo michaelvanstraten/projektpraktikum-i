@@ -1,17 +1,8 @@
-"""Module providing classes and functions for analyzing block matrices arising
+"""
+Module providing classes and functions for analyzing block matrices arising
 from finite difference approximations of the Laplace operator. The module
 includes methods for creating sparse representations, evaluating sparsity
 patterns, and analyzing LU decomposition.
-
-Classes:
---------
-- BlockMatrix: Represents block matrices and provides various analyses.
-
-Functions:
-----------
-- plot_compare_theoretical_memory_usage: Plots theoretical memory usage comparison.
-- plot_non_zero_entries: Plots the number of non-zero entries in a matrix.
-- plot_non_zero_entries_lu: Plots non-zero entries in the LU decomposition.
 
 Usage:
 ------
@@ -32,9 +23,9 @@ from joblib import Memory
 
 __all__ = [
     "BlockMatrix",
-    "plot_compare_theoretical_memory_usage",
-    "plot_non_zero_entries",
-    "plot_non_zero_entries_lu",
+    "plot_theoretical_memory_usage",
+    "plot_sparsity",
+    "plot_sparsity_lu",
 ]
 
 memory = Memory(location=".cache")
@@ -65,6 +56,7 @@ class BlockMatrix:
             raise ValueError("The parameter `n` must be at least 2.")
         self.n = n
         self.get_lu = memory.cache(self.get_lu)
+        self.eval_sparsity_lu = memory.cache(self.eval_sparsity_lu)
 
     def get_sparse(self):
         """Returns the block matrix as a sparse matrix.
@@ -119,7 +111,7 @@ class BlockMatrix:
         matrix_p, matrix_l, matrix_u = linalg.lu(matrix_a)  # pylint: disable=unbalanced-tuple-unpacking
         return matrix_p, matrix_l, matrix_u
 
-    def eval_sparsity_lu(self):
+    def eval_sparsity_lu(self, epsilon=0):  # pylint: disable=method-hidden
         """Returns the absolute and relative numbers of non-zero elements of the
         LU-Decomposition. The relative quantities are with respect to the total
         number of elements of the represented matrix.
@@ -133,7 +125,7 @@ class BlockMatrix:
         """
         matrix_p, matrix_l, matrix_u = self.get_lu()
         number_of_grid_point = (self.n - 1) ** 2
-        nnz = np.count_nonzero(matrix_p @ matrix_l + matrix_u)
+        nnz = np.sum(np.abs(matrix_p @ matrix_l + matrix_u) > epsilon)
         total_elements = number_of_grid_point**2
         return nnz, nnz / total_elements
 
@@ -152,7 +144,7 @@ class BlockMatrix:
         return 7
 
 
-def plot_compare_theoretical_memory_usage(interval, save_to=None):
+def plot_theoretical_memory_usage(interval, save_to=None):
     """Plots the theoretical memory usage comparison between raw format and CRS
     format.
 
@@ -165,31 +157,18 @@ def plot_compare_theoretical_memory_usage(interval, save_to=None):
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
-    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-
     # Calculate memory usage for raw and CRS formats
     raw_memory = (values_for_n - 1) ** 4
     crs_memory = 9 + values_for_n * (-14 + 5 * values_for_n)
 
-    # Plot for raw format and CRS format
-    ax1.plot(values_for_n, raw_memory, label="Raw format")
-    ax1.plot(values_for_n, crs_memory, label="CRS format")
-    ax1.set_title("Space Complexity vs Number of Interval Points ($n$)")
-    ax1.set_xlabel("Number of Interval Points ($n$)")
-    ax1.set_ylabel("Space Complexity")
-    ax1.grid(True)
-    ax1.set_yscale("log")
-    ax1.legend()
-
-    # Plot for discretization points
-    ax2.plot((values_for_n - 1) ** 2, raw_memory, label="Raw format")
-    ax2.plot((values_for_n - 1) ** 2, crs_memory, label="CRS format")
-    ax2.set_title("Space Complexity vs Number of Discretization Points ($N$)")
-    ax2.set_xlabel("Number of Discretization Points ($N$)")
-    ax2.set_ylabel("Space Complexity")
-    ax2.grid(True)
-    ax2.set_yscale("log")
-    ax2.legend()
+    plt.plot((values_for_n - 1) ** 2, raw_memory, label="Raw format")
+    plt.plot((values_for_n - 1) ** 2, crs_memory, label="CRS format")
+    plt.title("Space Complexity vs Number of Discretization Points ($N$)")
+    plt.xlabel("Number of Discretization Points ($N$)")
+    plt.ylabel("Space Complexity")
+    plt.grid(True)
+    plt.yscale("log")
+    plt.legend()
 
     # Save or display plot
     if save_to:
@@ -198,7 +177,7 @@ def plot_compare_theoretical_memory_usage(interval, save_to=None):
         plt.show()
 
 
-def plot_non_zero_entries(interval, save_to=None):
+def plot_sparsity(interval, save_to=None):
     """Plots the number of non-zero entries in $A$ as a function of $n$ and $N$,
     and compares it with the number of entries in a fully populated matrix.
 
@@ -213,41 +192,36 @@ def plot_non_zero_entries(interval, save_to=None):
 
     _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
-    # Calculate non-zero entries and fully populated matrix entries
-    nnz_values = [BlockMatrix(n).eval_sparsity()[0] for n in values_for_n]
-    fully_populated_entries = (values_for_n - 1) ** 4
+    nnz, rel_nnz = zip(*[BlockMatrix(n).eval_sparsity() for n in values_for_n])
 
-    # Plot for non-zero entries vs interval points
-    ax1.plot(values_for_n, nnz_values, label="Non-zero entries in $A$")
+    # Plot for non-zero entries vs discretization points
     ax1.plot(
-        values_for_n,
-        fully_populated_entries,
-        label="Fully populated matrix",
+        (values_for_n - 1) ** 2,
+        nnz,
+        label="Non-zero entries in $A$",
+    )
+    ax1.plot(
+        (values_for_n - 1) ** 2,
+        (values_for_n - 1) ** 4,
+        label="Number of entries in $A$",
         linestyle="--",
     )
-    ax1.set_title("Non-zero Entries vs Number of Interval Points ($n$)")
-    ax1.set_xlabel("Number of Interval Points ($n$)")
+    ax1.set_title("Non-zero Entries vs Number of Discretization Points ($N$)")
+    ax1.set_xlabel("Number of Discretization Points ($N$)")
     ax1.set_ylabel("Number of Non-zero Entries")
     ax1.set_yscale("log")
     ax1.grid(True)
     ax1.legend()
 
-    # Plot for non-zero entries vs discretization points
+    # Relative sparsity
     ax2.plot(
         (values_for_n - 1) ** 2,
-        nnz_values,
-        label="Non-zero entries in $A$",
+        rel_nnz,
+        label="Relative non-zero entries in $A$",
     )
-    ax2.plot(
-        (values_for_n - 1) ** 2,
-        fully_populated_entries,
-        label="Fully populated matrix",
-        linestyle="--",
-    )
-    ax2.set_title("Non-zero Entries vs Number of Discretization Points ($N$)")
+    ax2.set_title("Relative Non-zero Entries vs Number of Discretization Points ($N$)")
     ax2.set_xlabel("Number of Discretization Points ($N$)")
-    ax2.set_ylabel("Number of Non-zero Entries")
-    ax2.set_yscale("log")
+    ax2.set_ylabel("Relative Number of Non-zero Entries")
     ax2.grid(True)
     ax2.legend()
 
@@ -258,7 +232,7 @@ def plot_non_zero_entries(interval, save_to=None):
         plt.show()
 
 
-def plot_non_zero_entries_lu(interval, save_to=None):
+def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     """Plots the number of non-zero entries in the matrix $A$ and its LU
     decomposition as a function of $N$.
 
@@ -266,29 +240,61 @@ def plot_non_zero_entries_lu(interval, save_to=None):
     ----------
     interval : tuple
         Interval of values for n, defined as (start, end, num_points).
+    epsilon : float, optional
+        Threshold for considering an entry as non-zero in the LU decomposition.
     save_to : str, optional
         File path to save the plot. If None, the plot is displayed.
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
-    _, ax = plt.subplots(figsize=(10, 6))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7))
+
+    nnz_lu, rel_nnz_lu = zip(*[BlockMatrix(n).eval_sparsity_lu() for n in values_for_n])
+    nnz_ge_eps_lu, rel_nnz_ge_eps_lu = zip(
+        *[BlockMatrix(n).eval_sparsity_lu(epsilon) for n in values_for_n]
+    )
 
     # Plot for non-zero entries vs discretization points
-    ax.plot(
+    ax1.plot(
         (values_for_n - 1) ** 2,
-        [BlockMatrix(n).eval_sparsity()[0] for n in values_for_n],
-        label="Non-zero entries in $A$",
+        (values_for_n - 1) ** 4,
+        label="Number of entries in LU-Decomposition",
     )
-    ax.plot(
+    ax1.plot(
         (values_for_n - 1) ** 2,
-        [BlockMatrix(n).eval_sparsity_lu()[0] for n in values_for_n],
-        label="Non-zero entries in LU decomposition",
+        nnz_lu,
+        label="Non-zero entries in LU-Decomposition",
     )
-    ax.set_title("Non-zero Entries vs Number of Discretization Points ($N$)")
-    ax.set_xlabel("Number of Discretization Points ($N$)")
-    ax.set_ylabel("Number of Non-zero Entries")
-    ax.grid(True)
-    ax.legend()
+    ax1.plot(
+        (values_for_n - 1) ** 2,
+        nnz_ge_eps_lu,
+        linestyle="--",
+        label=f"Entries in LU-Decomposition > {epsilon} (by abs.)",
+    )
+    ax1.set_title("Sparsity analysis of the LU-Decomposition of $A$")
+    ax1.set_xlabel("Number of Discretization Points ($N$)")
+    ax1.set_ylabel("Number of Non-zero Entries")
+    ax1.set_yscale("log")
+    ax1.grid(True)
+    ax1.legend()
+
+    # Relative sparsity
+    ax2.plot(
+        (values_for_n - 1) ** 2,
+        rel_nnz_lu,
+        label="Relative non-zero entries in LU-Decomposition",
+    )
+    ax2.plot(
+        (values_for_n - 1) ** 2,
+        rel_nnz_ge_eps_lu,
+        linestyle="--",
+        label=f"Relative entries in LU-Decomposition > {epsilon} (by abs.)",
+    )
+    ax2.set_title("Relative Sparsity analysis of the LU-Decomposition of $A$")
+    ax2.set_xlabel("Number of Discretization Points ($N$)")
+    ax2.set_ylabel("Relative Number of Non-zero Entries")
+    ax2.grid(True)
+    ax2.legend()
 
     # Save or display plot
     if save_to:
@@ -337,13 +343,13 @@ def main():
 
     # Plotting functions
     print("\nPlotting theoretical memory usage comparison...")
-    plot_compare_theoretical_memory_usage((10, 100, 20))
+    plot_theoretical_memory_usage((10, 100, 20))
 
     print("\nPlotting non-zero entries in matrix A...")
-    plot_non_zero_entries((10, 100, 20))
+    plot_sparsity((10, 100, 20))
 
     print("\nPlotting non-zero entries in LU decomposition...")
-    plot_non_zero_entries_lu((10, 20, 10))
+    plot_sparsity_lu((10, 20, 10))
 
     plot_sparse_vs_full(100)
 
