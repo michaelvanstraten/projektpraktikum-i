@@ -141,13 +141,15 @@ class BlockMatrix:
             return 7
 
 
-def plot_compare_theoretical_memory_usage(interval, save_to):
+def plot_compare_theoretical_memory_usage(interval, save_to=None):
     """Plots the theoretical memory usage comparison between raw format and CRS format.
 
     Parameters
     ----------
     interval : tuple
         Interval of values for n, defined as (start, end, num_points).
+    save_to : str, optional
+        File path to save the plot. If None, the plot is displayed.
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
@@ -184,7 +186,7 @@ def plot_compare_theoretical_memory_usage(interval, save_to):
         plt.show()
 
 
-def plot_non_zero_entries(interval, save_to):
+def plot_non_zero_entries(interval, save_to=None):
     """Plots the number of non-zero entries in $A$ as a function of $n$ and $N$,
     and compares it with the number of entries in a fully populated matrix.
 
@@ -192,6 +194,8 @@ def plot_non_zero_entries(interval, save_to):
     ----------
     interval : tuple
         Interval of values for n, defined as (start, end, num_points).
+    save_to : str, optional
+        File path to save the plot. If None, the plot is displayed.
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
@@ -242,7 +246,7 @@ def plot_non_zero_entries(interval, save_to):
         plt.show()
 
 
-def plot_non_zero_entries_lu(interval, save_to):
+def plot_non_zero_entries_lu(interval, save_to=None):
     """Plots the number of non-zero entries in the matrix $A$ and its LU decomposition
     as a function of $N$.
 
@@ -250,6 +254,8 @@ def plot_non_zero_entries_lu(interval, save_to):
     ----------
     interval : tuple
         Interval of values for n, defined as (start, end, num_points).
+    save_to : str, optional
+        File path to save the plot. If None, the plot is displayed.
     """
     values_for_n = np.linspace(*interval, dtype=int)
 
