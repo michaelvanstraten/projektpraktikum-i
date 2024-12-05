@@ -250,7 +250,7 @@ die wir benutzt haben um einem Diskretisierungspunkt seine Gleichungsnummer zuzu
 Sei \(A \in \mathbb{R}^{n \times n}\), dann existieren \(P, L, U \in \mathbb{R}^{n \times n}\), 
 wobei \(P\) eine Permutationsmatrix, \(L\) eine linke untere Dreiecksmatrix und \(U\) eine rechte obere
 Dreiecksmatrix ist mit \(A = PLU\).  \cite{LU}
-Da \(P\) Permutationsmatrix ist, ist \(P^{-1} = P^{T}\).
+Da \(P\) Permutationsmatrix ist, gilt \(P^{-1} = P^{T}\).
 Liegt nun ein lineares Gleichungssystem \(Ax = b\) vor, so gilt:
 \begin{align*}
   Ax &= b \\
@@ -261,28 +261,100 @@ Mit der Substitution \(Ux = z\) lässt sich \(Lz = P^{T}b\) nach \(z\) mittels V
 Danach kann man \(Ux = z\) mittels Rückwärtssubstitution nach \(x\) in \(\mathcal{O}(n^{2})\) lösen und erhält damit die Lösung des
 ursprünglichen Gleichungssystems.
 
-\subsection{Vergleich: Vollbesetzte und Sparse Matrizen}
+\subsection{Vergleich: A als vollbesetzte und sparse Matrix}
 Die Matrix \(A\) besitzt viele Nulleinträge; für größere Werte von \(n\) wird das Speichern
 der Matrix als vollbesetzte Matrix sehr ineffizient. Daher haben wir Sparse-Matrizen verwendet.
 Sparse-Matrizen speichern nur die von Null verschiedenen Einträge mitsamt ihren Koordinaten innerhalb 
 der Matrix. Für einen nicht-Nulleintrag werden also drei Einträge gespeichert.  
 
-% TODO ADD DIAGRAM
-
-Wie zu sehen ist, benötigt man schon ab \(n = 5\) mehr Speicherplatz für vollbesetzte Matrizen als für Sparse-Matrizen, 
-weshalb eine Implementation von \(A\) als Sparse-Matrix sinnvoll ist.
-
 
 
 \section{Experimente}
+Für unsere Experimente haben wir uns die Funktion \(u(x) = x_{1}\sin(3x_{1})x_{2}\sin(3x_{2})\) vorgegeben. Für diese Funktion gilt:
+\[-\Delta u(x) = -6(x_{1}\cos(3x_{2})\sin(3x_{1}) + x_{2}\cos(3x_{1})\sin(3x_{2}) - 3x_{1}x_{2}\sin(3x_{1})\sin(3x_{2})) = f(x)\] 
+Für diese Funktion \(f\) haben wir eine numerische \(\hat{u}\) des Poisson-Problems, für die am Anfang gegeben Startbedinungen, bestimmt und sie 
+mit der analytischen Lösung \(u\) verglichen.
+
+Der erste Teil unserer Experimente richtet sich an die Matrix \(A\) in verschiedenen Speicherformaten.
+Zuerst haben wir die Sparsity der Matrix \(A\) und ihrer LU-Zerlegung betrachtet.
+
+%TO DO ADD DIAGRAMS FOR SPARSITY
+
+Zudem haben wir auch den theoretischen Speicherbedarf der Matrix \(A\) im vollbesetzten und sparse Format untersucht.
+
+%TO DO ADD DIAGRAM FOR MEMORY COMPLEXITY
+
+Im nächsten Teil unserer Experimente haben wir die \(\hat{u}\) mit \(u\) verglichen.
+Dazu haben wir zunächst beide Funktion für \(n = 4, 11, 128\) geplottet.
+
+%TO DO ADD ANALYTICAL SOLUTION AND NUMERICAL SOLUTION PLOTS
+
+Ferner haben wir den Fehler zwischen der approximierten und tatsächlichen Lösung untersicht, indem wir zuerst den maximalen Fehler
+in Abhängigkeit von \(n\) geplottet haben und haben dann die Fehler an den einzelnen Diskretisierungspunkten in 3D, sowie Heatmap-Format
+geplottet.
+
+%TO DO ADD ERROR VS NUMBER OF DISCRETIZATION POINTS AND 3D/HEATMAP PLOTS OF ERROR
+
+
+\subsection{Beobachtungen}
+
+%TO DO ADD REFS TO ABBILDUNGEN
+
+\begin{itemize}
+  \item In Abbildung 1 
+        ist zu sehen, dass, für größer werdende \(n\), die Anzahl an Gesamteinträgen in \(A\) für sehr viel schneller steigt, als die Anzahl an nicht-Null-Einträgen,
+        sowie dass die relative Anzahl an nicht-Null-Einträgen gegen 0 geht.
+        Auch für die LU-Zerlegung ist das selbe Verhalten zu erkennen.
+
+        %TO DO MAYBE ADD EXPLANATION OF > 0.001 (by abs)
+
+  \item In Abbildung 2
+        ist der theoretischen Speicherplatzbedarf dargestellt. Für größer werdende Werte von \(n\) steigt der Speicherplatzbedarf für das raw-Format
+        stärker an, als das CRS-Format, also das Format um \(A\) als sparse-Matrix zu speichern.
+
+  \item In Abbildung 3
+        ist der Vergleich der analytischen Lösung mit den approxmierten Lösungen für verschiedene Werte von \(n\) dargestellt.
+        Es ist zu beobachten, dass, für größer werdende Werte von \(n\), die approximierte Lösung sich der analytischen Lösung immer mehr annähert.
+
+  \item In Abbildung 4
+        ist der maximale Fehler zwischen der numerischen und analytischen Lösung zu sehen.
+        Man kann beobachten, dass der Fehler für größer werdende Werte von \(n\) immer kleiner wird.
+        Für \(n = 5000\) liegt er bei ca. \(10^{-3}\) und
+        für \(n = 10000\) bei ca. \(6 \cdot 10^{-2}\). 
+
+
+  \item In Abbildung 5
+        ist der Fehler an den einzelnen Diskretisierungspunkten, im 3D und Heatmap Plot, zu sehen. \\
+        Für \(n = 4\) liegt der Fehler zwischen ungefähr 0.04 und 0.14, \\
+        für \(n = 11\) zwischen ungefähr 0.005 und 0.035, und \\
+        für \(n = 128\) zwischen ungefähr 0.00005 und 0.00030. \\
+        Es ist also eine Verringerung des Fehlers an den einzelnen Diskretisierungspunkten für größer werdende \(n\) zu beobachten.
+\end{itemize}
 
 
 
 \section{Auswertung}
 
+%TO DO ALSO ADD REFS HERE
 
+\begin{itemize}
+  \item Der stärkere Anstieg in Abbildung 1 der Matrix \(A\) im vollbesetzten Format verglichen mit dem sparse Format
+        entspricht den Erwartungen, aufgrund der Struktur der Matrix und ihren vielen Nulleinträgen.
 
+        Auch der stärke Anstieg des theoretischen Speicherbedarfs ion Abbildung 2 ist wie im Theorie Teil vorhergesagt, denn obwohl drei
+        Einträge für jeden Matrixeintrag im sparse Format gespeichert werden müssen, steigt die Anzahl der Nulleinträge viel 
+        schneller und ist daher kostenaufwändiger.
 
+  \item Der graphische Vergleich in Abbildung 3 zeigt, dass die numerische Lösung für größere Werte von \(n\) immer besser
+        mit der analytischen Lösung übereinstimmt.
+
+        Dies wird ferner von Abbildung 4 bestätigt, denn der maximale Fehler zwischen der numerischen und analytischen Lösung
+        ist für \(n \geqslant 5000\) kleiner als \(10^{-3}\).
+
+        Auch Abbildung 5 zeigt dies nochmal durch einen Plot des Fehlers an den verschiedenen Diskretisierungspunkten.
+        Während der Fehler zwar variiert, so wird er für größere Werte von \(n\) immer kleiner und liegt beispielsweise
+        für \(n = 128\) nur noch ungefähr 0.00005 und 0.00030. 
+\end{itemize}
 
 
 \section{Zusammenfassung}
