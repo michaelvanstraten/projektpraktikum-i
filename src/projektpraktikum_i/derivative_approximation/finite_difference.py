@@ -202,7 +202,9 @@ class FiniteDifference:
 
         plt.figure(figsize=(10, 6))
 
-        plot = lambda *args, **kwargs: plt.plot(inputs, *args, **kwargs)
+        def plot(*args, **kwargs):
+            return plt.plot(inputs, *args, **kwargs)
+
         plot(self.__f(inputs), label="$f(x)$", color="red")
         plot(self.__d_f(inputs), label="$f'(x)$", color="orange")
         plot(self.__dd_f(inputs), label="$f''(x)$", color="green")
@@ -264,7 +266,8 @@ def plot_errors(h_values, f, d_f, dd_f, interval):  # pylint: disable=too-many-a
 
     plt.figure(figsize=(10, 6))
 
-    plot = lambda *args, **kwargs: plt.loglog(h_values, *args, **kwargs)
+    def plot(*args, **kwargs):
+        return plt.loglog(h_values, *args, **kwargs)
 
     plot(errors_right, label="Error in $D_h^+ f(x)$", color="magenta", linewidth=2)
     plot(errors_central, label="Error in $D_h^c f(x)$", color="cyan", linewidth=2)
@@ -313,9 +316,14 @@ def main():
     plt.style.use("dark_background")
 
     # Define the function and its analytical derivatives
-    f = lambda x: np.sinc(x / np.pi)
-    d_f = lambda x: (x * np.cos(x) - np.sin(x)) / x**2
-    dd_f = lambda x: -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / (x**3)
+    def f(x):
+        return np.sinc(x / np.pi)
+
+    def d_f(x):
+        return (x * np.cos(x) - np.sin(x)) / x**2
+
+    def dd_f(x):
+        return -((x**2 - 2) * np.sin(x) + 2 * x * np.cos(x)) / x**3
 
     # Define interval and discretization parameters
     interval = (np.pi, 3 * np.pi, 1000)

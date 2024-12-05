@@ -6,14 +6,16 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "click>=8.1.7",
+    "dill>=0.3.9",
+    "joblib>=1.4.2",
     "matplotlib>=3.9.2",
     "numpy>=1.26.4",
     "scipy>=1.14.1",
 ]
 
 [project.scripts]
-derivative-approximation = "projektpraktikum_i.derivative_approximation.finite_difference:main"
 derivative-approximation-experiments = "projektpraktikum_i.derivative_approximation.experiments:cli"
+discretization-experiements = "projektpraktikum_i.discretization.experiments_lu:cli"
 
 [build-system]
 requires = ["hatchling"]

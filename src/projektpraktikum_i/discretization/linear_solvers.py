@@ -1,6 +1,17 @@
+"""
+Module providing various linear solvers for solving linear systems of equations.
+"""
+
 import numpy as np
 
+# We need to import dill here first so we can hash lambda functions
+import dill as pickle  # pylint: disable=unused-import
+from joblib import Memory
 
+memory = Memory(location=".cache")
+
+
+@memory.cache
 def solve_lu(p, l, u, b):
     """Solves the linear system Ax = b via forward and backward substitution
     given the decomposition A = p * l * u.
@@ -29,25 +40,33 @@ def solve_lu(p, l, u, b):
     z = np.empty(len(b))
     z[0] = b_hat[0] / l[0, 0]
     for i in range(1, len(b)):
-        sum = 0
-        for j in range(i):
-            sum += l[i, j] * z[j]
-        z[i] = (b_hat[i] - sum) / l[i, i]
+        partial_sum = 0
+        for j in range(1, i + 1):
+            partial_sum += l[i, j - 1] * z[j - 1]
+        z[i] = (b_hat[i] - partial_sum) / l[i, i]
 
     # Solving Rx = z with backward substitution
     x = np.empty(len(b))
     x[len(b) - 1] = z[len(b) - 1] / u[len(b) - 1, len(b) - 1]
     for i in range(len(b) - 2, -1, -1):
-        sum = 0
+        partial_sum = 0
         for j in range(i + 1, len(b)):
-            sum += u[i, j] * x[j]
-        x[i] = (z[i] - sum) / u[i, i]
+            partial_sum += u[i, j] * x[j]
+        x[i] = (z[i] - partial_sum) / u[i, i]
 
     return x
 
 
-def solve_sor(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4), omega=1.5):
-    """Solves the linear system Ax = b via the successive over relaxation method.
+# pylint: disable=unused-argument
+# pylint: disable=invalid-name
+# pylint: disable=dangerous-default-value
+
+
+def solve_sor(
+    A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}, omega=1.5
+):
+    """Solves the linear system Ax = b via the successive over relaxation
+    method.
 
     Parameters
     ----------
@@ -90,7 +109,7 @@ def solve_sor(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4), omega=
     """
 
 
-def solve_gs(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+def solve_gs(A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}):
     """Solves the linear system Ax = b via the Jacobi method.
 
     Parameters
@@ -131,7 +150,7 @@ def solve_gs(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
     """
 
 
-def solve_es(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+def solve_es(A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}):
     """Solves the linear system Ax = b via the Gauss-Seidel method.
 
     Parameters
@@ -172,7 +191,7 @@ def solve_es(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
     """
 
 
-def solve_cg(A, b, x0, params=dict(eps=1e-8, max_iter=1000, var_x=1e-4)):
+def solve_cg(A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}):
     """Solves the linear system Ax = b via the conjugated gradient method.
 
     Parameters

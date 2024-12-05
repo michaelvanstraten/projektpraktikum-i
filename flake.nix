@@ -119,7 +119,7 @@
                 chktex.enable = true;
                 # Python
                 pylint = {
-                  enable = false;
+                  enable = true;
                   settings = {
                     binPath = "${devVirtualEnv}/bin/python -m pylint";
                   };

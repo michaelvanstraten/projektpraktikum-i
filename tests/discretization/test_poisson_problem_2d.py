@@ -1,9 +1,4 @@
-"""
-Test suite for the Poisson problem discretization functions.
-
-This module contains unit tests for the `idx`, `inv_idx`, `rhs`, and `compute_error`
-functions from the `projektpraktikum_i.discretization.poisson_problem_2d` module.
-"""
+# pylint: disable=missing-function-docstring,missing-module-docstring
 
 import pytest
 
@@ -13,11 +8,12 @@ from projektpraktikum_i.discretization.poisson_problem_2d import (
     idx,
     inv_idx,
     rhs,
-    compute_error,
 )
 
+
 # Example function for rhs
-f = lambda x: x[0] * np.sin(np.pi * x[0]) * x[1] * np.sin(np.pi * x[1])
+def f(x):
+    return x[0] * np.sin(np.pi * x[0]) * x[1] * np.sin(np.pi * x[1])
 
 
 @pytest.mark.parametrize("n", range(2, 20))
