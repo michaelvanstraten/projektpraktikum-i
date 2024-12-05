@@ -137,12 +137,7 @@ class BlockMatrix:
         float
             Condition number with respect to the infinity-norm
         """
-        if self.n == 2:
-            return 4
-        if self.n == 3:
-            return 6
-        return 7
-
+        return np.linalg.cond(self.get_sparse().toarray(), np.inf)
 
 def plot_theoretical_memory_usage(interval, save_to=None):
     """Plots the theoretical memory usage comparison between raw format and CRS
