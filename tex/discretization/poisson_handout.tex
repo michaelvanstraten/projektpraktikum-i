@@ -224,27 +224,36 @@ verwendet. Diese Ordnung induziert eine Bijektion
 die wir benutzt haben um einem Diskretisierungspunkt seine Gleichungsnummer zuzuweisen. Die Matrix, die das Gleichungssystem beschreibt ist dann
 \(h^{-2}A\), wobei
 \[
-  A \coloneq \begin{bmatrix}
-  C & -I & 0 & \cdots & 0 \\
-  -I & C & -I & \cdots & 0 \\
-  0 & \ddots & \ddots & \ddots & \vdots \\
-  \vdots & \ddots & \ddots & \ddots & -I \\
-  0 & \cdots & 0 & -I & C
-  \end{bmatrix}
-  \in \mathbb{R}^{N \times N}.
-  \]
-  und
-
-\[
-  C \coloneq \begin{bmatrix}
-  4 & -1 & 0 & \cdots & 0 \\
-  -1 & 4 & -1 & \cdots & 0 \\
-  0 & \ddots & \ddots & \ddots & \vdots \\
-  \vdots & \ddots & \ddots & \ddots & -1 \\
-  0 & \cdots & 0 & -1 & 4
-  \end{bmatrix}
-  \in \mathbb{R}^{(n-1) \times (n-1)},
-  \] \cite{PPI_Poisson} 
+\begin{array}{ccc}
+  \scalebox{0.9}{$
+  \begin{array}{l}
+    A \coloneq \begin{bmatrix}
+    C & -I & 0 & \cdots & 0 \\
+    -I & C & -I & \cdots & 0 \\
+    0 & \ddots & \ddots & \ddots & \vdots \\
+    \vdots & \ddots & \ddots & \ddots & -I \\
+    0 & \cdots & 0 & -I & C
+    \end{bmatrix}
+    \in \mathbb{R}^{N \times N}
+  \end{array}
+  $}
+  &
+  \text{und}
+  &
+  \scalebox{0.9}{$
+  \begin{array}{l}
+    C \coloneq \begin{bmatrix}
+    4 & -1 & 0 & \cdots & 0 \\
+    -1 & 4 & -1 & \cdots & 0 \\
+    0 & \ddots & \ddots & \ddots & \vdots \\
+    \vdots & \ddots & \ddots & \ddots & -1 \\
+    0 & \cdots & 0 & -1 & 4
+    \end{bmatrix}
+    \in \mathbb{R}^{(n-1) \times (n-1)}
+  \end{array}
+  $}
+\end{array}
+\] \cite{PPI_Poisson} 
 
 \subsection{LU-Zerlegung einer Matrix}
 Sei \(A \in \mathbb{R}^{n \times n}\), dann existieren \(P, L, U \in \mathbb{R}^{n \times n}\), 
