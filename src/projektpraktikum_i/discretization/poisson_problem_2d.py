@@ -20,7 +20,6 @@ import numpy as np
 import dill as pickle  # pylint: disable=unused-import
 from joblib import Memory
 
-
 from projektpraktikum_i.discretization import linear_solvers
 from projektpraktikum_i.discretization.block_matrix_2d import BlockMatrix
 
@@ -231,18 +230,19 @@ def plot_error(f, analytic_u, solver, interval, save_to=None):
     interval : tuple
         Interval of values for n, defined as (start, end, num_points).
     """
-    values_for_n = np.linspace(*interval, dtype=int)
+    start, end, num_points = interval
+    values_for_n = np.logspace(start, end, num=num_points, base=2, dtype=int)
     errors = [compute_error(n, solver(n, f), analytic_u) for n in values_for_n]
 
     # Plotting the error vs n
     plt.figure(figsize=(10, 6))
-    plt.plot(
+    plt.loglog(
         values_for_n**2, errors, marker="o", linestyle="-", color="r", label="Error"
     )
     plt.xlabel("Number of Discretization Points ($N$)")
-    plt.title("Error vs Number of Discretization Points")
-    plt.yscale("log")
-    plt.grid(True)
+    plt.ylabel("Error")
+    plt.title("Error vs Number of Discretization Points (Log-Log Scale)")
+    plt.grid(True, ls="--")
     plt.legend()
 
     # Save or display plot

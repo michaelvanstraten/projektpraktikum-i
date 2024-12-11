@@ -119,10 +119,17 @@ def plot_difference(n, save_to):
         plt.show()
 
 
-start_option = click.option("--start", default=2, help="Start value for n.")
-end_option = click.option("--end", default=20, help="End value for n.")
+start_option = click.option(
+    "--start", default=1, show_default=True, help="Start value for n (log base 2)."
+)
+end_option = click.option(
+    "--end", default=6, show_default=True, help="End value for n (log base 2)."
+)
 num_points_option = click.option(
-    "--num-points", default=10, help="Number of points in the interval."
+    "--num-points",
+    default=10,
+    show_default=True,
+    help="Number of points in the interval.",
 )
 
 
