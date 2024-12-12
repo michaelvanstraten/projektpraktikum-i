@@ -1,32 +1,26 @@
 \documentclass{scrartcl}
-\usepackage{scrhack}  % resolves deprecated warnings in context of float and KOMA
 
-%%% GENERAL PACKAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% inputenc allows the usage of non-ascii characters in the LaTeX source code
-\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+% Babel provides hyphenation patterns and translations of keywords like 'table
+% of contents'
+\usepackage[ngerman]{babel}
+% Provides commands for type-setting mathematical formulas
+\usepackage{amsmath}
+% Provides additional symbols
+\usepackage{amssymb}
+% Provides environments for typical math text structure
+\usepackage{amsthm}
+\usepackage{biblatex}
+% Automatic generation of hyperlinks for references and URIs
+\usepackage{hyperref}
+\usepackage{mathtools}
 
-
-%%% KOMA OPTIONS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \KOMAoptions{
-  % font size in pt
-  fontsize=12,
-  % parameter for size of type area, cf. KOMA script documentation
-  DIV=13,
-  % option for two-sided documents : false, semi, true
-  twoside=false,
-  % option for paragraph skip :
-  %   false - indent, without vertical space between two paragraphs
-  %   true  - vertical space between two paragraphs, without indent
+  % Add vertical space between two paragraphs, without indent
   parskip=true,
-  % option to generate a draft version
-  draft=false
 }
 
-
-%%% TITLEPAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% general description of the type of the document
 \subject{Bericht Handout}
-% head line of the title page, here with department and logo
 \titlehead{%
   \begin{minipage}{.7\textwidth}%
   Humboldt-Universit\"at zu Berlin\\
@@ -34,383 +28,338 @@
   Institut f\"ur Mathematik
   \end{minipage}
 }
-% title of the document
 \title{Poisson-Problem}
-% optional subtitle
-%\subtitle{Draft from~\today}
-% information about the author
 \author{%
   Eingereicht von M. van Straten und P. Merz
 }
-% date of submission
 \date{\today}
 
+\newcommand\N{\mathbb{N}}
+\newcommand\R{\mathbb{R}}
+\newcommand\BigO{\mathcal{O}}
 
+\DeclarePairedDelimiterXPP{\set}[1]{}{\lbrace}{\rbrace}{}{#1}
+\DeclarePairedDelimiterXPP{\paren}[1]{}{\lparen}{\rparen}{}{#1}
 
-%%% LANGUAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% babel provides hyphenation patterns and translations of keywords like 'table
-% of contents'
-\usepackage[ngerman]{babel}
+\addbibresource{poisson_handout.bib}
 
-\usepackage{mathtools}
-%%% MATH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% amsmath provides commands for type-setting mathematical formulas
-\usepackage{amsmath}
-% amssymb provides additional symbols
-\usepackage{amssymb}
-% HINT
-% Use http://detexify.kirelabs.org/classify.html to find unknown symbols!
-
-\usepackage{cite}
-
-%%% MATH ENVIRONMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% amsthm provides environments for typical math text structure
-\usepackage{amsthm}
-\theoremstyle{remark}
-\newtheorem*{bemerkung}{Bemerkung}
-
-
-%%% COLORS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% define own colors and use colored text
-\usepackage[pdftex,svgnames,hyperref]{xcolor}
-
-
-%%% FONT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% choose latin modern font (a good general purpose font)
-\usepackage{lmodern}
-% fontenc and microtype improve the appearance of the font
-\usepackage[T1]{fontenc}
-\usepackage{microtype}
-
-
-%%% HYPERLINKS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% automatic generation of hyperlinks for references and URIs
-\usepackage{hyperref}
-
-
-%%% GRAPHICAL ELEMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% provides commands to include graphics
-\usepackage{graphicx}
-
-
-%%% TABLES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% provides commands for good-looking tables
-\usepackage{booktabs}
-
-%%%% more fonts: e.g. fraktur
-\usepackage{yfonts}
-
-%%% Code Listings %%%%%%%%%%%%%%%%
-% provides commands for including code (python, latex, ...)
-\usepackage{listings}
-\definecolor{keywords}{RGB}{255,0,90}
-\definecolor{comments}{RGB}{0,0,113}
-\definecolor{red}{RGB}{160,0,0}
-\definecolor{green}{RGB}{0,150,0}
-\lstset{language=Python, 
-        basicstyle=\ttfamily\small, 
-        keywordstyle=\color{keywords},
-        commentstyle=\color{comments},
-        stringstyle=\color{red},
-        showstringspaces=false,
-        identifierstyle=\color{green},
-        }
-
-%%%% Grafiken zeichnen mit tikz
-\usepackage{tikz}
-% Definitionen f\"ur das Flowchart
-\usetikzlibrary{shapes.geometric, arrows, shapes.multipart}
-\tikzstyle{startstop} = [ellipse, minimum width=2.5cm, minimum height=0.8cm, 
-	align = left,text centered, draw=black, fill=red!30]
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110,
-	minimum width=2.5cm, minimum height=0.8cm, align = left, text centered, 
-	draw=black, fill=blue!30]
-\tikzstyle{process} = [rectangle, minimum width=2.5cm, minimum height=0.8cm, 
-	align = left, text centered, draw=black, fill=gray!30]
-\tikzstyle{err} = [rectangle, minimum width=2.5cm, minimum height=0.8cm, 
-	align = left, text centered, draw=black, fill=red!10,text width=3cm]
-\tikzstyle{subrout} = [rectangle split,rectangle split horizontal,
-	minimum width=2.5cm, minimum height=0.8cm,align = left, text centered, 
-	draw=black, fill=orange!30,rectangle split parts=3]
-\tikzstyle{decision} = [diamond,shape aspect=2.5, minimum width=2.5cm, 
-	minimum height=0.8cm, align = left, text centered, draw=black, 
-	fill=green!30]
-\tikzstyle{arrow} = [thick,->,>=stealth]
-
-
-
-
-%%% MY USER-DEFINED COMMANDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% define your own commands and abbreviations with \newcommand
-% or \DeclareMathOperator
-% e.g. try \R and \Span in math mode
-\newcommand\R{\mathbb R}
-\DeclareMathOperator\Span{span}
-
-
-%%% BEGIN OF DOCUMENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% the type-setting of the document starts here
 \begin{document}
 
-% generating the title page
 \maketitle
-% generating the table of contents (requires to run pdflatex twice!)
 \tableofcontents
-% start a new page
-\cleardoublepage
+\cleardoublepage%
 
-
-%%% BEGIN OF CONTENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Einleitung und Motivation}
-Die Poisson-Gleichung, benannt nach Siméon Denis Poisson, ist eine elliptische partielle Differentialgleichung, 
-die in vielen Bereichen des Ingenieurswesens und der Physik, wie zum Beispiel in der Gravitationstheorie, der Elektrostatik oder 
-der Fluiddynamik, Anwendung findet.\cite{Poisson} Aufgrund der Tatsache, dass es oftmals sehr schwer ist solche Differentialgleichungen analytisch zu lösen
-und dass wir in der letzten Aufgabenreihe die Approximation von Ableitungen erster und zweiter Ordnung betrachtet haben, möchten wir für
-feste vorgegebene Randbedingungen numerisch eine Approximation der Lösung der Poisson-Gleichung bestimmen und mit der analytischen Lösung
-vergleichen.
 
+Die Poisson-Gleichung, benannt nach dem französischen Mathematiker und Physiker
+Siméon Denis Poisson, ist eine elliptische partielle Differenzialgleichung mit
+zentraler Bedeutung in zahlreichen Bereichen der Ingenieurwissenschaften und
+Physik. Beispiele hierfür sind die Gravitationstheorie, Elektrostatik und
+Strömungsmechanik.\ cite{Poisson} Da analytische Lösungen solcher
+Differenzialgleichungen oft äußerst anspruchsvoll oder gar unmöglich zu finden
+sind, bietet sich die numerische Approximation als praktikable Alternative an.
+Im Rahmen der bisherigen Aufgabenreihe wurden bereits Verfahren zur
+Approximation von Ableitungen erster und zweiter Ordnung untersucht. Aufbauend
+darauf soll in dieser Arbeit für gegebene Randbedingungen eine numerische
+Lösung der Poisson-Gleichung ermittelt und mit der analytischen Lösung
+verglichen werden.
 
 \section{Theorie}
-\subsection{Poisson-Problem} 
-Das Poisson-Problem beschreibt die Suche nach einer Funktion \(u \in C^{2}(\mathbb{R}^{2};\mathbb{R})\), sodass für ein gegebenes Gebiet
-\(\Omega\ \subset \mathbb{R}^{2}\) mit Rand \(\partial \Omega\) und zwei gebenen Funktionen \(f \in C(\Omega;\mathbb{R})\) und
-\(g \in C(\partial \Omega;\mathbb{R})\) folgendes gilt:
+
+\subsection{Poisson-Problem}
+
+Das Poisson-Problem besteht in der Bestimmung einer Funktion \(u \in C^2(\R^2;
+\R)\), die für ein gegebenes Gebiet \(\Omega \subset \R^2\) mit Rand \(\partial
+\Omega\) sowie zwei vorgegebene Funktionen \(f \in C(\Omega; \R)\) und \(g \in
+C(\partial \Omega; \R)\) die folgenden Bedingungen erfüllt:
 \begin{align*}
--\Delta u &= f \text{       in } \Omega  \\
-        u &= g \text{       auf } \partial \Omega
+    -\Delta u & = f \; \text{in} \; \Omega           \\
+    u         & = g \; \text{auf} \; \partial \Omega
 \end{align*}
-wobei \(\Delta u = \frac{\partial^{2}u}{\partial x_{1}^{2}} + \frac{\partial^{2}u}{\partial x_{2}^{2}}\) den Laplace-Operator für
-\(u\) bezeichnet. \cite{PPI_Poisson} \\
-In diesem Handout werden wir den Fall \(\Omega = (0, 1)^{2}\) und \(g = 0\) betrachten.
+wobei
+\begin{equation*}
+    \Delta u = \frac{\partial^2 u}{\partial x_1^2} + \frac{\partial^2 u}{\partial x_2^2}
+\end{equation*}
+den Laplace-Operator von \(u\) darstellt.\ \cite{PPI_Poisson} In diesem
+Handout wird speziell der Fall \[\Omega = {(0, 1)}^2\] und \[g = 0\] behandelt.
 
+\subsection{Diskretisierung des Gebietes}
 
-
-\subsection{Diskretisierung von \(\Omega\)}
-Um \(\Omega = (0,1)^{2}\) zu diskretisieren teilen wir dieses in ein Gitter von Punkten auf.
-Hierfür zerlege man das Intervall \((0,1)\) in \(n\) gleich lange Teilintervalle der Länge \(\frac{1}{n}\)
-und erhält die Menge \(X_{1} = \{\frac{j}{n}: 1 \leqslant j \leqslant n - 1\} \).
-Die Gitterpunkte, also Diskretisierungspunkte ergeben sich dann wie folgt:
-\[X = X_{1} \times X_{1} = \{(\frac{j}{n}, \frac{k}{n}): 1 \leqslant j,k \leqslant n - 1\} \] \cite{PPI_Poisson}
-
+Zur Diskretisierung des Gebiets \(\Omega = {(0,1)}^2\) wird dieses in ein
+Gitter aus Punkten unterteilt. Dafür wird das Intervall \((0,1)\) in \(n\)
+gleich lange Teilintervalle der Länge \(\frac{1}{n}\) zerlegt, wodurch sich die
+Menge
+\[
+    X_1 = \set*{\frac{j}{n} : 1 \leqslant j \leqslant n - 1}
+\]
+ergibt. Die Gitterpunkte, also die Diskretisierungspunkte, sind dann durch
+  das kartesische Produkt definiert:
+\[
+    X
+    = X_1 \times X_1
+    = \set*{\paren*{\frac{j}{n}, \frac{k}{n}} : 1 \leqslant j, k \leqslant n - 1}.
+\]
+~\cite{PPI_Poisson}
 
 \subsection{Diskretisierung des Laplace-Operators}
-Mithilfe von finiten Differenzen, die bereits im ersten Hausaufgabenteil bearbeitet wurden, lassen sich die zweiten partiellen Ableitungen 
-nach einer Variable dann wie folgt approximieren:
-\begin{align*}
-  \frac{\partial^{2}u}{\partial x_{1}^{2}}(v, w) &\approx \frac{u(v + h, w) - 2u(v, w) + u(v - h, w)}{h^{2}} \\
-  \frac{\partial^{2}u}{\partial x_{1}^{2}}(v, w) &\approx \frac{u(v, w + h) - 2u(v, w) + u(v, w - h)}{h^{2}}
-\end{align*}
-Für \(h = \frac{1}{n}\) mit \(n \in \mathbb{N}^{+}\) und \((v, w) \in X\). \\
-Also lässt sich der Laplace-Operator wie folgt approximieren
-\begin{align*}
-  \Delta u &= \frac{\partial^{2}u}{\partial x_{1}^{2}} + \frac{\partial^{2}u}{\partial x_{2}^{2}} \\
-           &\approx \frac{u(v + h, w) + u(v, w + h) - 4u(v, w) + u(v - h, w) + u(v, w - h)}{h^2}
-\end{align*}
-Dieser diskrete Laplace-Operator von \(u\) wird mit \(\Delta_{h}u\) bezeichnet
-\subsection{Aufstellen des linearen Gleichungssystems}
-Gesucht ist nun eine Lösung \(\hat{u}\) der diskretisierten partiellen Differentialgleichung
-\begin{align*}
-  -\Delta_{h} u(x) &= f \quad \text{für } x \in X   \\
-              u(x) &= 0 \quad \text{auf } \partial \Omega
-\end{align*}
-an den \(N\) Gitterpunkten. Somit erhält man \(N\) Gleichungen, die zu lösen sind. Um diese Gleichungen zu ordnen
-haben wir für \(x = (x_{1}, x_{2}), y = (y_{1}, y_{2} \in X)\) die Ordnung
-\[x <_{X} y \iff x_{1}n + x_{2}n^{2} < y_{1}n + y_{2}n^{2}\]
-verwendet. Diese Ordnung induziert eine Bijektion
-\begin{align*}
-  idx: \{1, \cdots ,n - 1\}^{2} &\longrightarrow \{1, \cdots ,N \} \\ 
-                          (j, k)&\longmapsto (k - 1)(n - 1) + j
-\end{align*}
-die wir benutzt haben um einem Diskretisierungspunkt seine Gleichungsnummer zuzuweisen. Die Matrix, die das Gleichungssystem beschreibt ist dann
-\(h^{-2}A\), wobei
+
+Mithilfe finiten Differenzen, die bereits im ersten Hausaufgabenteil behandelt
+wurden, können die zweiten partiellen Ableitungen einer Funktion nach einer
+Variablen wie folgt approximiert werden:
 \[
-\begin{array}{ccc}
-  \scalebox{0.9}{$
-  \begin{array}{l}
+    \frac{\partial^2 u}{\partial x_1^2} (v, w) \approx \frac{u(v + h, w) - 2u(v, w) + u(v - h, w)}{h^2}
+\]
+sowie
+\[
+    \frac{\partial^2 u}{\partial x_2^2} (v, w) \approx \frac{u(v, w + h) - 2u(v, w) + u(v, w - h)}{h^2}
+\]
+wobei \[h = \frac{1}{n}\] für \(n \in \N^+\) gilt und \((v, w) \in X\).
+
+Daraus ergibt sich für den Laplace-Operator folgende Approximation:
+\begin{align*}
+    \Delta u & = \frac{\partial^2 u}{\partial x_1^2}
+    + \frac{\partial^2 u}{\partial x_2^2}              \\
+             & \approx \frac{u(v + h, w) + u(v, w + h)
+        - 4u(v, w) + u(v - h, w) + u(v, w - h)}{h^2}.
+\end{align*}
+
+Dieser diskrete Laplace-Operator wird mit \(\Delta_h u\) bezeichnet.
+
+\subsection{Aufstellen des linearen Gleichungssystems}
+
+Ziel ist es, eine Lösung \(\hat u\) der diskretisierten partiellen
+Differenzialgleichung zu finden:
+\begin{align*}
+    -\Delta_{h} u(x) & = f \; \text{für} \; x \in X         \\
+    u(x)             & = 0 \; \text{auf} \; \partial \Omega
+\end{align*}
+an den \(N\) Gitterpunkten. Damit ergibt sich ein System von \(N\)
+Gleichungen, die zu lösen sind.
+
+Zur Ordnung dieser Gleichungen wird für \(x = (x_1, x_2)\) und \(y = (y_1, y_2)
+\in X\) die folgende Ordnung definiert:
+\[
+    x <_{X} y \iff x_1n + x_2n^2 < y_1n + y_2n^2.
+\]
+Diese Ordnung induziert eine Bijektion:
+\begin{align*}
+    \operatorname{idx}: \set{1, \ldots, n - 1}^2 & \longrightarrow \set*{1, \ldots , N} \\
+    (j, k)                                       & \longmapsto (k - 1)(n - 1) + j
+\end{align*}
+mit der jedem Diskretisierungspunkt eine eindeutige Gleichungsnummer
+zugewiesen wird.
+
+Das resultierende Gleichungssystem wird durch die Matrix \(h^{-2}A\)
+beschrieben, wobei \(A\) eine block diagonale Struktur besitzt:
+\[
     A \coloneq \begin{bmatrix}
-    C & -I & 0 & \cdots & 0 \\
-    -I & C & -I & \cdots & 0 \\
-    0 & \ddots & \ddots & \ddots & \vdots \\
-    \vdots & \ddots & \ddots & \ddots & -I \\
-    0 & \cdots & 0 & -I & C
+        C      & -I     & 0      & \cdots & 0      \\
+        -I     & C      & -I     & \cdots & 0      \\
+        0      & \ddots & \ddots & \ddots & \vdots \\
+        \vdots & \ddots & \ddots & \ddots & -I     \\
+        0      & \cdots & 0      & -I     & C
     \end{bmatrix}
-    \in \mathbb{R}^{N \times N}
-  \end{array}
-  $}
-  &
-  \text{und}
-  &
-  \scalebox{0.9}{$
-  \begin{array}{l}
+    \in \R^{N \times N},
+\]
+wobei \(C\) eine Tridiagonalmatrix ist:
+\[
     C \coloneq \begin{bmatrix}
-    4 & -1 & 0 & \cdots & 0 \\
-    -1 & 4 & -1 & \cdots & 0 \\
-    0 & \ddots & \ddots & \ddots & \vdots \\
-    \vdots & \ddots & \ddots & \ddots & -1 \\
-    0 & \cdots & 0 & -1 & 4
+        4      & -1     & 0      & \cdots & 0      \\
+        -1     & 4      & -1     & \cdots & 0      \\
+        0      & \ddots & \ddots & \ddots & \vdots \\
+        \vdots & \ddots & \ddots & \ddots & -1     \\
+        0      & \cdots & 0      & -1     & 4
     \end{bmatrix}
-    \in \mathbb{R}^{(n-1) \times (n-1)}
-  \end{array}
-  $}
-\end{array}
-\] \cite{PPI_Poisson} 
+    \in \R^{(n-1) \times (n-1)}.
+\]
+~\cite{PPI_Poisson}
 
 \subsection{LU-Zerlegung einer Matrix}
-Sei \(A \in \mathbb{R}^{n \times n}\), dann existieren \(P, L, U \in \mathbb{R}^{n \times n}\), 
-wobei \(P\) eine Permutationsmatrix, \(L\) eine linke untere Dreiecksmatrix und \(U\) eine rechte obere
-Dreiecksmatrix ist mit \(A = PLU\).  \cite{LU}
-Da \(P\) Permutationsmatrix ist, gilt \(P^{-1} = P^T\).
-Liegt nun ein lineares Gleichungssystem \(Ax = b\) vor, so gilt:
-\begin{align*}
-  Ax &= b \\
-  \iff PLUx &= b \\
-  \iff LUx  &= P^{T}b
-\end{align*}
-Mit der Substitution \(Ux = z\) lässt sich \(Lz = P^{T}b\) nach \(z\) mittels Vorwärtssubstitution in \(\mathcal{O}(n^{2})\) lösen.
-Danach kann man \(Ux = z\) mittels Rückwärtssubstitution nach \(x\) in \(\mathcal{O}(n^{2})\) lösen und erhält damit die Lösung des
-ursprünglichen Gleichungssystems.
+
+Sei \(A \in \R^{n \times n}\), dann existieren \(P, L, U \in \R^{n \times n}\),
+wobei \(P\) eine Permutationsmatrix, \(L\) eine linke untere Dreiecksmatrix und
+\(U\) eine rechte obere Dreiecksmatrix ist mit \(A = PLU\).\ \cite{LU} Da \(P\)
+Permutationsmatrix ist, gilt \(P^{-1} = P^T\). Liegt nun ein lineares
+Gleichungssystem \(Ax = b\) vor, so gilt:
+\[
+    Ax = b \iff PLUx = b \iff LUx = P^T b.
+\]
+Mit der Substitution \(Ux = z\) lässt sich \(Lz = P^{T}b\) nach \(z\) mittels
+  vorwärts Substitution in \(\BigO(n^2)\) lösen. Danach kann man \(Ux = z\)
+  mittels rückwärts Substitution nach \(x\) in \(\BigO(n^2)\) lösen und erhält
+  damit die Lösung des ursprünglichen Gleichungssystems.
 
 \subsection{Vergleich: A als vollbesetzte und sparse Matrix}
-Die Matrix \(A\) besitzt viele Nulleinträge; für größere Werte von \(n\) wird das Speichern
-der Matrix als vollbesetzte Matrix sehr ineffizient. Daher haben wir Sparse-Matrizen verwendet.
-Sparse-Matrizen speichern nur die von Null verschiedenen Einträge mitsamt ihren Koordinaten innerhalb 
-der Matrix. Für einen nicht-Nulleintrag werden also drei Einträge gespeichert.
-Die Anzahl der Einträge für \(A\) als vollbesetzte Matrix ist gleich \((n - 1)^4\)
-die der nicht-Nulleinträge gleich \(5n^2 - 14n + 9\), was man durch Zählen der nicht-Nulleinträge erhält.
 
-
+Die Matrix \(A\) besitzt viele Nulleinträge; für größere Werte von \(n\) wird
+das Speichern der Matrix als vollbesetzte Matrix sehr ineffizient. Daher haben
+wir Sparse-Matrizen verwendet. Sparse-Matrizen speichern nur die von null
+verschiedenen Einträge mitsamt ihren Koordinaten innerhalb der Matrix. Für
+einen nicht-Nulleintrag werden also drei Einträge gespeichert. Die Anzahl der
+Einträge für \(A\) als vollbesetzte Matrix ist gleich \({(n - 1)}^4\) die der
+nicht-Nulleinträge gleich \(5n^2 - 14n + 9\), was man durch Zählen der
+nicht-Nulleinträge erhält.
 
 \section{Experimente}
-Für unsere Experimente haben wir uns die Funktion \(u(x) = x_{1}\sin(3x_{1})x_{2}\sin(3x_{2})\) vorgegeben. Für diese Funktion gilt:
-\[-\Delta u(x) = -6(x_{1}\cos(3x_{2})\sin(3x_{1}) + x_{2}\cos(3x_{1})\sin(3x_{2}) - 3x_{1}x_{2}\sin(3x_{1})\sin(3x_{2})) = f(x)\] 
-Für diese Funktion \(f\) haben wir eine numerische \(\hat{u}\) des Poisson-Problems, für die am Anfang gegeben Startbedinungen, bestimmt und sie 
-mit der analytischen Lösung \(u\) verglichen. Gewählt haben wir unsere Experimente, um zum einen zu untersuchen, welches Format zum Speichern
-der Matrix \(A\) sich als sinnvoll erweist, und um das Konvergenzverhalten der numerischen Approximation einer Lösung des Poisson-Problems zu 
-untersuchen.
 
-Der erste Teil unserer Experimente richtet sich an die Matrix \(A\) in verschiedenen Speicherformaten.
-Zuerst haben wir die Sparsity der Matrix \(A\) und ihrer LU-Zerlegung betrachtet.
+Für unsere Experimente haben wir uns die Funktion
+\begin{equation}\label{eq:u}
+    u(x) \coloneq x_1 \cdot \sin(3 \cdot x_1) \cdot x_2 \cdot \sin(3 \cdot x_2),
+\end{equation}
+vorgegeben. Für diese Funktion gilt:
+\begin{equation}\label{eq:f}
+    f(x) \coloneq -6 \paren*{\begin{array}{l}
+            x_1 \cdot \cos(3 \cdot x_2) \cdot \sin(3 \cdot x_1)   \\
+            + x_2 \cdot \cos(3 \cdot x_1) \cdot \sin(3 \cdot x_2) \\
+            - 3 \cdot x_1 \cdot x_2 \sin(3 \cdot x_1) \cdot \sin(3 \cdot x_2)
+        \end{array}}
+    = -\Delta u(x)
+\end{equation}
+Für diese Funktion \(f\) haben wir eine numerische \(\hat u\) des
+Poisson-Problems, für die am Anfang gegeben Startbedingungen, bestimmt und
+sie mit der analytischen Lösung \(u\) verglichen. Gewählt haben wir unsere
+Experimente, um zum einen zu untersuchen, welches Format zum Speichern der
+Matrix \(A\) sich als sinnvoll erweist, und um das Konvergenz verhalten der
+numerischen Approximation einer Lösung des Poisson-Problems zu untersuchen.
+
+Der erste Teil unserer Experimente richtet sich an die Matrix \(A\) in
+verschiedenen Speicherformaten. Zuerst haben wir die Sparsity der Matrix \(A\)
+und ihrer LU-Zerlegung betrachtet.
 
 %TO DO ADD DIAGRAMS FOR SPARSITY
 
-Zudem haben wir auch den theoretischen Speicherbedarf der Matrix \(A\) im vollbesetzten und sparse Format untersucht.
+Zudem haben wir auch den theoretischen Speicherbedarf der Matrix \(A\) im
+vollbesetzten und sparse Format untersucht.
 
 %TO DO ADD DIAGRAM FOR MEMORY COMPLEXITY
 
-Im nächsten Teil unserer Experimente haben wir die \(\hat{u}\) mit \(u\) graphisch verglichen.
-Dazu haben wir zunächst beide Funktion für \(n = 4, 11, 128\) geplottet.
+Im nächsten Teil unserer Experimente haben wir die \(\hat u \) mit \(u\)
+grafisch verglichen. Dazu haben wir zunächst beide Funktion für \(n \in \set{4,
+11, 128}\) geplottet.
 
 %TO DO ADD ANALYTICAL SOLUTION AND NUMERICAL SOLUTION PLOTS
 
-Ferner haben wir den Fehler zwischen der approximierten und tatsächlichen Lösung untersicht, indem wir zuerst den maximalen Fehler
-in Abhängigkeit von \(n\) geplottet haben und haben dann die Fehler an den einzelnen Diskretisierungspunkten in 3D, sowie Heatmap-Format
-geplottet.
+Ferner haben wir den Fehler zwischen der approximierten und tatsächlichen
+Lösung untersucht, indem wir zuerst den maximalen Fehler in Abhängigkeit von
+\(n\) geplottet haben und haben dann die Fehler an den einzelnen
+Diskretisierungspunkten in 3D, sowie Heatmap-Format geplottet.
 
 %TO DO ADD ERROR VS NUMBER OF DISCRETIZATION POINTS AND 3D/HEATMAP PLOTS OF ERROR
-
 
 \subsection{Beobachtungen}
 
 %TO DO ADD REFS TO ABBILDUNGEN
 
 \begin{itemize}
-  \item In Abbildung PLACEHOLDER %TO DO ADD NUMBER 
-        ist zu sehen, dass, für größer werdende \(n\), die Anzahl an Gesamteinträgen in \(A\) im Log-Log Plot proportional zu \(n^4\) verläuft,
-        während die Anzahl an nicht-Nulleinträgen proportional zu \(n^2\) verläuft und damit langsamer wächst.
-        Auch zu sehen ist, dass die relative Sparsity gegen 0 geht und zwar proportional zu \(n^-2\)
-        Auch für die LU-Zerlegung ist ähnliches Verhalten zu erkennen.
+    \item In Abbildung PLACEHOLDER ist zu sehen, dass, für größer werdende
+          \(n\), die Anzahl an Gesamteinträgen in \(A\) im Log-Log Plot
+          proportional zu \(n^4\) verläuft, während die Anzahl an
+          nicht-Nulleinträgen proportional zu \(n^2\) verläuft und damit
+          langsamer wächst. Auch zu sehen ist, dass die relative Sparsity gegen
+          0 geht und zwar proportional zu \(n^-2\) Auch für die LU-Zerlegung
+          ist ähnliches Verhalten zu erkennen.%TO DO ADD NUMBER 
 
-        %TO DO MAYBE ADD EXPLANATION OF > 0.001 (by abs)
+          %TO DO MAYBE ADD EXPLANATION OF > 0.001 (by abs)
 
-  \item In Abbildung PLACEHOLDER %TO DO ADD NUMBER
-        ist der theoretische Speicherplatzbedarf in Abhängigkeit von \(n\) im Log-Log Plot
-        dargestellt. Für größer werdende Werte von \(n\) steigt der Speicherplatzbedarf für das raw-Format
-        stärker an, als das CRS-Format, also das Format um \(A\) als sparse-Matrix zu speichern. Es ist zu sehen, dass der Speicherplatzbedarf
-        für das raw-Format proportional zu %TO DO ADD PROPORTIONALITY 
-        und das CRS-Format proportional zu % "  "  "     "
-        .
+    \item In Abbildung PLACEHOLDER ist der theoretische Speicherplatzbedarf in
+          Abhängigkeit von \(n\) im Log-Log Plot dargestellt. Für größer
+          werdende Werte von \(n\) steigt der Speicherplatzbedarf für das
+          raw-Format stärker an, als das CRS-Format, also das Format um \(A\)
+          als sparse-Matrix zu speichern. Es ist zu sehen, dass der
+          Speicherplatzbedarf für das raw-Format proportional zu und das
+          CRS-Format proportional zu. %TO DO ADD NUMBER%TO DO ADD PROPORTIONALITY % "  "  "     "
 
-  \item In Abbildung PLACEHOLDER %TO DO ADD NUMBER
-        ist der Vergleich der analytischen Lösung mit den approxmierten Lösungen für verschiedene Werte von \(n\) dargestellt.
-        Es ist zu beobachten, dass, für größer werdende Werte von \(n\), die approximierte Lösung sich der analytischen Lösung immer mehr annähert.
+    \item In Abbildung PLACEHOLDER ist der Vergleich der analytischen Lösung
+          mit den approxmierten Lösungen für verschiedene Werte von \(n\)
+          dargestellt. Es ist zu beobachten, dass, für größer werdende Werte
+          von \(n\), die approximierte Lösung sich der analytischen Lösung
+          immer mehr annähert.%TO DO ADD NUMBER
 
-  \item In Abbildung %TO DO ADD NUMBER
-        ist der maximale Fehler zwischen der numerischen und analytischen Lösung in Abhängigkeit von \(n\) im Log-Log Plot zu sehen.
-        Man kann beobachten, dass der Fehler für größer werdende Werte von \(n\) immer kleiner wird.
-        Für \(n = 5000\) liegt er bei ca. \(10^{-3}\) und
-        für \(n = 10000\) bei ca. \(6 \cdot 10^{-2}\).
-        Dabei ist auch zu beobachten, dass der Fehler ab \(n \approx 25\) proportional zu PLACEHOLDER
-        %TO DO ADD PROPORTIONALITY
-        verläuft
+    \item In Abbildung ist der maximale Fehler zwischen der numerischen und
+          analytischen Lösung in Abhängigkeit von \(n\) im Log-Log Plot zu
+          sehen. Man kann beobachten, dass der Fehler für größer werdende Werte
+          von \(n\) immer kleiner wird. Für \(n = 5000\) liegt er bei ca.
+          \(10^{-3}\) und für \(n = 10000\) bei ca. \(6 \cdot 10^{-2}\). Dabei
+          ist auch zu beobachten, dass der Fehler ab \(n \approx 25\)
+          proportional zu PLACEHOLDER%TO DO ADD NUMBER
+          %TO DO ADD PROPORTIONALITY
+          verläuft
 
-
-  \item In Abbildung %TO DO ADD NUMBER
-        ist der Fehler an den einzelnen Diskretisierungspunkten, im 3D und Heatmap Plot, zu sehen. \\
-        Für \(n = 4\) liegt der Fehler zwischen ungefähr 0.04 und 0.14, \\
-        für \(n = 11\) zwischen ungefähr 0.005 und 0.035, und \\
-        für \(n = 128\) zwischen ungefähr 0.00005 und 0.00030. \\
-        Es ist also eine Verringerung des Fehlers an den einzelnen Diskretisierungspunkten für größer werdende \(n\) zu beobachten.
+    \item In Abbildung ist der Fehler an den einzelnen Diskretisierungspunkten,
+          im 3D und Heatmap Plot, zu sehen. \\ Für \(n = 4\) liegt der Fehler
+          zwischen ungefähr 0.04 und 0.14, \\ für \(n = 11\) zwischen ungefähr
+          0.005 und 0.035, und \\ für \(n = 128\) zwischen ungefähr 0.00005 und
+          0.00030. \\ Es ist also eine Verringerung des Fehlers an den
+          einzelnen Diskretisierungspunkten für größer werdende \(n\) zu
+          beobachten.%TO DO ADD NUMBER
 \end{itemize}
-
-
 
 \section{Auswertung}
 
 %TO DO ALSO ADD REFS HERE
 
 \begin{itemize}
-  \item Der stärkere Anstieg in Abbildung PLACEHOLDER %TO DO ADD NUMBER
-        der Matrix \(A\) im vollbesetzten Format verglichen mit dem sparse Format
-        entspricht den Erwartungen, denn die Anzahl der Gesamteinträge ist wie in der Theorie erwähnt
-        gleich \((n - 1)^{4}\) was proportional zu \(n^4\) ist, und die Anzahl der nicht-Null Einträge
-        ist gleich \(5n^2 - 14n + 9\) was proportional zu \(n^2\) ist.
-        Auch dass die relative Sparsity im Graphen proportional zu \(n^{-2}\) verläuft, ist hiermit zu erklären,
-        da nach Definition die relative Sparsity gleich \(\frac{5n^2 - 14n + 9}{(n - 1)^{4}}\) ist, was offensichtlich
-        proportional zu \(n^{-2}\) ist, also in \(\mathcal{O}(n^{-2})\) liegt.
+    \item Der stärkere Anstieg in Abbildung PLACEHOLDER der Matrix \(A\) im
+          vollbesetzten Format verglichen mit dem sparse Format entspricht den
+          Erwartungen, denn die Anzahl der Gesamteinträge ist wie in der
+          Theorie erwähnt gleich \({(n - 1)}^4\) was proportional zu \(n^4\)
+          ist, und die Anzahl der nicht-Null Einträge ist gleich \(5n^2 - 14n +
+          9\) was proportional zu \(n^2\) ist. Auch dass die relative Sparsity
+          im Graphen proportional zu \(n^{-2}\) verläuft, ist hiermit zu
+          erklären, da nach Definition die relative Sparsity gleich
+          \(\frac{5n^2 - 14n + 9}{{(n - 1)}^4}\) ist, was offensichtlich
+          proportional zu \(n^{-2}\) ist, also in \(\BigO(n^{-2})\) liegt.%TO DO ADD NUMBER
 
-        Auch der stärkere Anstieg des theoretischen Speicherbedarfs in Abbildung PLACEHOLDER %TO DO ADD NUMBER 
-        ist wie erwartet, da für das raw-Format jeder Eintrag einmal abgespeichert werden muss, also liegt hier das Speichern in
-        \(\mathcal{O}(n^4)\) und für das CRS-Format für jeden nicht-Null-Eintrag drei Werte gespeichert werden müssen, was proportional zu
-        \(n^2\) ist, also in \(\mathcal{O}(n^2)\) liegt.
+          Auch der stärkere Anstieg des theoretischen Speicherbedarfs in
+          Abbildung PLACEHOLDER ist wie erwartet, da für das raw-Format jeder
+          Eintrag einmal abgespeichert werden muss, also liegt hier das
+          Speichern in \(\BigO(n^4)\) und für das CRS-Format für jeden
+          nicht-Null-Eintrag drei Werte gespeichert werden müssen, was
+          proportional zu \(n^2\) ist, also in \(\BigO(n^2)\) liegt.%TO DO ADD NUMBER 
 
-  \item Der graphische Vergleich in Abbildung PLACEHOLDER %TO DO ADD NUMBER
-        zeigt, dass die numerische Lösung für größere Werte von \(n\) immer besser
-        mit der analytischen Lösung übereinstimmt.
+    \item Der grafische Vergleich in Abbildung PLACEHOLDER zeigt, dass die
+          numerische Lösung für größere Werte von \(n\) immer besser mit der
+          analytischen Lösung übereinstimmt.%TO DO ADD NUMBER
 
-        Dies wird ferner von Abbildung PLACEHOLDER % TO DO ADD NUMBER
-        bestätigt, denn der maximale Fehler zwischen der numerischen und analytischen Lösung
-        ist für \(n \geqslant 5000\) kleiner als \(10^{-3}\).
-        Dabei liegt der Fehler in \(\mathcal{O}(n^{PLACEHOLDER})\) %TO DO ADD PROPORTIONALITY
+          Dies wird ferner von Abbildung PLACEHOLDER bestätigt, denn der
+          maximale Fehler zwischen der numerischen und analytischen Lösung ist
+          für \(n \geqslant 5000\) kleiner als \(10^{-3}\). Dabei liegt der
+          Fehler in \(\BigO(n^{PLACEHOLDER})\) % TO DO ADD NUMBER%TO DO ADD PROPORTIONALITY
 
-        Auch Abbildung PLACEHOLDER % TO DO ADD NUMBER
-        zeigt dies nochmal durch einen Plot des Fehlers an den verschiedenen Diskretisierungspunkten.
-        Während der Fehler zwar variiert, so wird er für größere Werte von \(n\) immer kleiner und liegt beispielsweise
-        für \(n = 128\) nur noch ungefähr 0.00005 und 0.00030. 
+          Auch Abbildung PLACEHOLDER zeigt dies nochmal durch einen Plot des
+          Fehlers an den verschiedenen Diskretisierungspunkten. Während der
+          Fehler zwar variiert, so wird er für größere Werte von \(n\) immer
+          kleiner und liegt beispielsweise für \(n = 128\) nur noch ungefähr
+          0.00005 und 0.00030.% TO DO ADD NUMBER
 
-        Dieses Verhalten stimmt auch mit der Theorie überein, denn die analytische Lösung ist, für das gesamte Gebiet \(\Omega\) definiert,
-        und da je größer man \(n\) wählt, man auch mehr Punkte des Gebietes abdeckt, und die numerische Lösung daher gegen die
-        analytische Lösung konvergiert.
+          Dieses Verhalten stimmt auch mit der Theorie überein, denn die
+          analytische Lösung ist, für das gesamte Gebiet \(\Omega\) definiert,
+          und da je größer man \(n\) wählt, man auch mehr Punkte des Gebietes
+          abdeckt, und die numerische Lösung daher gegen die analytische Lösung
+          konvergiert.
 
 \end{itemize}
 
-
 \section{Zusammenfassung}
-Untersucht wurde das numerische Approximieren einer Lösung des Poisson-Problems für das Gebiet \(\Omega = (0, 1)^2\) und \(g = 0\).
-Dafür haben wir das Gebiet in ein Gitter von \((n - 1)^2\) Diskretisierungspunkten aufgeteilt und die zu suchende Funktion an diesen Stellen
-mithilfe eines Gleichungssystems approximiert. Zuerst wurde die Matrix \(A\), die das Gleichungssytem beschreibt untersucht. 
-Unsere Ergebnisse sind, dass die Anzahl der Gesamteinträge viel schneller steigt, als die der nicht-Null-Einträge, was ein Speichern
-dieser Matrix im CRS-Format sinnvoll macht. Selbiges Ergebnis fanden wir auch für die LU-Zerlegung von \(A\), die zum Lösen des Gleichungssystems diente,
-dieser Matrix.
-Zum untersuchen des Konvergenzverhaltens der Approximation nahmen wir uns die Funktion
-\[u(x) = x_{1}\sin(3x_{1})x_{2}\sin(3x_{2})\]
-welche die analytische Lösung für
-\[f(x) = -6(x_{1}\cos(3x_{2})\sin(3x_{1}) + x_{2}\cos(3x_{1})\sin(3x_{2}) - 3x_{1}x_{2}\sin(3x_{1})\sin(3x_{2}))\]
-für das Poisson-Problem ist.
-Wir haben unsere numerische Lösung für verschiedene Werte von \(n\) mit der analytischen Lösung verglichen und fanden,
-dass der maximale Fehler zwischen analytischer und numerischer Lösung in \(\mathcal{O}(n^{PLACEHOLDER})\) liegt.
-Auch graphisch ist zu sehen, dass die numerische Lösung für größere \(n\) der Funktion \(u\) immer mehr ähnelt bzw.
-gar nicht mehr zu unterscheiden ist. 
 
+Untersucht wurde das numerische Approximieren einer Lösung des Poisson-Problems
+für das Gebiet \(\Omega = {(0, 1)}^2\) und \(g = 0\). Dafür haben wir das
+Gebiet in ein Gitter von \({(n - 1)}^2\) Diskretisierungs-Punkten aufgeteilt
+und die zu suchende Funktion an diesen Stellen mithilfe eines Gleichungssystems
+approximiert. Zuerst wurde die Matrix \(A\), die das Gleichungssystem
+beschreibt untersucht. Unsere Ergebnisse sind, dass die Anzahl der
+Gesamteinträge viel schneller steigt, als die der nicht-Null-Einträge, was ein
+Speichern dieser Matrix im CRS-Format sinnvoll macht. Selbiges Ergebnis fanden
+wir auch für die LU-Zerlegung von \(A\), die zum Lösen des Gleichungssystems
+diente, dieser Matrix. Zum Untersuchen des Konvergenz Verhaltens der
+Approximation von \autoref{eq:u} nahmen wir uns die Funktion in \autoref{eq:f}
+welche die analytische Lösung für das Poisson-Problem ist. Wir haben unsere
+numerische Lösung für verschiedene Werte von \(n\) mit der analytischen Lösung
+verglichen und fanden, dass der maximale Fehler zwischen analytischer und
+numerischer Lösung in \(\BigO(n^{PLACEHOLDER})\) liegt. Auch grafisch ist zu
+sehen, dass die numerische Lösung für größere \(n\) der Funktion \(u\) immer
+mehr ähnelt bzw.\ gar nicht mehr zu unterscheiden ist.
 
-\printbibliography
+\printbibliography%
+
 \end{document}

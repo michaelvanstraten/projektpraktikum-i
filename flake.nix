@@ -93,6 +93,55 @@
               pkgs.inkscape
             ];
           };
+
+          "discretization/figures" =
+            pkgs.runCommand "discretization-figures"
+              {
+                buildInputs = [ self.packages.${system}.default ];
+              }
+              ''
+                mkdir -p $out/figures
+                export MPLBACKEND=AGG
+                discretization-experiements plot-solutions -n 4 --save-to $out/figures/solutions-for-n-equal-4.png
+                discretization-experiements plot-solutions -n 11 --save-to $out/figures/solutions-for-n-equal-11.png
+                discretization-experiements plot-solutions -n 64 --save-to $out/figures/solutions-for-n-equal-64.png
+                discretization-experiements plot-difference -n 4 --save-to $out/figures/difference-for-n-equal-4.png
+                discretization-experiements plot-difference -n 11 --save-to $out/figures/difference-for-n-equal-11.png
+                discretization-experiements plot-difference -n 64 --save-to $out/figures/difference-for-n-equal-64.png
+                discretization-experiements plot-error --save-to $out/figures/error.png
+                discretization-experiements plot-sparsity --save-to $out/figures/sparsity.png
+                discretization-experiements plot-sparsity-lu --save-to $out/figures/sparsity-lu.png
+                discretization-experiements plot-theoretical-memory-usage --save-to $out/figures/theoretical-memory-usage.png
+              '';
+
+          "discretization/handout" = buildLatexmkProject {
+            name = "discretization-handout";
+            filename = "poisson_handout.tex";
+            SOURCE_DATE_EPOCH = toString self.lastModified;
+            extraOptions = [ "--shell-escape" ];
+            src = pkgs.buildEnv {
+              name = "discretization-handout-source";
+              paths = [
+                ./tex/discretization
+                # self.packages.${system}."discretization/figures"
+              ];
+            };
+            buildInputs = [
+              pkgs.biber
+              (pkgs.texlive.combine {
+                inherit (pkgs.texlive)
+                  scheme-basic
+
+                  csquotes
+                  babel-german
+                  biblatex
+                  float
+                  koma-script
+                  mathtools
+                  ;
+              })
+            ];
+          };
         };
 
         # Formatter for this flake
