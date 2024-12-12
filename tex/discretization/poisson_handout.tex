@@ -210,8 +210,8 @@ Dieser diskrete Laplace-Operator von \(u\) wird mit \(\Delta_{h}u\) bezeichnet
 \subsection{Aufstellen des linearen Gleichungssystems}
 Gesucht ist nun eine Lösung \(\hat{u}\) der diskretisierten partiellen Differentialgleichung
 \begin{align*}
-  -\Delta_{h} u(x) &= f \text{       für } x \in X   \\
-              u(x) &= 0 \text{       auf } \partial \Omega
+  -\Delta_{h} u(x) &= f \quad \text{für } x \in X   \\
+              u(x) &= 0 \quad \text{auf } \partial \Omega
 \end{align*}
 an den \(N\) Gitterpunkten. Somit erhält man \(N\) Gleichungen, die zu lösen sind. Um diese Gleichungen zu ordnen
 haben wir für \(x = (x_{1}, x_{2}), y = (y_{1}, y_{2} \in X)\) die Ordnung
@@ -259,7 +259,7 @@ die wir benutzt haben um einem Diskretisierungspunkt seine Gleichungsnummer zuzu
 Sei \(A \in \mathbb{R}^{n \times n}\), dann existieren \(P, L, U \in \mathbb{R}^{n \times n}\), 
 wobei \(P\) eine Permutationsmatrix, \(L\) eine linke untere Dreiecksmatrix und \(U\) eine rechte obere
 Dreiecksmatrix ist mit \(A = PLU\).  \cite{LU}
-Da \(P\) Permutationsmatrix ist, gilt \(P^{-1} = P^{T}\).
+Da \(P\) Permutationsmatrix ist, gilt \(P^{-1} = P^T\).
 Liegt nun ein lineares Gleichungssystem \(Ax = b\) vor, so gilt:
 \begin{align*}
   Ax &= b \\
@@ -274,7 +274,9 @@ ursprünglichen Gleichungssystems.
 Die Matrix \(A\) besitzt viele Nulleinträge; für größere Werte von \(n\) wird das Speichern
 der Matrix als vollbesetzte Matrix sehr ineffizient. Daher haben wir Sparse-Matrizen verwendet.
 Sparse-Matrizen speichern nur die von Null verschiedenen Einträge mitsamt ihren Koordinaten innerhalb 
-der Matrix. Für einen nicht-Nulleintrag werden also drei Einträge gespeichert.  
+der Matrix. Für einen nicht-Nulleintrag werden also drei Einträge gespeichert.
+Die Anzahl der Einträge für \(A\) als vollbesetzte Matrix ist gleich \((n - 1)^4\)
+die der nicht-Nulleinträge gleich \(5n^2 - 14n + 9\), was man durch Zählen der nicht-Nulleinträge erhält.
 
 
 
@@ -282,7 +284,9 @@ der Matrix. Für einen nicht-Nulleintrag werden also drei Einträge gespeichert.
 Für unsere Experimente haben wir uns die Funktion \(u(x) = x_{1}\sin(3x_{1})x_{2}\sin(3x_{2})\) vorgegeben. Für diese Funktion gilt:
 \[-\Delta u(x) = -6(x_{1}\cos(3x_{2})\sin(3x_{1}) + x_{2}\cos(3x_{1})\sin(3x_{2}) - 3x_{1}x_{2}\sin(3x_{1})\sin(3x_{2})) = f(x)\] 
 Für diese Funktion \(f\) haben wir eine numerische \(\hat{u}\) des Poisson-Problems, für die am Anfang gegeben Startbedinungen, bestimmt und sie 
-mit der analytischen Lösung \(u\) verglichen.
+mit der analytischen Lösung \(u\) verglichen. Gewählt haben wir unsere Experimente, um zum einen zu untersuchen, welches Format zum Speichern
+der Matrix \(A\) sich als sinnvoll erweist, und um das Konvergenzverhalten der numerischen Approximation einer Lösung des Poisson-Problems zu 
+untersuchen.
 
 Der erste Teil unserer Experimente richtet sich an die Matrix \(A\) in verschiedenen Speicherformaten.
 Zuerst haben wir die Sparsity der Matrix \(A\) und ihrer LU-Zerlegung betrachtet.
@@ -293,7 +297,7 @@ Zudem haben wir auch den theoretischen Speicherbedarf der Matrix \(A\) im vollbe
 
 %TO DO ADD DIAGRAM FOR MEMORY COMPLEXITY
 
-Im nächsten Teil unserer Experimente haben wir die \(\hat{u}\) mit \(u\) verglichen.
+Im nächsten Teil unserer Experimente haben wir die \(\hat{u}\) mit \(u\) graphisch verglichen.
 Dazu haben wir zunächst beide Funktion für \(n = 4, 11, 128\) geplottet.
 
 %TO DO ADD ANALYTICAL SOLUTION AND NUMERICAL SOLUTION PLOTS
@@ -310,29 +314,37 @@ geplottet.
 %TO DO ADD REFS TO ABBILDUNGEN
 
 \begin{itemize}
-  \item In Abbildung 1 
-        ist zu sehen, dass, für größer werdende \(n\), die Anzahl an Gesamteinträgen in \(A\) für sehr viel schneller steigt, als die Anzahl an nicht-Null-Einträgen,
-        sowie dass die relative Anzahl an nicht-Null-Einträgen gegen 0 geht.
-        Auch für die LU-Zerlegung ist das selbe Verhalten zu erkennen.
+  \item In Abbildung PLACEHOLDER %TO DO ADD NUMBER 
+        ist zu sehen, dass, für größer werdende \(n\), die Anzahl an Gesamteinträgen in \(A\) im Log-Log Plot proportional zu \(n^4\) verläuft,
+        während die Anzahl an nicht-Nulleinträgen proportional zu \(n^2\) verläuft und damit langsamer wächst.
+        Auch zu sehen ist, dass die relative Sparsity gegen 0 geht und zwar proportional zu \(n^-2\)
+        Auch für die LU-Zerlegung ist ähnliches Verhalten zu erkennen.
 
         %TO DO MAYBE ADD EXPLANATION OF > 0.001 (by abs)
 
-  \item In Abbildung 2
-        ist der theoretischen Speicherplatzbedarf dargestellt. Für größer werdende Werte von \(n\) steigt der Speicherplatzbedarf für das raw-Format
-        stärker an, als das CRS-Format, also das Format um \(A\) als sparse-Matrix zu speichern.
+  \item In Abbildung PLACEHOLDER %TO DO ADD NUMBER
+        ist der theoretische Speicherplatzbedarf in Abhängigkeit von \(n\) im Log-Log Plot
+        dargestellt. Für größer werdende Werte von \(n\) steigt der Speicherplatzbedarf für das raw-Format
+        stärker an, als das CRS-Format, also das Format um \(A\) als sparse-Matrix zu speichern. Es ist zu sehen, dass der Speicherplatzbedarf
+        für das raw-Format proportional zu %TO DO ADD PROPORTIONALITY 
+        und das CRS-Format proportional zu % "  "  "     "
+        .
 
-  \item In Abbildung 3
+  \item In Abbildung PLACEHOLDER %TO DO ADD NUMBER
         ist der Vergleich der analytischen Lösung mit den approxmierten Lösungen für verschiedene Werte von \(n\) dargestellt.
         Es ist zu beobachten, dass, für größer werdende Werte von \(n\), die approximierte Lösung sich der analytischen Lösung immer mehr annähert.
 
-  \item In Abbildung 4
-        ist der maximale Fehler zwischen der numerischen und analytischen Lösung zu sehen.
+  \item In Abbildung %TO DO ADD NUMBER
+        ist der maximale Fehler zwischen der numerischen und analytischen Lösung in Abhängigkeit von \(n\) im Log-Log Plot zu sehen.
         Man kann beobachten, dass der Fehler für größer werdende Werte von \(n\) immer kleiner wird.
         Für \(n = 5000\) liegt er bei ca. \(10^{-3}\) und
-        für \(n = 10000\) bei ca. \(6 \cdot 10^{-2}\). 
+        für \(n = 10000\) bei ca. \(6 \cdot 10^{-2}\).
+        Dabei ist auch zu beobachten, dass der Fehler ab \(n \approx 25\) proportional zu PLACEHOLDER
+        %TO DO ADD PROPORTIONALITY
+        verläuft
 
 
-  \item In Abbildung 5
+  \item In Abbildung %TO DO ADD NUMBER
         ist der Fehler an den einzelnen Diskretisierungspunkten, im 3D und Heatmap Plot, zu sehen. \\
         Für \(n = 4\) liegt der Fehler zwischen ungefähr 0.04 und 0.14, \\
         für \(n = 11\) zwischen ungefähr 0.005 und 0.035, und \\
@@ -347,27 +359,57 @@ geplottet.
 %TO DO ALSO ADD REFS HERE
 
 \begin{itemize}
-  \item Der stärkere Anstieg in Abbildung 1 der Matrix \(A\) im vollbesetzten Format verglichen mit dem sparse Format
-        entspricht den Erwartungen, aufgrund der Struktur der Matrix und ihren vielen Nulleinträgen.
+  \item Der stärkere Anstieg in Abbildung PLACEHOLDER %TO DO ADD NUMBER
+        der Matrix \(A\) im vollbesetzten Format verglichen mit dem sparse Format
+        entspricht den Erwartungen, denn die Anzahl der Gesamteinträge ist wie in der Theorie erwähnt
+        gleich \((n - 1)^{4}\) was proportional zu \(n^4\) ist, und die Anzahl der nicht-Null Einträge
+        ist gleich \(5n^2 - 14n + 9\) was proportional zu \(n^2\) ist.
+        Auch dass die relative Sparsity im Graphen proportional zu \(n^{-2}\) verläuft, ist hiermit zu erklären,
+        da nach Definition die relative Sparsity gleich \(\frac{5n^2 - 14n + 9}{(n - 1)^{4}}\) ist, was offensichtlich
+        proportional zu \(n^{-2}\) ist, also in \(\mathcal{O}(n^{-2})\) liegt.
 
-        Auch der stärke Anstieg des theoretischen Speicherbedarfs ion Abbildung 2 ist wie im Theorie Teil vorhergesagt, denn obwohl drei
-        Einträge für jeden Matrixeintrag im sparse Format gespeichert werden müssen, steigt die Anzahl der Nulleinträge viel 
-        schneller und ist daher kostenaufwändiger.
+        Auch der stärkere Anstieg des theoretischen Speicherbedarfs in Abbildung PLACEHOLDER %TO DO ADD NUMBER 
+        ist wie erwartet, da für das raw-Format jeder Eintrag einmal abgespeichert werden muss, also liegt hier das Speichern in
+        \(\mathcal{O}(n^4)\) und für das CRS-Format für jeden nicht-Null-Eintrag drei Werte gespeichert werden müssen, was proportional zu
+        \(n^2\) ist, also in \(\mathcal{O}(n^2)\) liegt.
 
-  \item Der graphische Vergleich in Abbildung 3 zeigt, dass die numerische Lösung für größere Werte von \(n\) immer besser
+  \item Der graphische Vergleich in Abbildung PLACEHOLDER %TO DO ADD NUMBER
+        zeigt, dass die numerische Lösung für größere Werte von \(n\) immer besser
         mit der analytischen Lösung übereinstimmt.
 
-        Dies wird ferner von Abbildung 4 bestätigt, denn der maximale Fehler zwischen der numerischen und analytischen Lösung
+        Dies wird ferner von Abbildung PLACEHOLDER % TO DO ADD NUMBER
+        bestätigt, denn der maximale Fehler zwischen der numerischen und analytischen Lösung
         ist für \(n \geqslant 5000\) kleiner als \(10^{-3}\).
+        Dabei liegt der Fehler in \(\mathcal{O}(n^{PLACEHOLDER})\) %TO DO ADD PROPORTIONALITY
 
-        Auch Abbildung 5 zeigt dies nochmal durch einen Plot des Fehlers an den verschiedenen Diskretisierungspunkten.
+        Auch Abbildung PLACEHOLDER % TO DO ADD NUMBER
+        zeigt dies nochmal durch einen Plot des Fehlers an den verschiedenen Diskretisierungspunkten.
         Während der Fehler zwar variiert, so wird er für größere Werte von \(n\) immer kleiner und liegt beispielsweise
         für \(n = 128\) nur noch ungefähr 0.00005 und 0.00030. 
+
+        Dieses Verhalten stimmt auch mit der Theorie überein, denn die analytische Lösung ist, für das gesamte Gebiet \(\Omega\) definiert,
+        und da je größer man \(n\) wählt, man auch mehr Punkte des Gebietes abdeckt, und die numerische Lösung daher gegen die
+        analytische Lösung konvergiert.
+
 \end{itemize}
 
 
 \section{Zusammenfassung}
-
+Untersucht wurde das numerische Approximieren einer Lösung des Poisson-Problems für das Gebiet \(\Omega = (0, 1)^2\) und \(g = 0\).
+Dafür haben wir das Gebiet in ein Gitter von \((n - 1)^2\) Diskretisierungspunkten aufgeteilt und die zu suchende Funktion an diesen Stellen
+mithilfe eines Gleichungssystems approximiert. Zuerst wurde die Matrix \(A\), die das Gleichungssytem beschreibt untersucht. 
+Unsere Ergebnisse sind, dass die Anzahl der Gesamteinträge viel schneller steigt, als die der nicht-Null-Einträge, was ein Speichern
+dieser Matrix im CRS-Format sinnvoll macht. Selbiges Ergebnis fanden wir auch für die LU-Zerlegung von \(A\), die zum Lösen des Gleichungssystems diente,
+dieser Matrix.
+Zum untersuchen des Konvergenzverhaltens der Approximation nahmen wir uns die Funktion
+\[u(x) = x_{1}\sin(3x_{1})x_{2}\sin(3x_{2})\]
+welche die analytische Lösung für
+\[f(x) = -6(x_{1}\cos(3x_{2})\sin(3x_{1}) + x_{2}\cos(3x_{1})\sin(3x_{2}) - 3x_{1}x_{2}\sin(3x_{1})\sin(3x_{2}))\]
+für das Poisson-Problem ist.
+Wir haben unsere numerische Lösung für verschiedene Werte von \(n\) mit der analytischen Lösung verglichen und fanden,
+dass der maximale Fehler zwischen analytischer und numerischer Lösung in \(\mathcal{O}(n^{PLACEHOLDER})\) liegt.
+Auch graphisch ist zu sehen, dass die numerische Lösung für größere \(n\) der Funktion \(u\) immer mehr ähnelt bzw.
+gar nicht mehr zu unterscheiden ist. 
 
 
 \printbibliography
