@@ -140,6 +140,29 @@ class BlockMatrix:
         return np.linalg.cond(self.get_sparse().toarray(), np.inf)
 
 
+def generate_label_for_polynomial(coeffs, var="n"):
+    """Generates a label for a polynomial.
+
+    Parameters
+    ----------
+    coeffs : array-like
+        The coefficients of the polynomial fit.
+    var : str, optional
+        The variable name to use in the label. Default is "n".
+
+    Returns
+    -------
+    str
+        A label for the polynomial fit.
+    """
+    terms = [
+        f"{coeff:.0f}{var}{'^'+str(exp) if exp > 1 else ''}"
+        for exp, coeff in enumerate(coeffs[::-1])
+    ][::-1]
+
+    return " + ".join(terms).replace("+ -", "- ")
+
+
 def plot_theoretical_memory_usage(interval, save_to=None):
     """Plots the theoretical memory usage comparison between raw format and CRS
     format.
@@ -159,9 +182,17 @@ def plot_theoretical_memory_usage(interval, save_to=None):
     # Calculate memory usage for raw and CRS formats
     raw_memory = (values_for_n - 1) ** 4
     crs_memory = [BlockMatrix(n).eval_sparsity()[0] * 3 + 1 for n in values_for_n]
+    crs_ref_line = np.polyfit(values_for_n, crs_memory, 2)
 
     plt.loglog(number_of_discretization_points, raw_memory, label="Raw format")
     plt.loglog(number_of_discretization_points, crs_memory, label="CRS format")
+    plt.loglog(
+        number_of_discretization_points,
+        np.poly1d(crs_ref_line)(values_for_n),
+        label=f"${generate_label_for_polynomial(crs_ref_line)}$",
+        linestyle="--",
+        color="gray",
+    )
     plt.title("Space Complexity vs Number of Discretization Points ($N$)")
     plt.xlabel("Number of Discretization Points ($N$)")
     plt.ylabel("Space Complexity")
@@ -194,18 +225,29 @@ def plot_sparsity(interval, save_to=None):
     number_of_discretization_points = (values_for_n - 1) ** 2
 
     nnz, rel_nnz = zip(*[BlockMatrix(n).eval_sparsity() for n in values_for_n])
+    nnz_ref_line = np.polyfit(values_for_n, nnz, 2)
+    nnz_ref_line_label = generate_label_for_polynomial(nnz_ref_line)
 
     # Plot for non-zero entries vs discretization points
     ax1.loglog(
         number_of_discretization_points,
+        (values_for_n - 1) ** 4,
+        label="Number of entries in $A$",
+        color="orange",
+        linestyle="--",
+    )
+    ax1.loglog(
+        number_of_discretization_points,
         nnz,
+        alpha=0.7,
         label="Non-zero entries in $A$",
     )
     ax1.loglog(
         number_of_discretization_points,
-        (values_for_n - 1) ** 4,
-        label="Number of entries in $A$",
+        np.poly1d(nnz_ref_line)(values_for_n),
         linestyle="--",
+        color="gray",
+        label=f"${nnz_ref_line_label}$",
     )
     ax1.set_title("Non-zero Entries vs Number of Discretization Points ($N$)")
     ax1.set_xlabel("Number of Discretization Points ($N$)")
@@ -217,7 +259,15 @@ def plot_sparsity(interval, save_to=None):
     ax2.loglog(
         number_of_discretization_points,
         rel_nnz,
+        alpha=0.7,
         label="Relative non-zero entries in $A$",
+    )
+    ax2.loglog(
+        number_of_discretization_points,
+        np.poly1d(nnz_ref_line)(values_for_n) / number_of_discretization_points**2,
+        linestyle="--",
+        color="gray",
+        label=f"$\\frac{{({nnz_ref_line_label})}}{{N}}$",
     )
     ax2.set_title("Relative Non-zero Entries vs Number of Discretization Points ($N$)")
     ax2.set_xlabel("Number of Discretization Points ($N$)")
@@ -232,6 +282,7 @@ def plot_sparsity(interval, save_to=None):
         plt.show()
 
 
+# pylint: disable=too-many-locals
 def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     """Plots the number of non-zero entries in the matrix $A$ and its LU
     decomposition as a function of $N$.
@@ -256,17 +307,29 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     nnz_ge_eps_lu, rel_nnz_ge_eps_lu = zip(
         *[BlockMatrix(n).eval_sparsity_lu(epsilon) for n in values_for_n]
     )
+    nnz_lu_ref_line = np.polyfit(values_for_n, nnz_lu, 3)
+    nnz_lu_ref_line_label = generate_label_for_polynomial(nnz_lu_ref_line)
 
     # Plot for non-zero entries vs discretization points
     ax1.loglog(
         number_of_discretization_points,
         (values_for_n - 1) ** 4,
         label="Number of entries in LU-Decomposition",
+        linestyle="--",
+        color="orange",
     )
     ax1.loglog(
         number_of_discretization_points,
         nnz_lu,
+        alpha=0.7,
         label="Non-zero entries in LU-Decomposition",
+    )
+    ax1.loglog(
+        number_of_discretization_points,
+        np.poly1d(nnz_lu_ref_line)(values_for_n),
+        linestyle="--",
+        color="gray",
+        label=f"${nnz_lu_ref_line_label}$",
     )
     ax1.loglog(
         number_of_discretization_points,
@@ -274,6 +337,7 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
         linestyle="--",
         label=f"Entries in LU-Decomposition > {epsilon} (by abs.)",
     )
+
     ax1.set_title("Sparsity analysis of the LU-Decomposition of $A$")
     ax1.set_xlabel("Number of Discretization Points ($N$)")
     ax1.set_ylabel("Number of Non-zero Entries")
@@ -284,7 +348,15 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     ax2.loglog(
         number_of_discretization_points,
         rel_nnz_lu,
+        alpha=0.7,
         label="Relative non-zero entries in LU-Decomposition",
+    )
+    ax2.loglog(
+        number_of_discretization_points,
+        np.poly1d(nnz_lu_ref_line)(values_for_n) / number_of_discretization_points**2,
+        linestyle="--",
+        color="gray",
+        label=f"$\\frac{{({nnz_lu_ref_line_label})}}{{N}}$",
     )
     ax2.loglog(
         number_of_discretization_points,
