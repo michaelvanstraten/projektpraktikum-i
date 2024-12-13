@@ -29,7 +29,7 @@ def plot_solutions(n, save_to):
     evalutation_points = poisson_problem_2d.get_evaluation_points(128)
     analytical_solution = example_u(evalutation_points)
     numeric_solution = poisson_problem_2d.solve_via_lu_decomposition(
-        n, example_f
+        n, example_f, fast=True
     ).reshape((n - 1, n - 1))
 
     # Plot solutions
@@ -79,7 +79,7 @@ def plot_difference(n, save_to):
     evalutation_points = poisson_problem_2d.get_evaluation_points(n)
     analytical_solution = example_u(evalutation_points)
     numeric_solution = poisson_problem_2d.solve_via_lu_decomposition(
-        n, example_f
+        n, example_f, fast=True
     ).reshape((n - 1, n - 1))
 
     # Compute the difference between numerical and analytical solutions
@@ -146,6 +146,7 @@ def plot_error(start, end, num_points, save_to):
         poisson_problem_2d.solve_via_lu_decomposition,
         (start, end, num_points),
         save_to,
+        fast=True,
     )
 
 

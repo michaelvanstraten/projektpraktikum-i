@@ -101,17 +101,17 @@
               }
               ''
                 mkdir -p $out/figures
-                export MPLBACKEND=AGG
-                discretization-experiements plot-solutions -n 4 --save-to $out/figures/solutions-for-n-equal-4.png
-                discretization-experiements plot-solutions -n 11 --save-to $out/figures/solutions-for-n-equal-11.png
-                discretization-experiements plot-solutions -n 64 --save-to $out/figures/solutions-for-n-equal-64.png
-                discretization-experiements plot-difference -n 4 --save-to $out/figures/difference-for-n-equal-4.png
-                discretization-experiements plot-difference -n 11 --save-to $out/figures/difference-for-n-equal-11.png
-                discretization-experiements plot-difference -n 64 --save-to $out/figures/difference-for-n-equal-64.png
-                discretization-experiements plot-error --save-to $out/figures/error.png
-                discretization-experiements plot-sparsity --save-to $out/figures/sparsity.png
-                discretization-experiements plot-sparsity-lu --save-to $out/figures/sparsity-lu.png
-                discretization-experiements plot-theoretical-memory-usage --save-to $out/figures/theoretical-memory-usage.png
+                export MPLBACKEND=PDF
+                discretization-experiements plot-solutions -n 4 --save-to $out/figures/solutions-for-n-equal-4.pdf
+                discretization-experiements plot-solutions -n 11 --save-to $out/figures/solutions-for-n-equal-11.pdf
+                discretization-experiements plot-solutions -n 128 --save-to $out/figures/solutions-for-n-equal-128.pdf
+                discretization-experiements plot-difference -n 4 --save-to $out/figures/difference-for-n-equal-4.pdf
+                discretization-experiements plot-difference -n 11 --save-to $out/figures/difference-for-n-equal-11.pdf
+                discretization-experiements plot-difference -n 128 --save-to $out/figures/difference-for-n-equal-128.pdf
+                discretization-experiements plot-error --end 6 --num-points 20 --save-to $out/figures/error.pdf
+                discretization-experiements plot-sparsity --end 6 --num-points 20 --save-to $out/figures/sparsity.pdf
+                discretization-experiements plot-sparsity-lu --end 6 --num-points 20 --save-to $out/figures/sparsity-lu.pdf
+                discretization-experiements plot-theoretical-memory-usage --end 6 --num-points 20 --save-to $out/figures/theoretical-memory-usage.pdf
               '';
 
           "discretization/handout" = buildLatexmkProject {
@@ -123,7 +123,7 @@
               name = "discretization-handout-source";
               paths = [
                 ./tex/discretization
-                # self.packages.${system}."discretization/figures"
+                self.packages.${system}."discretization/figures"
               ];
             };
             buildInputs = [

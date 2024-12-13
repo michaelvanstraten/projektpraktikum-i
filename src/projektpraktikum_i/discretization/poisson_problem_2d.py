@@ -149,7 +149,7 @@ def compute_error(n, hat_u, u):
 
 
 @memory.cache
-def solve_via_lu_decomposition(n, f):
+def solve_via_lu_decomposition(n, f, fast=False):
     """Solves the Poisson problem using LU decomposition.
 
     Parameters
@@ -166,9 +166,15 @@ def solve_via_lu_decomposition(n, f):
         Approximate solution of the Poisson problem.
     """
     discretization_matrix = BlockMatrix(n)
-    p, l, u = discretization_matrix.get_lu()
     b = rhs(n, f)
 
+    if fast:
+        from scipy.linalg import lu_factor, lu_solve  # pylint: disable=import-outside-toplevel
+
+        lu, piv = lu_factor(discretization_matrix.get_sparse().toarray())
+        return lu_solve((lu, piv), b)
+
+    p, l, u = discretization_matrix.get_lu()
     return linear_solvers.solve_lu(p, l, u, b)
 
 
@@ -218,7 +224,8 @@ def example_u(x, k=3):
     return (x[0] * np.sin(k * np.pi * x[0])) * (x[1] * np.sin(k * np.pi * x[1]))
 
 
-def plot_error(f, analytic_u, solver, interval, save_to=None):
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+def plot_error(f, analytic_u, solver, interval, save_to=None, fast=False):
     """Plots the error of the numerical solution for different values of n.
 
     Parameters
@@ -232,12 +239,25 @@ def plot_error(f, analytic_u, solver, interval, save_to=None):
     """
     start, end, num_points = interval
     values_for_n = np.logspace(start, end, num=num_points, base=2, dtype=int)
-    errors = [compute_error(n, solver(n, f), analytic_u) for n in values_for_n]
+    errors = [compute_error(n, solver(n, f, fast), analytic_u) for n in values_for_n]
+    number_of_discretization_points = (values_for_n - 1) ** 2
 
     # Plotting the error vs n
     plt.figure(figsize=(10, 6))
     plt.loglog(
-        values_for_n**2, errors, marker="o", linestyle="-", color="r", label="Error"
+        number_of_discretization_points,
+        errors,
+        marker="o",
+        linestyle="-",
+        color="r",
+        label="Error",
+    )
+    plt.loglog(
+        number_of_discretization_points,
+        1 / values_for_n**2,
+        linestyle="--",
+        color="gray",
+        label=r"$\frac{1}{N^2}$",
     )
     plt.xlabel("Number of Discretization Points ($N$)")
     plt.ylabel("Error")
