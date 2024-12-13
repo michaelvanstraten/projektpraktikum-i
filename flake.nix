@@ -142,6 +142,55 @@
               })
             ];
           };
+
+          docs = pkgs.stdenvNoCC.mkDerivation {
+            name = "projektpraktikum-i-docs";
+            src =
+              with lib.fileset;
+              toSource {
+                root = ./.;
+                fileset = unions [
+                  ./src
+                  ./docs
+                  ./README.md
+                ];
+              };
+            SOURCE_DATE_EPOCH = toString self.lastModified;
+            buildInputs = [
+              (pythonSet.mkVirtualEnv "projektpraktikum-i-env" { projektpraktikum-i = [ "docs" ]; })
+              (pkgs.texlive.combine {
+                inherit (pkgs.texlive)
+                  scheme-basic
+
+                  booktabs
+                  capt-of
+                  cm-super
+                  cmap
+                  etoolbox
+                  fancyvrb
+                  float
+                  fncychap
+                  framed
+                  latexmk
+                  needspace
+                  parskip
+                  tabulary
+                  tex-gyre
+                  titlesec
+                  upquote
+                  varwidth
+                  wrapfig
+                  xcolor
+                  ;
+              })
+            ];
+            buildPhase = ''
+              cd docs && make latexpdf
+            '';
+            installPhase = ''
+              mkdir -p $out/docs && install -m644 -D _build/latex/*.pdf $out/docs
+            '';
+          };
         };
 
         # Formatter for this flake
@@ -198,6 +247,7 @@
               preCommitHooks = self.checks.${system}.pre-commit-hooks;
             in
             pkgs.mkShell {
+              inputsFrom = [ self.packages.${system}.docs ];
               packages = [
                 virtualEnv
                 pkgs.uv

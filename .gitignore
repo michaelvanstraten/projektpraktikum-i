@@ -29,3 +29,7 @@ result*
 
 # Direnv cache
 .direnv
+
+# Sphinx files
+docs/_autosummary
+docs/_build

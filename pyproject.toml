@@ -32,13 +32,16 @@ dev = [
     "ruff>=0.7.1",
 	{include-group = "test"},
 	{include-group = "manim"},
+	{include-group = "docs"},
 ]
-
 test = [
   "pytest-cov>=6.0.0",
   "pytest>=8.3.3",
 ]
-
 manim = [
 	"manim>=0.18.1",
+]
+docs = [
+    "myst-parser>=4.0.0",
+    "sphinx>=8.1.3",
 ]
