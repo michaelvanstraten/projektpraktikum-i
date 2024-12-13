@@ -53,7 +53,21 @@
         pkgs = import nixpkgs { inherit system; };
         inherit (latix.lib.${system}) buildLatexmkProject;
 
-        workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };
+        workspace = uv2nix.lib.workspace.loadWorkspace {
+          workspaceRoot = builtins.toString (
+            with lib.fileset;
+            toSource {
+              root = ./.;
+              fileset = unions [
+                ./src
+                ./tests
+                ./pyproject.toml
+                ./uv.lock
+                ./README.md
+              ];
+            }
+          );
+        };
 
         overlay = workspace.mkPyprojectOverlay {
           sourcePreference = "wheel";
