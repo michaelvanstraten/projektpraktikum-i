@@ -28,10 +28,9 @@ for generating reports and presentations.
 
 ## Setup with uv
 
-[uv](https://docs.astral.sh) is a Python dependency management tool. To use
-`uv`, ensure that [Poetry](https://python-poetry.org/) is installed and
-available in your system's PATH. If needed, you can install it without root
-access:
+[uv](https://docs.astral.sh/uv/) is a Python dependency management tool. To use
+`uv`, ensure that it is installed and available in your system's PATH. If
+needed, you can install it without root access:
 
 ```sh
 # Install uv with restricted permissions (no root access required)
@@ -55,7 +54,7 @@ append `--help` to the command:
 
 ```sh
 # Display CLI options for the experiments module
-derivative-approximation-experiments --help
+derivative-approximation --help
 ```
 
 The above command runs the
