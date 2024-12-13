@@ -1,0 +1,38 @@
+name: Build and Upload Nix Packages
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targets:
+          - name: discretization-handout
+            attr: discretization/handout
+          - name: derivative-approximation-handout
+            attr: derivative_approximation/handout
+          - name: docs
+            attr: docs
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Build ${{ matrix.targets.name }}
+        run: nix build .#${{ matrix.targets.attr }}
+
+      - name: Upload ${{ matrix.targets.name }} artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.targets.name }}
+          path: result
