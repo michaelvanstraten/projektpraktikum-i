@@ -20,4 +20,4 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Check Flake for all systems
-        run: nix flake check --all-systems
+        run: nix flake check --all-systems --print-build-logs

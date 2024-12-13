@@ -1,4 +1,4 @@
-name: Build and Upload Nix Packages
+name: build
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches: [master]
 
 jobs:
-  build-and-upload:
+  build-package:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -29,10 +29,10 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Build ${{ matrix.targets.name }}
-        run: nix build .#${{ matrix.targets.attr }}
+        run: nix build .#${{ matrix.targets.attr }} --print-build-logs
 
       - name: Upload ${{ matrix.targets.name }} artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.targets.name }}
           path: result
