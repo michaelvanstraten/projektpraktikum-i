@@ -364,8 +364,8 @@ einzelnen Diskretisierungspunkten in 3D sowie im Heatmap-Format dargestellt.
           Speicherplatzbedarf für das raw-Format stärker an, als das
           CRS-Format, also das Format um \(A\) als sparse-Matrix zu speichern.
           Es ist zu sehen, dass der Speicherplatzbedarf für das raw-Format
-          proportional zu \(N^2\) und der des CRS-Format proportional zu
-          \(N\) ist.
+          proportional zu \(N^2\) und der des CRS-Format proportional zu \(N\)
+          ist.
 
     \item In \autoref{fig:solutions-for-n-equal-4},
           \autoref{fig:solutions-for-n-equal-11}, und
@@ -377,9 +377,9 @@ einzelnen Diskretisierungspunkten in 3D sowie im Heatmap-Format dargestellt.
 
     \item In \autoref{fig:error} ist der maximale Fehler zwischen der
           numerischen und analytischen Lösung in Abhängigkeit von \(N\) im
-          Log-Log Plot zu sehen. Man kann beobachten, dass der Fehler zuerst fällt 
-          und wieder hoch geht, aber dann ab ca. \(10^{1}\) immer kleiner wird. Ab diesem
-          Wert verläuft die Kurve proportional zu \(N^{-2}\).
+          Log-Log Plot zu sehen. Man kann beobachten, dass der Fehler zuerst
+          fällt und wieder hoch geht, aber dann ab ca. \(10^{1}\) immer kleiner
+          wird. Ab diesem Wert verläuft die Kurve proportional zu \(N^{-2}\).
 
     \item In \autoref{fig:difference-for-n-equal-4},
           \autoref{fig:difference-for-n-equal-11}, und
@@ -396,22 +396,25 @@ einzelnen Diskretisierungspunkten in 3D sowie im Heatmap-Format dargestellt.
 
 \begin{itemize}
     \item Der stärkere Anstieg in \autoref{fig:sparsity} der Matrix \(A\) im
-          vollbesetzten Format verglichen mit dem dünnbesetzten Format entspricht den
-          Erwartungen, denn die Anzahl der Gesamteinträge ist wie in der
-          Theorie erwähnt gleich \({(n - 1)}^4 = N^2\) was proportional zu \(n^4\) 
-          bzw. \(N^2\) ist, und die Anzahl der nicht-Null Einträge ist gleich \(5n^2 - 14n +
-          9\) was proportional zu \(n^2\) bzw. proportional zu \(N\) ist. Auch dass die relative Sparsity
-          im Graphen proportional zu \(n^{-2}\), also \(N^{-1}\) verläuft, ist hiermit zu
-          erklären, da nach Definition die relative Sparsity gleich
-          \(\frac{5n^2 - 14n + 9}{{(n - 1)}^4}\) ist, was offensichtlich
-          proportional zu \(n^{-2}\) ist, also in \(\BigO(n^{-2}) = \BigO(N^{-1})\) liegt.
+          vollbesetzten Format verglichen mit dem dünnbesetzten Format
+          entspricht den Erwartungen, denn die Anzahl der Gesamteinträge ist
+          wie in der Theorie erwähnt gleich \({(n - 1)}^4 = N^2\) was
+          proportional zu \(n^4\) bzw.\ \(N^2\) ist, und die Anzahl der
+          nicht-Null Einträge ist gleich \(5n^2 - 14n + 9\) was proportional zu
+          \(n^2\) bzw.\ proportional zu \(N\) ist. Auch dass die relative
+          Sparsity im Graphen proportional zu \(n^{-2}\), also \(N^{-1}\)
+          verläuft, ist hiermit zu erklären, da nach Definition die relative
+          Sparsity gleich \(\frac{5n^2 - 14n + 9}{{(n - 1)}^4}\) ist, was
+          offensichtlich proportional zu \(n^{-2}\) ist, also in
+          \(\BigO(n^{-2}) = \BigO(N^{-1})\) liegt.
 
     \item Auch der stärkere Anstieg des theoretischen Speicherbedarfs in
           \autoref{fig:theoretical-memory-usage} ist wie erwartet, da für das
           raw-Format jeder Eintrag einmal abgespeichert werden muss, also liegt
-          hier das Speichern in \(\BigO(n^4) = \BigO(N^2)\) und für das CRS-Format für jeden
-          nicht-Null-Eintrag drei Werte gespeichert werden müssen, was
-          proportional zu \(n^2\) ist, also in \(\BigO(n^2) = \BigO(N)\) liegt.
+          hier das Speichern in \(\BigO(n^4) = \BigO(N^2)\) und für das
+          CRS-Format für jeden nicht-Null-Eintrag drei Werte gespeichert werden
+          müssen, was proportional zu \(n^2\) ist, also in \(\BigO(n^2) =
+          \BigO(N)\) liegt.
 
     \item Der grafische Vergleich in \autoref{fig:solutions-for-n-equal-4},
           \autoref{fig:solutions-for-n-equal-11}, und
@@ -435,30 +438,31 @@ einzelnen Diskretisierungspunkten in 3D sowie im Heatmap-Format dargestellt.
 
     \item Dieses Verhalten stimmt auch mit der Theorie überein, denn die
           analytische Lösung ist, für das gesamte Gebiet \(\Omega\) definiert,
-          und da je größer man \(n\) wählt, desto größer wird auch \(N\) und deckt 
-          somit mehr Punkte des Gebietes ab und die numerische Lösung konvergiert
-          daher gegen die analytische Lösung.
+          und da je größer man \(n\) wählt, desto größer wird auch \(N\) und
+          deckt somit mehr Punkte des Gebietes ab und die numerische Lösung
+          konvergiert daher gegen die analytische Lösung.
 \end{itemize}
 
 \section{Zusammenfassung}
 
 Untersucht wurde das numerische Approximieren einer Lösung des Poisson-Problems
 für das Gebiet \(\Omega = {(0, 1)}^2\) und \(g = 0\). Dafür haben wir das
-Gebiet in ein Gitter von \({(n - 1)}^2 = N\) Diskretisierungs-Punkten aufgeteilt
-und die zu suchende Funktion an diesen Stellen mithilfe eines Gleichungssystems
-approximiert. Zuerst wurde die Matrix \(A\), die das Gleichungssystem
-beschreibt untersucht. Unsere Ergebnisse sind, dass die Anzahl der
-Gesamteinträge viel schneller steigt, als die der nicht-Null-Einträge, was ein
-Speichern dieser Matrix im CRS-Format sinnvoll macht. Selbiges Ergebnis fanden
-wir auch für die LU-Zerlegung von \(A\), die zum Lösen des Gleichungssystems
-diente, dieser Matrix. Zum Untersuchen des Konvergenzverhaltens der
-Approximation von \autoref{eq:u} nahmen wir uns die Funktion in \autoref{eq:f}
-welche die analytische Lösung für das Poisson-Problem ist. Wir haben unsere
-numerische Lösung für verschiedene Werte von \(n\) mit der analytischen Lösung
-verglichen und fanden, dass der maximale Fehler zwischen analytischer und
-numerischer Lösung in \(\BigO({(n - 1)}^{-4}) = BigO(N^{-2})\) liegt. Auch grafisch ist zu
-sehen, dass die numerische Lösung für größere \(n\) der Funktion \(u\) immer
-mehr ähnelt bzw.\ gar nicht mehr zu unterscheiden ist.
+Gebiet in ein Gitter von \({(n - 1)}^2 = N\) Diskretisierungs-Punkten
+aufgeteilt und die zu suchende Funktion an diesen Stellen mithilfe eines
+Gleichungssystems approximiert. Zuerst wurde die Matrix \(A\), die das
+Gleichungssystem beschreibt untersucht. Unsere Ergebnisse sind, dass die Anzahl
+der Gesamteinträge viel schneller steigt, als die der nicht-Null-Einträge, was
+ein Speichern dieser Matrix im CRS-Format sinnvoll macht. Selbiges Ergebnis
+fanden wir auch für die LU-Zerlegung von \(A\), die zum Lösen des
+Gleichungssystems diente, dieser Matrix. Zum Untersuchen des
+Konvergenzverhaltens der Approximation von \autoref{eq:u} nahmen wir uns die
+Funktion in \autoref{eq:f} welche die analytische Lösung für das
+Poisson-Problem ist. Wir haben unsere numerische Lösung für verschiedene Werte
+von \(n\) mit der analytischen Lösung verglichen und fanden, dass der maximale
+Fehler zwischen analytischer und numerischer Lösung in \(\BigO({(n - 1)}^{-4})
+= BigO(N^{-2})\) liegt. Auch grafisch ist zu sehen, dass die numerische Lösung
+für größere \(n\) der Funktion \(u\) immer mehr ähnelt bzw.\ gar nicht mehr zu
+unterscheiden ist.
 
 \printbibliography%
 
