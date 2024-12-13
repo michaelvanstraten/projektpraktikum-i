@@ -27,6 +27,11 @@ final: prev: {
       };
   });
 
+  manimpango = hacks.nixpkgsPrebuilt {
+    from = pythonPackages.manimpango;
+    prev = prev.scipy;
+  };
+
   scipy = hacks.nixpkgsPrebuilt {
     from = pythonPackages.scipy;
     prev = prev.scipy;
