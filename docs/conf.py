@@ -12,6 +12,10 @@ extensions = [
 ]
 autosummary_generate = True
 
+latex_elements = {
+  'extraclassoptions': 'openany,oneside'
+}
+
 import sys
 from pathlib import Path
 
