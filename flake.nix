@@ -95,7 +95,7 @@
 
           "derivative_approximation/handout" = buildLatexmkProject {
             name = "derivative_approximation-handout";
-            filename = "Handout.tex";
+            filename = "handout.tex";
             SOURCE_DATE_EPOCH = toString self.lastModified;
             XDG_CACHE_HOME = "$(mktemp -d)";
             XDG_CONFIG_HOME = "$(mktemp -d)";
@@ -130,7 +130,7 @@
 
           "discretization/handout" = buildLatexmkProject {
             name = "discretization-handout";
-            filename = "poisson_handout.tex";
+            filename = "handout.tex";
             SOURCE_DATE_EPOCH = toString self.lastModified;
             extraOptions = [ "--shell-escape" ];
             src = pkgs.buildEnv {
