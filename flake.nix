@@ -1,5 +1,5 @@
 {
-  description = "Projektpraktikum I assignments";
+  description = "Projektpraktikum I (WiSe2024)";
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
