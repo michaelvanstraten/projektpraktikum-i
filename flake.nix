@@ -157,6 +157,38 @@
             ];
           };
 
+          "discretization/presentation" = buildLatexmkProject {
+            name = "discretization-presentation";
+            filename = "presentation.tex";
+            SOURCE_DATE_EPOCH = toString self.lastModified;
+            extraOptions = [ "--shell-escape" ];
+            src = pkgs.buildEnv {
+              name = "discretization-handout-source";
+              paths = [
+                ./tex/discretization
+                self.packages.${system}."discretization/figures"
+              ];
+            };
+            buildInputs = [
+              pkgs.biber
+              (pkgs.texlive.combine {
+                inherit (pkgs.texlive)
+                  scheme-basic
+
+                  csquotes
+                  babel-german
+                  biblatex
+                  float
+                  koma-script
+                  mathtools
+                  beamer
+                  extsizes
+                  caption
+                  ;
+              })
+            ];
+          };
+
           docs = pkgs.stdenvNoCC.mkDerivation {
             name = "projektpraktikum-i-docs";
             src =

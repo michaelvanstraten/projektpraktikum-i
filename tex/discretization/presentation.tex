@@ -1,6 +1,5 @@
 \documentclass[9pt, t]{beamer}
 \usepackage[ngerman]{babel} 
-\usepackage{textgreek}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
@@ -10,9 +9,6 @@ style=alphabetic,
 sorting=ynt
 ]{biblatex}
 \bibliography{presentation.bib}
-\usepackage{svg}
-
-\usepackage{import}
 
 \usepackage{subcaption}
 
@@ -23,6 +19,11 @@ sorting=ynt
 \beamersetrightmargin{\margin}
 \beamersetleftmargin{\margin}
 
+\newcommand\N{\mathbb{N}}
+\newcommand\R{\mathbb{R}}
+\newcommand\BigO{\mathcal{O}}
+\DeclarePairedDelimiterXPP{\set}[1]{}{\lbrace}{\rbrace}{}{#1}
+\DeclarePairedDelimiterXPP{\paren}[1]{}{\lparen}{\rparen}{}{#1}
 
 \title{Poisson-Problem}
 \author{M. van Straten und P. Merz}
