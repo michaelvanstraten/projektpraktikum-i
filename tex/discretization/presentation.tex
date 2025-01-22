@@ -1,8 +1,7 @@
 \documentclass[9pt, t]{beamer}
 \usepackage[ngerman]{babel} 
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{subcaption}
 \usepackage[
 backend=biber,
 style=alphabetic,
@@ -10,7 +9,9 @@ sorting=ynt
 ]{biblatex}
 \bibliography{presentation.bib}
 
-\usepackage{subcaption}
+\graphicspath{{./figures/}}
+
+\usetheme{Berlin}
 
 % Disable navigation buttons
 \setbeamertemplate{navigation symbols}{}
@@ -22,16 +23,15 @@ sorting=ynt
 \newcommand\N{\mathbb{N}}
 \newcommand\R{\mathbb{R}}
 \newcommand\BigO{\mathcal{O}}
+
 \DeclarePairedDelimiterXPP{\set}[1]{}{\lbrace}{\rbrace}{}{#1}
 \DeclarePairedDelimiterXPP{\paren}[1]{}{\lparen}{\rparen}{}{#1}
 
 \title{Poisson-Problem}
-\author{M. van Straten und P. Merz}
+\author{P. Merz und M. van Straten}
 \institute{Humboldt-Universität zu Berlin \\
            Wintersemester 2024}
 \date{\today}
-
-\usetheme{Berlin}
 
 \begin{document}
 
@@ -44,18 +44,15 @@ sorting=ynt
 \section{Einführung}
 
 \begin{frame}{Einleitung und Motivation}
-
-    Die Poisson-Gleichung ist eine elliptische partielle Differenzialgleichung
-    von zentraler Bedeutung in Bereichen wie:
-
-    \begin{itemize}
-        \item Gravitationstheorie
-        \item Elektrostatik
-        \item Strömungsmechanik
+    Die Poisson-Gleichung ist eine elliptische partielle Differenzialgleichung, wichtig in:
+    \begin{itemize}[<+->]
+        \item Gravitationstheorie,
+        \item Elektrostatik,
+        \item Strömungsmechanik.
     \end{itemize}
-
-    Da analytische Lösungen schwierig zu finden sind, wird eine numerische
-    Approximation zur Lösung des Problems untersucht.
+    \pause%
+    Aufgrund der Schwierigkeit analytischer Lösungen wird eine numerische
+    Approximation untersucht\ \cite{Poisson}.
 \end{frame}
 
 \section{Theorie}
@@ -63,231 +60,324 @@ sorting=ynt
 \subsection{Poisson-Problem}
 
 \begin{frame}{Poisson-Problem}
-    Das Poisson-Problem besteht in der Bestimmung einer Funktion \(u \in
-    C^2(\mathbb{R}^2; \mathbb{R})\), die für ein gegebenes Gebiet \(\Omega
-    \subset \mathbb{R}^2\) mit Rand \(\partial \Omega\) sowie zwei vorgegebene
-    Funktionen \(f \in C(\Omega; \mathbb{R})\) und \(g \in C(\partial \Omega;
-    \mathbb{R})\) die folgenden Bedingungen erfüllt:
+    Gesucht ist \(u \in C^2(\R^2; \R)\), das die
+    Poisson-Gleichung auf einem Gebiet \(\Omega \subset \R^2\) erfüllt:
+    \pause%
     \begin{align*}
-        -\Delta u & = f \quad \text{in} \quad \Omega
-        \\
-        u         & = g \quad \text{auf} \quad \partial \Omega
+        -\Delta u & = f \quad \text{in} \quad \Omega,           \\
+        u         & = g \quad \text{auf} \quad \partial \Omega.
     \end{align*}
-    wobei \(\Delta u = \frac{\partial^2 u}{\partial x_1^2} + \frac{\partial^2
-        u}{\partial x_2^2}\) der Laplace-Operator von \(u\) ist. \\ Für unsere
-    Experimente haben wir \(\Omega = {(0, 1)^2}\) und \(g = 0\) betrachtet.
+    \pause%
+    Dabei ist
+    \[
+        \Delta u = \frac{\partial^2 u}{\partial x_1^2} + \frac{\partial^2 u}{\partial x_2^2}
+    \]
+    der Laplace-Operator.\ \pause%
+    \begin{block}{Spezielle Annahmen für Experimente}
+        \begin{itemize}[<+->]
+            \item Gebiet: \(\Omega = {(0, 1)}^2\)
+            \item Randbedingung: \(g = 0\)
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \subsection{Diskretisierung des Gebietes}
+
 \begin{frame}{Diskretisierung des Gebietes}
-    \begin{itemize}
-        \item
-              Zuerst wird das Intervall \((0,1)\) in \(n\) gleich lange Teile
-              unterteilt
+    \begin{itemize}[<+->]
+        \item Das Intervall \((0,1)\) wird in \(n\) gleich lange Teile
+              unterteilt:
               \[
-                  X_1 = \left\{ \frac{j}{n} \mid 1 \leq j \leq n-1 \right\}
+                  X_1 = \set*{ \frac{j}{n} \mid 1 \leq j \leq n-1}.
               \]
-        \item
-              Hieraus wird ein Gitter an äquidistanten Punkten konstruiert
+        \item Daraus wird ein Gitter aus äquidistanten Punkten konstruiert:
               \[
-                  X = X_1 \times X_1 = \left\{ \left( \frac{j}{n}, \frac{k}{n} \right) \mid 1 \leq j, k \leq n-1 \right\}
+                  X
+                  = X_1 \times X_1
+                  = \set*{\paren*{\frac{j}{n}, \frac{k}{n}} \mid 1 \leq j, k \leq n-1}.
               \]
-        \item
-              Das Gitter besteht somit aus \(N \coloneq(n - 1)^2\)
-              Gitterpunkten
+        \item Das Gitter umfasst \(N \coloneq {(n - 1)}^2\) Punkte.
     \end{itemize}
 \end{frame}
 
 \subsection{Diskretisierung des Laplace-Operators}
-\begin{frame}{Diskretisierung des Laplace-Operators}
-    Mithilfe der finiten Differenzen Methode gilt:
-    \[
-        \frac{\partial^2 u}{\partial x_1^2} (v, w) \approx \frac{u(v + h, w) - 2u(v, w) + u(v - h, w)}{h^2}
-    \]
-    \[
-        \frac{\partial^2 u}{\partial x_2^2} (v, w) \approx \frac{u(v, w + h) - 2u(v, w) + u(v, w - h)}{h^2}
-    \]
 
-    \begin{align*}
-        \Delta u & = \frac{\partial^2 u}{\partial x_1^2} + \frac{\partial^2 u}{\partial x_2^2}          \\
-                 & \approx \frac{u(v + h, w) + u(v, w + h) - 4u(v, w) + u(v - h, w) + u(v, w - h)}{h^2}
-        \\
-                 & \eqcolon \Delta_h u
-    \end{align*}
-    \begin{itemize}
+\begin{frame}{Diskretisierung des Laplace-Operators}
+    Mithilfe der finiten Differenzen Methode wird der Laplace-Operator approximiert:
+    \pause%
+    \[
+        \frac{\partial^2 u}{\partial x_1^2} (v, w)
+        \approx \frac{u(v + h, w) - 2u(v, w) + u(v - h, w)}{h^2}
+    \]
+    \[
+        \frac{\partial^2 u}{\partial x_2^2} (v, w)
+        \approx \frac{u(v, w + h) - 2u(v, w) + u(v, w - h)}{h^2}
+    \]
+    \pause%
+    \[
+        \Delta u
+        \approx \frac{u(v + h, w) + u(v, w + h)
+            - 4u(v, w) + u(v - h, w) + u(v, w - h)}{h^2}
+    \]
+    \pause%
+    \begin{itemize}[<+->]
         \item \(h = \frac{1}{n}\)
-        \item Mit \(\Delta_h u\) wird der diskretisierte Laplace-Operator
-              bezeichnet
+        \item Der diskretisierte Laplace-Operator wird als \(\Delta_h u\)
+              bezeichnet \ \cite{PPI_Poisson}.
     \end{itemize}
 \end{frame}
 
 \subsection{Aufstellen des Gleichungssystems}
-\begin{frame}{Aufstellen des Gleichungssystems}
+
+\begin{frame}{Problemformulierung}
     Gesucht ist eine Lösung für:
-
     \begin{align*}
-        -\Delta_h u(x) & = f \quad \text{für} \quad x \in X
-        \\
-        u(x)           & = 0 \quad \text{auf} \quad \partial \Omega
+        -\Delta_h u(x) & = f \quad \text{für} \quad x \in X,         \\
+        u(x)           & = 0 \quad \text{auf} \quad \partial \Omega.
     \end{align*}
+    \pause%
 
-    Dies ist ein lineares Gleichungssystem mit \(N\) Gleichungen. Geordnet
-    werden die Gleichungen mittels der Bijektion
+    Dieses Problem führt auf ein lineares Gleichungssystem (LGS) mit \(N =
+    {(n-1)}^2\) Gleichungen.
+
+    Die Gleichungen werden mittels der Bijektion geordnet:
     \begin{align*}
-        \operatorname{idx}: \{1, \ldots, n - 1\}^2 & \longrightarrow \{1, \ldots , N\}, \\
-        (j, k)                                     & \longmapsto (k - 1)(n - 1) + j.
+        \operatorname{idx}: \set{1, \ldots, n - 1}^2 & \longrightarrow \set*{1, \ldots , N}, \\
+        (j, k)                                       & \longmapsto (k - 1)(n - 1) + j.
     \end{align*}
+\end{frame}
 
-    Die Matrix, die dieses LGS beschreibt, hat folgende Struktur
+\begin{frame}{Matrixstruktur des Gleichungssystems}
+    Die Matrix \(A \in \R^{N \times N}\) hat die Blockstruktur:
     \[
-        \begin{array}{ccc}
-            \scalebox{0.85}{$
-                    \begin{array}{l}
-                        A \coloneq \begin{bmatrix}
-                                       C      & -I     & 0      & \cdots & 0      \\
-                                       -I     & C      & -I     & \cdots & 0      \\
-                                       0      & \ddots & \ddots & \ddots & \vdots \\
-                                       \vdots & \ddots & \ddots & \ddots & -I     \\
-                                       0      & \cdots & 0      & -I     & C
-                                   \end{bmatrix}
-                        \in \mathbb{R}^{N \times N}
-                    \end{array}
-                $}
-
-            \text{und}
-
-            \scalebox{0.85}{$
-                    \begin{array}{l}
-                        C \coloneq \begin{bmatrix}
-                                       4      & -1     & 0      & \cdots & 0      \\
-                                       -1     & 4      & -1     & \cdots & 0      \\
-                                       0      & \ddots & \ddots & \ddots & \vdots \\
-                                       \vdots & \ddots & \ddots & \ddots & -1     \\
-                                       0      & \cdots & 0      & -1     & 4
-                                   \end{bmatrix}
-                        \in \mathbb{R}^{(n-1) \times (n-1)}
-                    \end{array}
-                $}
-        \end{array}
+        A \coloneq
+        \begin{bmatrix}
+            C      & -I     & 0      & \cdots & 0      \\
+            -I     & C      & -I     & \cdots & 0      \\
+            0      & \ddots & \ddots & \ddots & \vdots \\
+            \vdots & \ddots & \ddots & \ddots & -I     \\
+            0      & \cdots & 0      & -I     & C
+        \end{bmatrix}.
     \]
+    \pause%
+    Hierbei ist \(I\) die Einheitsmatrix.
+\end{frame}
 
+\begin{frame}{Submatrix \(C\)}
+    Die Blockmatrix \(C \in \R^{(n-1) \times (n-1)}\) hat die Struktur:
+    \[
+        C \coloneq
+        \begin{bmatrix}
+            4      & -1     & 0      & \cdots & 0      \\
+            -1     & 4      & -1     & \cdots & 0      \\
+            0      & \ddots & \ddots & \ddots & \vdots \\
+            \vdots & \ddots & \ddots & \ddots & -1     \\
+            0      & \cdots & 0      & -1     & 4
+        \end{bmatrix}.
+    \]
+    \pause%
+    Diese Struktur ergibt sich aus der Diskretisierung des Laplace-Operators.
 \end{frame}
 
 \subsection{LU-Zerlegung}
-\begin{frame}
-    \frametitle{LU-Zerlegung}
 
-    Sei \(A \in \mathbb{R}^{n \times n}\) eine quadratische Matrix. Dann
-    existieren eine Permutationsmatrix \(P \in \R^{n \times n}\), eine linke
-    untere Dreiecksmatrix \(L \in \mathbb{R}^{n \times n}\) und eine rechte
-    obere Dreiecksmatrix \(U \in \mathbb{R}^{n \times n}\), sodass gilt:
-    \[
-        A = PLU.
-    \]
-
-    Die LU-Zerlegung hilft, das lineare Gleichungssystem effizient zu lösen:
-
-    \[
-        A x = b \quad \Rightarrow \quad PLU x = b \quad \Rightarrow \quad LU x = P^T b
-    \]
-    \begin{itemize}
-        \item Bestimmen der Matrizen \(P, L, U\) liegt in \(\mathcal{O}(n^3)\)
-        \item Lösen des Gleichungssystems mittels Vorwärts- und
-              Rückwärtssubstitution liegt in \(\mathcal{O}(n^2)\)
-    \end{itemize}
+\begin{frame}{LU-Zerlegung}
+    \begin{block}{Definition}
+        Für \(A \in \R^{n \times n}\) existieren:
+        \[
+            A = PLU,
+        \]
+        wobei \(P\) eine Permutationsmatrix, \(L\) eine untere Dreiecksmatrix
+        und \(U\) eine obere Dreiecksmatrix ist~\cite{LU}.
+    \end{block}
+    \pause%
+    \begin{block}{Lösung eines LGS}
+        \[
+            A x = b \quad \Rightarrow \quad LU x = P^T b
+        \]
+    \end{block}
+    \pause%
+    \begin{block}{Komplexität}
+        \begin{itemize}[<+->]
+            \item Zerlegung: \(\BigO(n^3)\)
+            \item Lösung: \(\BigO(n^2)\)
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \section{Experimente}
-\subsection{Rahmenbedingungen}
-\begin{frame}{Rahmenbedingungen}
-    \begin{itemize}
-        \item Untersucht wurde die Funktion \(u(x) \coloneq x_1 \cdot \sin(3
-              \cdot x_1) \cdot x_2 \cdot \sin(3 \cdot x_2)\)
-        \item Es gilt \(f(x) \coloneq -6 \paren*{
-                  \begin{array}{l}
-                      x_1 \cdot \cos(3 \cdot x_2) \cdot \sin(3 \cdot x_1)   \\
-                      + x_2 \cdot \cos(3 \cdot x_1) \cdot \sin(3 \cdot x_2) \\
-                      - 3 \cdot x_1 \cdot x_2 \sin(3 \cdot x_1) \cdot \sin(3 \cdot x_2)
-                  \end{array}}
-              = -\Delta u(x). \)
-        \item Die Funktion \(f\) wird als Input für das Poisson-Problem
-              verwendet und die numerische Lösung mit der analytische Lösung
-              \(u\) verglichen.
-    \end{itemize}
 
+\begin{frame}{Rahmenbedingungen}
+    \begin{block}{Analytische Lösung}
+        \[
+            u(x) \coloneq x_1 \cdot \sin(3 \cdot \pi \cdot x_1) \cdot x_2 \cdot \sin(3 \cdot \pi \cdot x_2)
+        \]
+    \end{block}
+    \pause%
+    \begin{block}{Numerische Approximation}
+        Numerische Lösung \(\hat u\) wurde für das Poisson-Problem unter
+        Einbeziehung der Anfangsbedingungen berechnet und mit der analytischen Lösung \(u\) verglichen.
+    \end{block}
+    \pause%
+    \begin{block}{Zentrale Fragestellungen}
+        \begin{enumerate}[<+->]
+            \item Optimales Speicherformat der Systemmatrix \(A\).
+            \item Konvergenzverhalten der numerischen Approximation.
+        \end{enumerate}
+    \end{block}
 \end{frame}
 
 \subsection{Sparsity}
-\begin{frame}{Sparsity}
 
-    %TO DO ADD GRAPH
-
-    %TO DO ADD BEOBACHTUNG
+\begin{frame}{Experimente: Untersuchung der Sparsity}
+    \begin{block}{Zielsetzung}
+        Analyse der Dünnbesetztheit (Sparsity) der Systemmatrix \(A\) sowie ihrer LU-Zerlegung.
+    \end{block}
+    \pause%
+    \begin{block}{Untersuchung}
+        \begin{itemize}[<+->]
+            \item Struktur von \(A\) in Abhängigkeit von \(N\).
+            \item Dünnbesetztheit der LU-Zerlegung von \(A\).
+        \end{itemize}
+    \end{block}
 \end{frame}
 
-\subsection{Graphischer Vergleich: Analytische und numerische Lösung}
-\begin{frame}{Graphischer Vergleich: Analytische und numerische Lösung}
-
-    %TO DO ADD GRAPH
-
-    \textbf{Beobachtung:}
-    \begin{itemize}
-        \item Numerische Lösung sieht für größere \(n\) der analytsichen Lösung
-              immer ähnlicher
-    \end{itemize}
+\begin{frame}{Sparsity der Matrix \(A\)}
+    \centering
+    \includegraphics[width=\textwidth]{sparsity.pdf}
 \end{frame}
 
+\begin{frame}{Sparsity der LU-Zerlegung von \(A\)}
+    \centering
+    \includegraphics[width=\textwidth]{sparsity-lu.pdf}
+\end{frame}
+
+% \begin{frame}{Beobachtungen und Auswertung}
+%     \begin{itemize}[<+->]
+%         \item Gesamteinträge in \(A\) skalieren proportional zu \(N^2\)
+%               (Log-Log-Darstellung).
+%         \item Nicht-Nulleinträge wachsen proportional zu \(N\), was langsamer
+%               ist.
+%         \item Relative Sparsity: Abfall proportional zu \(N^{-1}\).
+%         \item Nicht-Nulleinträge der LU-Zerlegung wachsen proportional zu
+%               \(n^3\).
+%         \item Relative Sparsity der LU-Zerlegung: Abfall proportional zu
+%               \(n^{-1}\).
+%     \end{itemize}
+% \end{frame}
+%
+\subsection{Vergleich der analytischen und numerischen Lösungen}
+
+\begin{frame}{Untersuchung: Numerische vs. Analytische Lösung}
+    \begin{block}{Zielsetzung}
+        Vergleich der numerischen Lösung \(\hat u\) mit der analytischen Lösung \(u\)
+        für unterschiedliche Gittergrößen \(n \in \{4, 11, 128\}\).
+    \end{block}
+    \pause%
+    \begin{block}{Visualisierung}
+        Grafische Darstellung der Lösungen zur Beurteilung der Annäherung.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Lösungsvergleich für \(n = 4\)}
+    \centering
+    \includegraphics[width=\textwidth]{solutions-for-n-equal-4.pdf}
+\end{frame}
+
+\begin{frame}{Lösungsvergleich für \(n = 11\)}
+    \centering
+    \includegraphics[width=\textwidth]{solutions-for-n-equal-11.pdf}
+\end{frame}
+
+\begin{frame}{Lösungsvergleich für \(n = 128\)}
+    \centering
+    \includegraphics[width=\textwidth]{solutions-for-n-equal-128.pdf}
+\end{frame}
+
+% \begin{frame}{Beobachtungen und Auswertung}
+%     \begin{itemize}[<+->]
+%         \item Mit steigendem \(n\) nähert sich die numerische Lösung \(\hat u\)
+%               der analytischen Lösung \(u\) immer besser an.
+%         \item Grafische Vergleiche zeigen eine deutliche Verbesserung der
+%               Übereinstimmung bei höheren Gitterauflösungen.
+%     \end{itemize}
+% \end{frame}
+%
 \subsection{Fehleranalyse}
-\begin{frame}{Maximaler Fehler}
 
-    %TO DO ADD GRAPH
-
-    \textbf{Beobachtung:}
-    \begin{itemize}
-        \item Anfangs noch kein Muster zu erkennen
-        \item Ab \(N \approx 10\) verläuft der Fehler proportional zu
-              \(N^{-2}\)
-    \end{itemize}
+\begin{frame}{Untersuchung des Fehlers}
+    \begin{block}{Zielsetzung}
+        Systematische Analyse des Fehlers zwischen der approximierten Lösung \(\hat u\) und der exakten Lösung \(u\).
+    \end{block}
+    \pause%
+    \begin{block}{Ansätze}
+        \begin{itemize}[<+->]
+            \item Darstellung der Fehlerverteilung in 3D und als Heatmap für
+                  \(n \in \{4, 11, 128\}\).
+            \item Analyse des maximalen Fehlers in Abhängigkeit von \(N\).
+        \end{itemize}
+    \end{block}
 \end{frame}
 
-\begin{frame}{Fehler an den Diskretisierungspunkten}
-
-    %TO DO ADD GRAPH
-
-    \textbf{Beobachtung}
-    \begin{itemize}
-        \item Der Fehler an den einzelnen Gitterpunkten nimmt mit zunehmendem
-              \(n\) ab.
-    \end{itemize}
-
+\begin{frame}{Fehlerverteilung für \(n = 4\)}
+    \centering
+    \includegraphics[width=\textwidth]{difference-for-n-equal-4.pdf}
 \end{frame}
 
+\begin{frame}{Fehlerverteilung für \(n = 11\)}
+    \centering
+    \includegraphics[width=\textwidth]{difference-for-n-equal-11.pdf}
+\end{frame}
+
+\begin{frame}{Fehlerverteilung für \(n = 128\)}
+    \centering
+    \includegraphics[width=\textwidth]{difference-for-n-equal-128.pdf}
+\end{frame}
+
+\begin{frame}{Maximaler Fehler in Abhängigkeit von \(n\)}
+    \centering
+    \includegraphics[width=0.9\textwidth]{error.pdf}
+\end{frame}
+
+% \begin{frame}{Beobachtungen und Auswertung}
+%     \begin{itemize}[<+->]
+%         \item Der maximale Fehler fällt zunächst, steigt kurz an und fällt
+%               schließlich proportional zu \(N^{-1}\) (Log-Log-Darstellung).
+%         \item Für größere Werte von \(n\) wird der Fehler insgesamt kleiner (z.
+%               B. bei \(n = 128\) liegt er zwischen 0.00005 und 0.00030).
+%         \item Die numerische Lösung \(\hat u\) konvergiert mit wachsendem \(n\)
+%               gegen die analytische Lösung \(u\), da feinere Diskretisierung
+%               mehr Punkte des Gebiets \(\Omega\) abdeckt.
+%         \item Dieses Verhalten ist konsistent mit der theoretischen Erwartung.
+%     \end{itemize}
+% \end{frame}
+%
 \section{Zusammenfassung}
 
 \begin{frame}{Zusammenfassung}
     \textbf{Erkenntnisse aus den Experimenten:}
-    \begin{itemize}
+    \begin{itemize}[<+->]
         \item Theoretischer Speicherplatzbedarf für \(A\) liegt im
-              vollbesetzten Format in \(\mathcal{O}(n^4)\) und im sparse Format
-              in \(\mathcal{O}(n^2)\)
-        \item relative Sparsity liegt
+              vollbesetzten Format in \(\BigO(n^4)\) und im sparse Format in
+              \(\BigO(n^2)\)
+        \item Sparsity der LU-Zerlegung in \(\BigO(n^3)\).
     \end{itemize}
 
     \textbf{Vergleich: Analytische vs numerische Lösung}
-    \begin{itemize}
+    \begin{itemize}[<+->]
         \item Numerische Lösung sieht mit wachsendem \(n\) immer mehr wie die
               die analytische Lösung aus.
     \end{itemize}
 
     \textbf{Fehleranalyse:}
-    \begin{itemize}
+    \begin{itemize}[<+->]
         \item Maximaler Fehler zwischen analytischer und numerischer Lösung
-              liegt in \(\mathcal{O}(n^{-2})\) \item
+              liegt in \(\BigO(N^{-1})\)
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Literaturverzeichnis}
-    \printbibliography
+    \printbibliography%
 \end{frame}
 
 \end{document}

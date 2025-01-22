@@ -254,10 +254,10 @@ def plot_error(f, analytic_u, solver, interval, save_to=None, fast=False):
     )
     plt.loglog(
         number_of_discretization_points,
-        1 / values_for_n**2,
+        1 / number_of_discretization_points,
         linestyle="--",
         color="gray",
-        label=r"$\frac{1}{N^2}$",
+        label=r"$\frac{1}{N}$",
     )
     plt.xlabel("Number of Discretization Points ($N$)")
     plt.ylabel("Error")

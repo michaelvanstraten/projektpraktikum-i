@@ -182,7 +182,7 @@ def plot_theoretical_memory_usage(interval, save_to=None):
     # Calculate memory usage for raw and CRS formats
     raw_memory = (values_for_n - 1) ** 4
     crs_memory = [BlockMatrix(n).eval_sparsity()[0] * 3 + 1 for n in values_for_n]
-    crs_ref_line = np.polyfit(values_for_n, crs_memory, 2)
+    crs_ref_line = np.round(np.polyfit(values_for_n, crs_memory, 2))
 
     plt.loglog(number_of_discretization_points, raw_memory, label="Raw format")
     plt.loglog(number_of_discretization_points, crs_memory, label="CRS format")
@@ -225,7 +225,7 @@ def plot_sparsity(interval, save_to=None):
     number_of_discretization_points = (values_for_n - 1) ** 2
 
     nnz, rel_nnz = zip(*[BlockMatrix(n).eval_sparsity() for n in values_for_n])
-    nnz_ref_line = np.polyfit(values_for_n, nnz, 2)
+    nnz_ref_line = np.round(np.polyfit(values_for_n, nnz, 2))
     nnz_ref_line_label = generate_label_for_polynomial(nnz_ref_line)
 
     # Plot for non-zero entries vs discretization points
@@ -267,7 +267,7 @@ def plot_sparsity(interval, save_to=None):
         np.poly1d(nnz_ref_line)(values_for_n) / number_of_discretization_points**2,
         linestyle="--",
         color="gray",
-        label=f"$\\frac{{({nnz_ref_line_label})}}{{N}}$",
+        label=f"$\\frac{{({nnz_ref_line_label})}}{{N^2}}$",
     )
     ax2.set_title("Relative Non-zero Entries vs Number of Discretization Points ($N$)")
     ax2.set_xlabel("Number of Discretization Points ($N$)")
@@ -307,7 +307,7 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     nnz_ge_eps_lu, rel_nnz_ge_eps_lu = zip(
         *[BlockMatrix(n).eval_sparsity_lu(epsilon) for n in values_for_n]
     )
-    nnz_lu_ref_line = np.polyfit(values_for_n, nnz_lu, 3)
+    nnz_lu_ref_line = np.round(np.polyfit(values_for_n, nnz_lu, 3))
     nnz_lu_ref_line_label = generate_label_for_polynomial(nnz_lu_ref_line)
 
     # Plot for non-zero entries vs discretization points
@@ -356,7 +356,7 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
         np.poly1d(nnz_lu_ref_line)(values_for_n) / number_of_discretization_points**2,
         linestyle="--",
         color="gray",
-        label=f"$\\frac{{({nnz_lu_ref_line_label})}}{{N}}$",
+        label=f"$\\frac{{({nnz_lu_ref_line_label})}}{{N^2}}$",
     )
     ax2.loglog(
         number_of_discretization_points,

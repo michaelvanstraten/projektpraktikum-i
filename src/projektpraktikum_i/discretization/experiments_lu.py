@@ -33,22 +33,21 @@ def plot_solutions(n, save_to):
     ).reshape((n - 1, n - 1))
 
     # Plot solutions
-    fig, (ax1, ax2) = plt.subplots(
+    _, (ax1, ax2) = plt.subplots(
         1, 2, figsize=(14, 6), subplot_kw={"projection": "3d"}
     )
 
     # Analytical solution
-    surf1 = ax1.plot_surface(
+    ax1.plot_surface(
         *evalutation_points, analytical_solution, cmap="viridis", edgecolor="none"
     )
     ax1.set_xlabel("$X_1$")
     ax1.set_ylabel("$X_2$")
     ax1.set_zlabel("$u(X)$")
     ax1.set_title("Analytical Solution $u(X)$")
-    fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=10)
 
     # Numerical solution
-    surf2 = ax2.plot_surface(
+    ax2.plot_surface(
         *poisson_problem_2d.get_evaluation_points(n),
         numeric_solution,
         cmap="coolwarm",
@@ -58,7 +57,6 @@ def plot_solutions(n, save_to):
     ax2.set_ylabel("$X_2$")
     ax2.set_zlabel(r"$\^{u}(X)$")
     ax2.set_title(f"Numerical Solution $\\^{{u}}(X)$ with $n={n}$")
-    fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=10)
 
     # Show plots
     plt.tight_layout()
@@ -90,14 +88,11 @@ def plot_difference(n, save_to):
 
     # 3D plot of the error
     ax1 = fig.add_subplot(1, 2, 1, projection="3d")
-    surf1 = ax1.plot_surface(
-        *evalutation_points, difference, cmap="coolwarm", edgecolor="none"
-    )
+    ax1.plot_surface(*evalutation_points, difference, cmap="coolwarm", edgecolor="none")
     ax1.set_xlabel("$X_1$")
     ax1.set_ylabel("$X_2$")
     ax1.set_zlabel("Absolute Error")
     ax1.set_title(f"3D Plot of Absolute Error for $n = {n}$")
-    fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=10)
 
     # Heatmap of the error
     ax2 = fig.add_subplot(1, 2, 2)
