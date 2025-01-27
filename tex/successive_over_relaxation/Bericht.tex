@@ -51,7 +51,7 @@
 
 \graphicspath{{./figures/}}
 
-\addbibresource{handout.bib}
+\addbibresource{Bericht.bib}
 
 \begin{document}
 
@@ -72,8 +72,8 @@ wobei
 \begin{equation*}
     \Delta u = \frac{\partial^2 u}{\partial x_1^2} + \frac{\partial^2 u}{\partial x_2^2}
 \end{equation*}
-den Laplace-Operator von \(u\) darstellt\ \cite{PPI_Poisson}, für eine gegebene Funktion \(f\)
-auf \(\Omega = {(0, 1)}^2 \quad \text{und} \quad g = 0\) diskretisiert und anschließend mit 
+den Laplace-Operator von \(u\) darstellt, für eine gegebene Funktion \(f\)
+auf \(\Omega = {(0, 1)}^2\) und \(g = 0\) diskretisiert und anschließend mit 
 der LU-Zerlegung der entstehenden Diskretisierungsmatrix \(A\) gelöst. Während die Matrix \(A\) zwar dünn besetzt war,
 war die LU-Zerlegung dieser nicht dünn besetzt. Aufgrund dessen wollen wir in diesem Bericht eine weitere Art des
 Lösens für das entstehende Gleichungssystem betrachten: Das SOR-Verfahren. Dieses Verfahren ist ein iteratives Verfahren
@@ -105,13 +105,13 @@ wobei \(C \in \R^{(n-1) \times (n-1)}\) eine Tridiagonalmatrix ist:
         \vdots & \ddots & \ddots & \ddots & -1     \\
         0      & \cdots & 0      & -1     & 4
     \end{bmatrix}.
-\]
+\]\cite{HandoutLU}
 
 \subsection{Iterative Verfahren}
 Sei im folgenden immer ein lineares Gleichungssystem
 \[Ax=b\]
 mit \(A \in \R^{n \times n}\) regulär und \(b \in \R^n\) gegeben.
-\begin{definition}
+\begin{definition}\cite{Iterative}
 Ein Iterationsverfahren ist gegeben durch die Abbildung
 \[\phi:\R^n \times \R^n \rightarrow \R^n\]
 mit Iterationsvorschrift
@@ -121,16 +121,16 @@ Das Iterationsverfahren heißt linear, falls \(B,C \in \R^{n \times n}\) existie
 \end{definition}
 
 
-\begin{definition}
+\begin{definition}\cite{Iterative}
 Eine Verfahrensfunktion heißt konvergent wenn für alle \(b \in \R^n\) und alle \(x_0 \in \R^n\) ein vom Startwert unabhängiger Grenzwert
 \[\tilde{x} = \lim_{k \to \infty} \phi(x^{(k)},b)\]
 existiert\\
 Eine Verfahrensfunktion heißt konsistent zur Matrix \(A\), falls die Lösung \(\tilde{x}\) des linearen Gleichungssystems ein Fixpunkt der Verfahrensfunktion ist, das heißt
 \[\tilde{x} = \phi(\tilde{x},b)\]
 \end{definition}
-Die Konvergenz und Konsistenz stellen zwei sinnvolle Kriterien dar, die wir von einem iterativen Verfahren erwarten, deshalb folgender Satz
+Die Konvergenz und Konsistenz stellen zwei sinnvolle Kriterien dar, die wir von einem iterativen Verfahren erwarten, da diese beiden sicherstellen, dass das Verfahren gegen die Lösung des linearen Gleichungssystems konvergiert, deshalb folgender Satz
 
-\begin{theorem}
+\begin{theorem}\cite{Iterative}
     Sei \(\phi(x,b)=Bx+Cb\) eine lineare Verfahrensfunktion, dann gilt:
     \(\phi\) ist genau dann konsistent zur Matrix \(A\), falls
     \[B=I-CA.\]
@@ -142,7 +142,7 @@ Die Konvergenz und Konsistenz stellen zwei sinnvolle Kriterien dar, die wir von 
     Siehe A. Meister Numerik linearer Gleichungssysteme 5. Auflage Satz 4.4 und 4.5
 \end{proof}
 \subsection{Splitting-Verfahren}
-Splitting-Verfahren basieren auf dem Aufteilen der Koeffizientenmatrix \(A\) in zwei Matrizen
+Splitting-Verfahren basieren auf dem Zerlegen der Koeffizientenmatrix \(A\) in zwei Matrizen
 \(M, N \in \R^{n \times n}\), mit \(M\) invertierbar, sodass 
 \[A = M-N\]
 gilt.
@@ -152,7 +152,7 @@ Für das lineare Gleichungssystem gilt dann
     \iff (M-N)x &= b \\
         \iff Mx &= Nx + b\\
          \iff x &= M^{-1}Nx + M^{-1}b
-\end{align*}
+\end{align*}\cite{SOR}
 Das heißt die Lösung des linearen Gleichungssystems ist per Konstruktion ein Fixpunkt des Iterationsverfahrens 
 \[x^{(k+1)}= M^{-1}Nx^{(k)} + M^{-1}b\]
 Also ist dieses Verfahren per Definition konsistent zur Matrix \(A\). \\
@@ -195,10 +195,8 @@ wobei \(\operatorname{det}D \neq 0\) gelten soll, das heißt \(D\) ist invertier
 und aufgrund der linken unteren Dreiecksstruktur von \(M\)
 ist diese Matrix ebenfalls invertierbar.
 Damit ist \[N= M-A=(\frac{1-\omega}{\omega})D-U\]
-Daraus folgt
-%TODO FOLLOWUP
 
-und damit lautet die Iterationsvorschrift
+und daher lautet die Iterationsvorschrift
 \[x^{(k+1)}=(D - \omega L)^{-1}[(1- \omega)D + \omega U]x^{(k)} + \omega (D-\omega U)^{-1}b\]
 
 
@@ -214,7 +212,7 @@ Einträge von \(x^{(k+1)}\) berechnen und es gilt:
 x_i^{(k+1)} = (1 - \omega) x_i^{(k)} + \frac{\omega}{a_{ii}} 
 \left( b_i - \sum_{j < i} a_{ij} x_j^{(k+1)} - \sum_{j > i} a_{ij} x_j^{(k)} \right), 
 \quad i = 1, 2, \ldots, n.
-\]
+\]\cite{SOR}
 
 \subsection{Konvergenz des SOR-Verfahren}
 \begin{theorem}
@@ -232,15 +230,15 @@ Band 1: Numerische Methoden der Algebra Satz 6.3-2. von W. Törnig
 
 
 \subsubsection{Anwendung auf die Matrix \(A_{p}\)}
-Die Matrix \(A_p\), die sich durch Diskretisierung des Laplace-Operators ergibt, ist aufgrund ihrer Struktur trivialerweise symmetrisch. Ferner ist sie auch positiv definit\cite{something}.
+Die Matrix \(A_p\), die sich durch Diskretisierung des Laplace-Operators ergibt, ist aufgrund ihrer Struktur trivialerweise symmetrisch. Ferner ist sie auch positiv definit\cite{PosDef}.
 Also konvergiert das SOR-Verfahren für \(\omega \in (0, 2)\) für diese Matrix.
 
 
 \section{Experimentelle Untersuchungen}
 Für unsere experimentellen Untersuchungen wurde, wie für die Untersuchungen zur LU-Zerlegung, die Funktion
-\begin{equation}
+\begin{equation*}
 u(x) := x_1 \cdot \sin(3 \cdot x_1) \cdot x_2 \cdot \sin(3 \cdot x_2)
-\end{equation}
+\end{equation*}
 betrachtet. Für diese Funktion gilt:
 \begin{equation*}
 f(x) := -6 \begin{pmatrix}
@@ -251,14 +249,16 @@ x_2 \cdot \cos(3 \cdot x_1) \cdot \sin(3 \cdot x_2) \\
 = -\Delta u(x).
 \end{equation*}
 
-Zuerst haben wir mithilfe des SOR-Verfahren für Werte von n zwische PLACEHOLDER UND PLACEHOLDER für die Funktion \(f\) gelöst und dann mit der Funktion \(u\), die für \(f\) die analytische Lösung des Problems darstellt, den maximalen Fehler zwischen numerischer und analytischer Lösung im log-log-Plot dargestellt.
+%Zuerst haben wir mithilfe des SOR-Verfahren für Werte von n zwische PLACEHOLDER UND %PLACEHOLDER für die Funktion \(f\) gelöst und dann mit der Funktion \(u\), die für \(f\) die %analytische Lösung des Problems darstellt, den maximalen Fehler zwischen numerischer und %analytischer Lösung im log-log-Plot dargestellt.
 
-%TODO ADD DIAGRAM FOR THIS EXPERIMENT
+%TODO ADD DIAGRAM
 
-%TODO ADD DESCRIPTION AND DIAGRAMS OF OTHER EXPERIMENT
+%b)
+%TODO ADD DESCRIPTION AND DIAGRAM
 
 
-
+%TODO MAKE THIS WAY BETTER
+%Ferner haben wir den optimalen Relaxationsfaktor, mithilfe von PLACEHOLDER ermittelt
 
 
 
@@ -273,7 +273,6 @@ Zuerst haben wir mithilfe des SOR-Verfahren für Werte von n zwische PLACEHOLDER
 
 
 \section{Zusammenfassung}
-
 
 
 \printbibliography%
