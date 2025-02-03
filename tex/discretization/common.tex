@@ -1,0 +1,27 @@
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+
+\newcommand\N{\mathbb{N}}
+\newcommand\R{\mathbb{R}}
+\newcommand\BigO{\mathcal{O}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\DeclarePairedDelimiterXPP{\set}[1]{}{\lbrace}{\rbrace}{}{#1}
+\DeclarePairedDelimiterXPP{\paren}[1]{}{\lparen}{\rparen}{}{#1}
+
+\newcommand{\definitionU}{
+    \[
+        u(x) \coloneqq \prod_{l=1}^2 x_l \sin(\kappa \pi x_l)
+    \]
+}
+
+\newcommand{\definitionF}{
+    \begin{align*}
+        f(x) \coloneq 2 \kappa \pi
+        ( & - x_1 \cos(\kappa \pi x_2) \sin(\kappa \pi x_2) \\
+          & + x_2 (\cos(\kappa \pi x_1)
+        + \kappa \pi x_1 \sin(\kappa \pi x_1)) \cdot \sin(\kappa \pi x_2))
+    \end{align*}
+}

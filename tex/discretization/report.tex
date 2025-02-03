@@ -4,19 +4,14 @@
 % Babel provides hyphenation patterns and translations of keywords like 'table
 % of contents'
 \usepackage[ngerman]{babel}
-% Provides commands for type-setting mathematical formulas
-\usepackage{amsmath}
-% Provides additional symbols
-\usepackage{amssymb}
-% Provides environments for typical math text structure
-\usepackage{amsthm}
 \usepackage{biblatex}
 % Automatic generation of hyperlinks for references and URIs
 \usepackage{hyperref}
-\usepackage{mathtools}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{luatodonotes}
 
+\include{common.tex}
 
 \KOMAoptions{
   % Add vertical space between two paragraphs, without indent
@@ -37,18 +32,6 @@
 }
 \date{\today}
 
-\newcommand\N{\mathbb{N}}
-\newcommand\R{\mathbb{R}}
-\newcommand\BigO{\mathcal{O}}
-
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-
-\newtheorem{theorem}{Theorem}
-
-\DeclarePairedDelimiterXPP{\set}[1]{}{\lbrace}{\rbrace}{}{#1}
-\DeclarePairedDelimiterXPP{\paren}[1]{}{\lparen}{\rparen}{}{#1}
-
 \graphicspath{{./figures/}}
 
 \addbibresource{report.bib}
@@ -59,11 +42,10 @@
 \tableofcontents
 \cleardoublepage%
 
-
 %TODO ADD CITATIONS
 \section{Einleitung und Motivation}
-Im Laufe des Moduls "Projekt Praktikum I" haben wir uns zuerst mit dem Thema Finite Differenzen
-beschäftigt. Mit hilfe dieser haben wir das Poisson-Problem
+Im Laufe des Moduls "Projekt Praktikum I" haben wir uns zuerst mit dem Thema
+Finite Differenzen beschäftigt. Mit hilfe dieser haben wir das Poisson-Problem
 \begin{align}\label{Eq:Poisson}
     -\Delta u & = f \; \text{in} \; \Omega           \\
     u         & = g \; \text{auf} \; \partial \Omega
@@ -73,20 +55,19 @@ wobei
     \Delta u = \frac{\partial^2 u}{\partial x_1^2} + \frac{\partial^2 u}{\partial x_2^2}
 \end{equation*}
 den Laplace-Operator von \(u\) darstellt, für eine gegebene Funktion \(f\)
-auf \(\Omega = {(0, 1)}^2\) und \(g = 0\) diskretisiert und anschließend mit 
+auf \(\Omega = {(0, 1)}^2\) und \(g = 0\) diskretisiert und anschließend mit
 der LU-Zerlegung der entstehenden Diskretisierungsmatrix \(A\) gelöst. Während die Matrix \(A\) zwar dünn besetzt war,
 war die LU-Zerlegung dieser nicht dünn besetzt. Aufgrund dessen wollen wir in diesem Bericht eine weitere Art des
 Lösens für das entstehende Gleichungssystem betrachten: Das SOR-Verfahren. Dieses Verfahren ist ein iteratives Verfahren
 und hat damit den Vorteil, das der Rechenaufwand pro Iteration verhältnismäßig gering ist \cite{AB3}
 
-
-
-
 \section{Theoretische Grundlagen}
 
-
 \subsection{Poisson-Problem (diskretisiert)}
-Durch Diskretisieren des Laplace-Operators und des Gebietes auf \((n-1)^2\) Gitterpunkte wird Gleichung \ref{Eq:Poisson} zu einem Gleichungssystem in \((n-1)^2\) Unbekannten. Die Koeffizientenmatrix, die das Gleichungssystem beschreibt lautet \(h^{-2}A_p\) mit \(h = \frac{1}{n}\) und
+Durch Diskretisieren des Laplace-Operators und des Gebietes auf \((n-1)^2\)
+Gitterpunkte wird Gleichung \ref{Eq:Poisson} zu einem Gleichungssystem in
+\((n-1)^2\) Unbekannten. Die Koeffizientenmatrix, die das Gleichungssystem
+beschreibt lautet \(h^{-2}A_p\) mit \(h = \frac{1}{n}\) und
 \[
     A_p \coloneq \begin{bmatrix}
         C      & -I     & 0      & \cdots & 0      \\
@@ -112,21 +93,22 @@ Sei im folgenden immer ein lineares Gleichungssystem
 \[Ax=b\]
 mit \(A \in \R^{n \times n}\) regulär und \(b \in \R^n\) gegeben.
 \begin{definition}\cite{Iterative}
-Ein Iterationsverfahren ist gegeben durch die Abbildung
-\[\phi:\R^n \times \R^n \rightarrow \R^n\]
-mit Iterationsvorschrift
-\[x^{(k+1)}=\phi(x^{(k)},b)\]
-Das Iterationsverfahren heißt linear, falls \(B,C \in \R^{n \times n}\) existieren, sodass
-\[\phi(x,b)=Bx+Cb\]
+    Ein Iterationsverfahren ist gegeben durch die Abbildung
+    \[\phi:\R^n \times \R^n \rightarrow \R^n\]
+    mit Iterationsvorschrift
+    \[x^{(k+1)}=\phi(x^{(k)},b)\]
+    Das Iterationsverfahren heißt linear, falls \(B,C \in \R^{n \times n}\)
+    existieren, sodass
+    \[\phi(x,b)=Bx+Cb\]
 \end{definition}
 
-
 \begin{definition}\cite{Iterative}
-Eine Verfahrensfunktion heißt konvergent wenn für alle \(b \in \R^n\) und alle \(x_0 \in \R^n\) ein vom Startwert unabhängiger Grenzwert
-\[\tilde{x} = \lim_{k \to \infty} \phi(x^{(k)},b)\]
-existiert\\
-Eine Verfahrensfunktion heißt konsistent zur Matrix \(A\), falls die Lösung \(\tilde{x}\) des linearen Gleichungssystems ein Fixpunkt der Verfahrensfunktion ist, das heißt
-\[\tilde{x} = \phi(\tilde{x},b)\]
+    Eine Verfahrensfunktion heißt konvergent wenn für alle \(b \in \R^n\) und alle \(x_0 \in \R^n\) ein vom Startwert unabhängiger Grenzwert
+    \[\tilde{x} = \lim_{k \to \infty} \phi(x^{(k)},b)\]
+    existiert\\ Eine Verfahrensfunktion heißt konsistent zur Matrix \(A\),
+    falls die Lösung \(\tilde{x}\) des linearen Gleichungssystems ein Fixpunkt
+    der Verfahrensfunktion ist, das heißt
+    \[\tilde{x} = \phi(\tilde{x},b)\]
 \end{definition}
 Die Konvergenz und Konsistenz stellen zwei sinnvolle Kriterien dar, die wir von einem iterativen Verfahren erwarten, da diese beiden sicherstellen, dass das Verfahren gegen die Lösung des linearen Gleichungssystems konvergiert, deshalb folgender Satz
 
@@ -134,146 +116,235 @@ Die Konvergenz und Konsistenz stellen zwei sinnvolle Kriterien dar, die wir von 
     Sei \(\phi(x,b)=Bx+Cb\) eine lineare Verfahrensfunktion, dann gilt:
     \(\phi\) ist genau dann konsistent zur Matrix \(A\), falls
     \[B=I-CA.\]
-    Außerdem ist \(\phi\) genau dann konvergent, wenn für den Spektralradius von \(B\)
+    Außerdem ist \(\phi\) genau dann konvergent, wenn für den Spektralradius
+    von \(B\)
     \[\rho(B)<1\]\label{Thrm:Spectralradius}
-    gilt.   
+    gilt.
 \end{theorem}
 \begin{proof}
     Siehe A. Meister Numerik linearer Gleichungssysteme 5. Auflage Satz 4.4 und 4.5
 \end{proof}
 \subsection{Splitting-Verfahren}
-Splitting-Verfahren basieren auf dem Zerlegen der Koeffizientenmatrix \(A\) in zwei Matrizen
-\(M, N \in \R^{n \times n}\), mit \(M\) invertierbar, sodass 
+Splitting-Verfahren basieren auf dem Zerlegen der Koeffizientenmatrix \(A\) in
+zwei Matrizen \(M, N \in \R^{n \times n}\), mit \(M\) invertierbar, sodass
 \[A = M-N\]
-gilt.
-Für das lineare Gleichungssystem gilt dann
+gilt. Für das lineare Gleichungssystem gilt dann
 \begin{align*}
-        \iff Ax &= b \\
-    \iff (M-N)x &= b \\
-        \iff Mx &= Nx + b\\
-         \iff x &= M^{-1}Nx + M^{-1}b
+    \iff Ax     & = b                  \\
+    \iff (M-N)x & = b                  \\
+    \iff Mx     & = Nx + b             \\
+    \iff x      & = M^{-1}Nx + M^{-1}b
 \end{align*}\cite{SOR}
-Das heißt die Lösung des linearen Gleichungssystems ist per Konstruktion ein Fixpunkt des Iterationsverfahrens 
+Das heißt die Lösung des linearen Gleichungssystems ist per Konstruktion ein Fixpunkt des Iterationsverfahrens
 \[x^{(k+1)}= M^{-1}Nx^{(k)} + M^{-1}b\]
-Also ist dieses Verfahren per Definition konsistent zur Matrix \(A\). \\
-Gilt zusätzlich \(\rho(M^{-1}N) < 1\), so ist das Verfahren nach Theorem \ref{Thrm:Spectralradius}
-auch konvergent
-
+Also ist dieses Verfahren per Definition konsistent zur Matrix \(A\). \\ Gilt
+  zusätzlich \(\rho(M^{-1}N) < 1\), so ist das Verfahren nach Theorem
+  \ref{Thrm:Spectralradius} auch konvergent
 
 \subsection{SOR-Verfahren}
-Gegeben sei ein lineares Gleichungssystem 
+Gegeben sei ein lineares Gleichungssystem
 \[Ax = b\]
-mit \(A \in \mathbb{R}^{n \times n} \quad x,b \in \mathbb{R}^n\).
-Man zerlege A in eine Diagonalmatrix \(D\), eine strikte linke untere Dreiecksmatrix 
-\(L\) und eine strikte obere Dreiecksmatrix \(U\), sodass
-\(A = D -L-U)\) mit
+mit \(A \in \mathbb{R}^{n \times n} \quad x,b \in \mathbb{R}^n\). Man zerlege
+  A in eine Diagonalmatrix \(D\), eine strikte linke untere Dreiecksmatrix
+  \(L\) und eine strikte obere Dreiecksmatrix \(U\), sodass \(A = D -L-U)\) mit
 \[
-D = \begin{pmatrix}
-a_{11} & 0 & \cdots & 0 \\
-0 & a_{22} & \cdots & 0 \\
-\vdots & \vdots & \ddots & \vdots \\
-0 & 0 & \cdots & a_{nn}
-\end{pmatrix}, \quad
-L = \begin{pmatrix}
-0 & 0 & \cdots & 0 \\
--a_{21} & 0 & \cdots & 0 \\
-\vdots & \vdots & \ddots & \vdots \\
--a_{n1} & -a_{n2} & \cdots & 0
-\end{pmatrix}, \quad
-R = \begin{pmatrix}
-0 & -a_{12} & \cdots & -a_{1n} \\
-0 & 0 & \cdots & -a_{2n} \\
-\vdots & \vdots & \ddots & \vdots \\
-0 & 0 & \cdots & 0
-\end{pmatrix}
+    D = \begin{pmatrix}
+        a_{11} & 0      & \cdots & 0      \\
+        0      & a_{22} & \cdots & 0      \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0      & 0      & \cdots & a_{nn}
+    \end{pmatrix}, \quad
+    L = \begin{pmatrix}
+        0       & 0       & \cdots & 0      \\
+        -a_{21} & 0       & \cdots & 0      \\
+        \vdots  & \vdots  & \ddots & \vdots \\
+        -a_{n1} & -a_{n2} & \cdots & 0
+    \end{pmatrix}, \quad
+    R = \begin{pmatrix}
+        0      & -a_{12} & \cdots & -a_{1n} \\
+        0      & 0       & \cdots & -a_{2n} \\
+        \vdots & \vdots  & \ddots & \vdots  \\
+        0      & 0       & \cdots & 0
+    \end{pmatrix}
 \]
 
-
-Sei ferner \(\omega \neq 0\).
-Wähle \[M = \frac{1}{\omega}D-L\] 
-wobei \(\operatorname{det}D \neq 0\) gelten soll, das heißt \(D\) ist invertierbar, 
-und aufgrund der linken unteren Dreiecksstruktur von \(M\)
-ist diese Matrix ebenfalls invertierbar.
-Damit ist \[N= M-A=(\frac{1-\omega}{\omega})D-U\]
+Sei ferner \(\omega \neq 0\). Wähle \[M = \frac{1}{\omega}D-L\]
+wobei \(\operatorname{det}D \neq 0\) gelten soll, das heißt \(D\) ist
+  invertierbar, und aufgrund der linken unteren Dreiecksstruktur von \(M\) ist
+  diese Matrix ebenfalls invertierbar. Damit ist \[N= M-A=(\frac{1-\omega}{\omega})D-U\]
 
 und daher lautet die Iterationsvorschrift
 \[x^{(k+1)}=(D - \omega L)^{-1}[(1- \omega)D + \omega U]x^{(k)} + \omega (D-\omega U)^{-1}b\]
 
-
-
-
-
-
-
-
-Nutzt man die untere Dreiecksstruktur von \(D - \omega L\) aus, kann man mittels Vorwärtssubstitution die einzelnen 
-Einträge von \(x^{(k+1)}\) berechnen und es gilt:
+Nutzt man die untere Dreiecksstruktur von \(D - \omega L\) aus, kann man
+mittels Vorwärtssubstitution die einzelnen Einträge von \(x^{(k+1)}\) berechnen
+und es gilt:
 \[
-x_i^{(k+1)} = (1 - \omega) x_i^{(k)} + \frac{\omega}{a_{ii}} 
-\left( b_i - \sum_{j < i} a_{ij} x_j^{(k+1)} - \sum_{j > i} a_{ij} x_j^{(k)} \right), 
-\quad i = 1, 2, \ldots, n.
+    x_i^{(k+1)} = (1 - \omega) x_i^{(k)} + \frac{\omega}{a_{ii}}
+    \left( b_i - \sum_{j < i} a_{ij} x_j^{(k+1)} - \sum_{j > i} a_{ij} x_j^{(k)} \right),
+    \quad i = 1, 2, \ldots, n.
 \]\cite{SOR}
 
 \subsection{Konvergenz des SOR-Verfahren}
 \begin{theorem}
-Sei \(A \in \mathbb{R}^n\) symmetrisch und positiv definit, dann gilt aufgrund der Symmetrie
-für die Zerlegung von \(A\), dass
-\[U = L^T.\]
-Daraus folgt: Das SOR-Verfahren konvergiert für \(0 < \omega < 2\) für alle Startwerte \(x^{(0)} \in \mathbb{R}^n\).
+    Sei \(A \in \mathbb{R}^n\) symmetrisch und positiv definit, dann gilt aufgrund der Symmetrie
+    für die Zerlegung von \(A\), dass
+    \[U = L^T.\]
+    Daraus folgt: Das SOR-Verfahren konvergiert für \(0 < \omega < 2\) für alle
+    Startwerte \(x^{(0)} \in \mathbb{R}^n\).
 
 \end{theorem}
 
 \begin{proof}
-   Siehe Numerische Mathematik für Ingenieure und Physiker
-Band 1: Numerische Methoden der Algebra Satz 6.3-2. von W. Törnig 
+    Siehe Numerische Mathematik für Ingenieure und Physiker
+    Band 1: Numerische Methoden der Algebra Satz 6.3-2. von W. Törnig
 \end{proof}
-
 
 \subsubsection{Anwendung auf die Matrix \(A_{p}\)}
 Die Matrix \(A_p\), die sich durch Diskretisierung des Laplace-Operators ergibt, ist aufgrund ihrer Struktur trivialerweise symmetrisch. Ferner ist sie auch positiv definit\cite{PosDef}.
 Also konvergiert das SOR-Verfahren für \(\omega \in (0, 2)\) für diese Matrix.
 
-
 \section{Experimentelle Untersuchungen}
-Für unsere experimentellen Untersuchungen wurde, wie für die Untersuchungen zur LU-Zerlegung, die Funktion
-\begin{equation*}
-u(x) := x_1 \cdot \sin(3 \cdot x_1) \cdot x_2 \cdot \sin(3 \cdot x_2)
-\end{equation*}
-betrachtet. Für diese Funktion gilt:
-\begin{equation*}
-f(x) := -6 \begin{pmatrix}
-x_1 \cdot \cos(3 \cdot x_2) \cdot \sin(3 \cdot x_1) \\ 
-x_2 \cdot \cos(3 \cdot x_1) \cdot \sin(3 \cdot x_2) \\ 
--3 \cdot x_1 \cdot x_2 \sin(3 \cdot x_1) \cdot \sin(3 \cdot x_2)
-\end{pmatrix}
-= -\Delta u(x).
-\end{equation*}
 
-%Zuerst haben wir mithilfe des SOR-Verfahren für Werte von n zwische PLACEHOLDER UND %PLACEHOLDER für die Funktion \(f\) gelöst und dann mit der Funktion \(u\), die für \(f\) die %analytische Lösung des Problems darstellt, den maximalen Fehler zwischen numerischer und %analytischer Lösung im log-log-Plot dargestellt.
+Für die folgenden Experimente definieren wir die Funktion \definitionU sowie
+\definitionF mit \(\kappa = 3\), für welche gelten das
+\[
+    - \Delta u(x) = f(x)
+\]
+ist.
 
-%TODO ADD DIAGRAM
+\subsection{Lösung des Poisson-Problems}
 
-%b)
-%TODO ADD DESCRIPTION AND DIAGRAM
+Ähnlich wie zur Lösung der Poisson-Gleichung via LU-Zerlegung wollen wir
+untersuchen, ob und wie sich der maximalen absoluten Fehler entwickelt.
+Hierfür wollen wir diesen Grafisch darstellen, was wir mit dem folgenden code
+Snippet erreicht haben.
 
+% [TODO] Add code snippet
 
-%TODO MAKE THIS WAY BETTER
-%Ferner haben wir den optimalen Relaxationsfaktor, mithilfe von PLACEHOLDER ermittelt
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{error_plot_eps1}
+    \caption{Maximaler absoluter Fehler in Abhängigkeit der Iterationen für
+        $\epsilon = 10^{-6}$}
+    \label{fig:error_plot_eps1}
+\end{figure}
 
+Wir sehen das der maximale Fehler für größere \(n\) schneller gegen 0 zu
+konvergieren scheint dann allerdings für \(n = \todo{Wert ergänzen}\) wieder
+ansteigt. Dies könnte an der Wahl des Abbruchkriteriums liegen, welches wir auf
+\(\epsilon = 10^{\todo{Wert ergänzen}}\) gesetzt haben. Für größere \(n\)
+könnte es sein das dieses Kriterium zu streng ist und das Verfahren deshalb
+abbricht bevor es konvergiert.
 
+Um dies zu überprüfen haben wir dieselbe Untersuchung für \(\epsilon =
+10^{\todo{Wert ergänzen}}\)erneut durchgeführt.
 
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{error_plot_eps2}
+    \caption{Maximaler absoluter Fehler in Abhängigkeit der Iterationen für
+        $\epsilon = 10^{-8}$}
+    \label{fig:error_plot_eps2}
+\end{figure}
 
+\subsection{Optimale Wahl von \(\epsilon\)}\label{sec:optimal_epsilon}
 
-\subsection{Beobachtungen}
+Wie wir in den vorherigen Experimenten gesehen haben, hat die Wahl von
+\(\epsilon\) einen großen Einfluss auf die Konvergenz des SOR-Verfahrens.
+Deshalb wollen wir nun untersuchen wie sich der maximale absolute Fehler in
+Abhängigkeit von \(\epsilon\) entwickelt.
 
+Hierfür haben wir uns den maximalen absoluten Fehler für
+\[
+    \epsilon = h^k \quad \text{mit} \quad
+    k \in \set{-2, 0, 2, 4, 6}
+\]
+angesehen.
 
+Der code Snippet um dies zu erreichen sieht wie folgt aus:
+
+% [TODO] Add code snippet
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{optimal_epsilon}
+    \caption{Maximaler absoluter Fehler für verschiedene \(\epsilon\)}
+    \label{fig:optimal_epsilon}
+\end{figure}
+
+Wir sehen das mit steigendem \(k\) der maximale Fehler abnimmt. Für \(k = 4\)
+und \(k = 6\) scheint der Graph allerdings nahezu identisch zu sein.
+
+Dies ist auch zu erwarten, da für kleinere \(\epsilon\) das Verfahren zu früh
+abbricht und für größere \(\epsilon\) das Verfahren zu lange läuft. Der Fakt,
+dass der Graph für \(\epsilon = h^{-6}\) gleich zu dem für \(\epsilon =
+h^{-4}\) ist, lässt folgern das \(\epsilon = h^{-4}\) die optimale Wahl ist da
+weitere Iterationen keinen zusätzlichen Nutzen bringen.
+
+\subsection{Optimaler Relaxationsparameter \(\omega\)}
+
+% [TODO]
+
+\subsection{Vergleich mit dem LU-Verfahren}
+
+Da wir bereits das LU-Verfahren zu Lösung des Poisson-Problems untersucht haben
+scheint es sinnvoll die beiden Verfahren miteinander zu vergleichen.
+
+\subsubsection{Konvergenz verhalten}
+
+Hierfür betrachten wir zunächst inwiefern beide Verfahren in der Lage sind, die
+exakte Lösung zu approximieren. Hierfür haben wir wiederum den maximalen
+absoluten Fehler in Abhängigkeit der Iterationen betrachtet. Für das
+SOR-Verfahren haben wir \(\epsilon = 10^{-8}\) fest sowie optimal wie in
+\autoref{sec:optimal_epsilon} bestimmt.
+
+Um den folgenden Graphen zu erstellen haben wir den folgenden code Snippet
+verwendet:
+
+% [TODO] Add code snippet
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{convergence-comparison}
+    \caption{Vergleich des maximalen absoluten Fehlers für das LU- und
+        SOR-Verfahren}
+    \label{fig:convergence-comparison}
+\end{figure}
+
+Wir beobachten das beide Verfahren bis \(n = \todo{Wert ergänzen}\) sehr
+ähnlich konvergieren. Ab diesem Punkt steigt der maximale Fehler für das
+SOR-Verfahren mit \(\epsilon = 10^{-8}\) wieder an. Ab \(n = \todo{Wert
+ergänzen}\) geschieht für das SOR-Verfahren mit optimalen \(\epsilon\)
+dasselbe.
+
+\subsubsection{Laufzeitverhalten}
+
+Ein wesentlicher Faktor bei der Wahl des Verfahrens ist dessen Laufzeit. Um
+dies zu untersuchen haben wir die Laufzeit beider Verfahren in Abhängigkeit der
+Diskretisierung Feinheit \(n\) betrachtet. Das SOR-Verfahren haben wir dabei
+mit optimalen \(\epsilon\) optimalem \(\omega\) betrachtet. Die dargestellten
+Laufzeiten sind dabei gemittelt über \(\todo{Wert ergänzen}\) Durchläufe, um
+Beeinflussungen durch andere Prozesse zu minimieren.
+
+Der code Snippet um dies zu erreichen sieht wie folgt aus:
+
+% [TODO] Add code snippet
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{runtime-comparison}
+    \caption{Vergleich der Laufzeiten des LU- und SOR-Verfahrens}
+    \label{fig:runtime-comparison}
+\end{figure}
 
 \section{Auswertung}
 
-
+% [TODO]
 
 \section{Zusammenfassung}
 
+% [TODO]
 
 \printbibliography%
 
