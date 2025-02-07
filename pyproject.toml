@@ -13,10 +13,6 @@ dependencies = [
     "scipy>=1.14.1",
 ]
 
-[project.scripts]
-derivative-approximation-experiments = "projektpraktikum_i.derivative_approximation.experiments:cli"
-discretization-experiements = "projektpraktikum_i.discretization.experiments_lu:cli"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
