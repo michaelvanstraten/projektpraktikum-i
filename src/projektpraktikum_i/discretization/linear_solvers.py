@@ -142,7 +142,7 @@ def solve_sor(
                 return "eps"
 
             # Termination condition: maximum iteration reached
-            if 0 < max_iter < iteration_count:
+            if 0 < max_iter <= iteration_count:
                 return "max_iter"
 
             # Solves: (I + ω * D^{-1} * L) x^(k+1)

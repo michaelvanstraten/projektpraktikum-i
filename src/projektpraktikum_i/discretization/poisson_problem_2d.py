@@ -13,6 +13,7 @@ arguments. For example, to solve the Poisson problem and plot the error, run the
 main function.
 """
 
+import functools
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -33,7 +34,7 @@ __all__ = [
 ]
 
 
-
+@functools.cache
 def get_evaluation_points(n):
     """Generates the evaluation points for the given number of intervals.
 
@@ -144,6 +145,31 @@ def compute_error(n, hat_u, u):
     return np.max(np.abs(u(get_evaluation_points(n)).flatten() - hat_u))
 
 
+def solve_discrete(n, f, equation_solver):
+    """
+    Solves the discretized Poisson problem using a provided equation solver.
+
+    Parameters
+    ----------
+    n : int
+        Number of discretization points in each dimension.
+    f : callable
+        Function right-hand-side of Poisson problem. The calling signature is `f(x)`.
+        Here `x` is an array_like of `numpy`. The return value is a scalar.
+    equation_solver : callable
+        Function to solve the discretized system of equations. The calling signature
+        is `equation_solver(A, b)`, where `A` is the discretization matrix and `b` is
+        the right-hand side vector.
+
+    Returns
+    -------
+    numpy.ndarray
+        Approximate solution of the Poisson problem.
+    """
+    discretization_matrix = BlockMatrix(n)
+    b = rhs(n, f)
+
+    return equation_solver(discretization_matrix, b)
 @utils.cache
 def solve_via_lu_decomposition(n, f, fast=False):
     """Solves the Poisson problem using LU decomposition.
@@ -161,17 +187,54 @@ def solve_via_lu_decomposition(n, f, fast=False):
     numpy.ndarray
         Approximate solution of the Poisson problem.
     """
-    discretization_matrix = BlockMatrix(n)
-    b = rhs(n, f)
 
-    if fast:
+    def solver(system_matrix, right_hand_side):
+        p, l, u = system_matrix.get_lu()
+        return linear_solvers.solve_lu(p, l, u, right_hand_side)
+
+    return solve_discrete(n, f, solver)
+
+
+@utils.cache
+def solve_via_lu_decomposition_fast(n, f):
+    """Solves the Poisson problem using LU decomposition.
+
+    Parameters
+    ----------
+    n : int
+        Number of intervals in each dimension.
+    f : callable
+        Function right-hand-side of Poisson problem. The calling signature is `f(x)`.
+        Here `x` is an array_like of `numpy`. The return value is a scalar.
+
+    Returns
+    -------
+    numpy.ndarray
+        Approximate solution of the Poisson problem.
+    """
+
+    def solver(system_matrix, right_hand_side):
         from scipy.linalg import lu_factor, lu_solve  # pylint: disable=import-outside-toplevel
 
-        lu, piv = lu_factor(discretization_matrix.get_sparse().toarray())
-        return lu_solve((lu, piv), b)
+        lu, piv = lu_factor(system_matrix.get_sparse().toarray())
+        return lu_solve((lu, piv), right_hand_side)
 
-    p, l, u = discretization_matrix.get_lu()
-    return linear_solvers.solve_lu(p, l, u, b)
+    return solve_discrete(n, f, solver)
+
+
+@utils.cache
+def solve_via_sor(n, f, params, omega):
+    """
+    Solves the Poisson problem using the Successive Over-Relaxation (SOR) method.
+    """
+    def solver(system_matrix, right_hand_side):
+        _, iterates, _ = linear_solvers.solve_sor(
+            system_matrix.get_sparse(), right_hand_side, right_hand_side, params, omega
+        )
+
+        return iterates[-1]
+
+    return solve_discrete(n, f, solver)
 
 
 def example_f(x, k=3):

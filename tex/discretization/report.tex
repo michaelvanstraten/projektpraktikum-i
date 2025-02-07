@@ -409,7 +409,7 @@ verwendet.
 \end{code}
 
 Wie in Abbildung \ref{fig:convergence-comparison} ersichtlich, ähneln sich die
-Verläufe beider Verfahren bis etwa \(n \approx 3000\). Ab diesem Punkt steigt
+Verläufe beider Verfahren bis etwa \(N \approx 3000\). Ab diesem Punkt steigt
 der maximale Fehler beim SOR-Verfahren mit \(\epsilon = 10^{-3}\) wieder an.
 Der für das LU-Verfahren und das SOR-Verfahren mit optimalem \(\epsilon\)
 ermittelte Fehler bleibt hingegen konstant konvergent. Hierbei ist zu beachten,
@@ -418,7 +418,7 @@ dass die Rechnungen mit dem LU-Verfahren aufgrund hoher Rechenzeit nur bis \(n
 
 \textbf{Auswertung:}
 Die Ergebnisse zeigen, dass das LU-Verfahren für moderate Problemgrößen (bis
-etwa \(n = 3000\)) gut mit dem SOR-Verfahren konkurrieren kann. Allerdings
+etwa \(N = 3000\)) gut mit dem SOR-Verfahren konkurrieren kann. Allerdings
 erfüllt das SOR-Verfahren bei zu groß gewähltem Abbruchkriterium \(\epsilon\)
 die Konvergenzanforderungen nicht mehr zuverlässig. Bei Verwendung eines
 sensibler gewählten (optimalen) \(\epsilon\) beweist sich das SOR-Verfahren
@@ -455,7 +455,7 @@ klar diejenige des SOR-Verfahrens.
 
 \textbf{Auswertung:}
 Die Untersuchungen deuten darauf hin, dass das LU-Verfahren sich für kleine
-Systemgrößen (z.\,B.\ bis \(n\sim 30\)) lohnt, da hier die direkte
+Systemgrößen (z.\,B.\ bis \(n \sim 30\)) lohnt, da hier die direkte
 Faktorisierung vergleichsweise schnelle Resultate liefert. Für größere
 Problemgrößen wächst der Rechenaufwand jedoch massiv, was das iterativ
 arbeitende SOR-Verfahren (mit optimierten Parametern) klar bevorzugt erscheinen
