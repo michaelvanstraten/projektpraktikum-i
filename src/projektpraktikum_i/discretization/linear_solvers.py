@@ -3,9 +3,9 @@ Module providing various linear solvers for solving linear systems of equations.
 """
 
 import numpy as np
+import scipy
 
 from projektpraktikum_i import utils
-
 
 
 @utils.cache
@@ -54,11 +54,9 @@ def solve_lu(p, l, u, b):
     return x
 
 
-# pylint: disable=unused-argument
 # pylint: disable=invalid-name
 # pylint: disable=dangerous-default-value
-
-
+# pylint: disable=too-many-locals
 def solve_sor(
     A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}, omega=1.5
 ):
@@ -105,125 +103,68 @@ def solve_sor(
         If no termination condition is active, i.e., `eps=0` and `max_iter=0`, etc.
     """
 
+    eps = params.get("eps", 1e-8)
+    max_iter = params.get("max_iter", 1000)
+    var_x = params.get("var_x", 1e-4)
 
-def solve_gs(A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}):
-    """Solves the linear system Ax = b via the Jacobi method.
+    if eps <= 0 and max_iter <= 0 and var_x <= 0:
+        raise ValueError(
+            "No termination condition is active: eps <= 0, max_iter <= 0, var_x <= 0."
+        )
 
-    Parameters
-    ----------
-    A : scipy.sparse.csr_matrix
-        system matrix of the linear system
-    b : numpy.ndarray (of shape (N,) )
-        right-hand-side of the linear system
-    x0 : numpy.ndarray (of shape (N,) )
-        initial guess of the solution
+    d_inv = scipy.sparse.diags(1.0 / A.diagonal())  # D^{-1}
+    lower_tri = scipy.sparse.tril(A, k=-1)  # Strictly lower triangular part of A
+    upper_tri = scipy.sparse.triu(A, k=1)  # Strictly upper triangular part of A
 
-    params : dict, optional
-        dictionary containing termination conditions
+    # Precompute scaled matrices/terms used in each iteration
+    scaled_d_inv = omega * d_inv  # ω * D^{-1}
+    mat_lower_factor = scaled_d_inv @ lower_tri  # ω * D^{-1} * L
+    mat_upper_factor = scaled_d_inv @ upper_tri  # ω * D^{-1} * U
+    const_b = scaled_d_inv @ b  # ω * D^{-1} * b
 
-        eps : float
-            tolerance for the norm of the residual in the infinity norm. If set
-            less or equal to 0 no constraint on the norm of the residual is imposed.
-        max_iter : int
-            maximal number of iterations that the solver will perform. If set
-            less or equal to 0 no constraint on the number of iterations is imposed.
-        var_x : float
-            minimal change of the iterate in every step in the infinity norm. If set
-            less or equal to 0 no constraint on the change is imposed.
+    def compute_residual(x):
+        """Compute the infinity norm of the residual."""
+        return np.max(np.abs(b - A @ x))
 
-    Returns
-    -------
-    str
-        reason of termination. Key of the respective termination parameter.
-    list (of numpy.ndarray of shape (N,) )
-        iterates of the algorithm. First entry is `x0`.
-    list (of float)
-        infinity norm of the residuals of the iterates
+    iterates = [x0]
+    residuals = [compute_residual(x0)]
 
-    Raises
-    ------
-    ValueError
-        If no termination condition is active, i.e., `eps=0` and `max_iter=0`, etc.
-    """
+    def sor_iteration_loop():
+        """Run the SOR iteration loop until a termination condition is met."""
+        iteration_count = 0
 
+        while True:
+            current_x = iterates[-1]
+            current_res = residuals[-1]
 
-def solve_es(A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}):
-    """Solves the linear system Ax = b via the Gauss-Seidel method.
+            # Termination condition: residual below threshold
+            if eps > 0 and current_res <= eps:
+                return "eps"
 
-    Parameters
-    ----------
-    A : scipy.sparse.csr_matrix
-        system matrix of the linear system
-    b : numpy.ndarray (of shape (N,) )
-        right-hand-side of the linear system
-    x0 : numpy.ndarray (of shape (N,) )
-        initial guess of the solution
+            # Termination condition: maximum iteration reached
+            if 0 < max_iter < iteration_count:
+                return "max_iter"
 
-    params : dict, optional
-        dictionary containing termination conditions
+            # Solves: (I + ω * D^{-1} * L) x^(k+1)
+            # = (1 - ω) * x^(k) + ω * D^{-1} * b - ω * D^{-1} * U * x^(k)
+            next_x = scipy.sparse.linalg.spsolve_triangular(
+                mat_lower_factor,
+                (1 - omega) * current_x + const_b - mat_upper_factor @ current_x,
+                lower=True,
+                unit_diagonal=True,
+            )
 
-        eps : float
-            tolerance for the norm of the residual in the infinity norm. If set
-            less or equal to 0 no constraint on the norm of the residual is imposed.
-        max_iter : int
-            maximal number of iterations that the solver will perform. If set
-            less or equal to 0 no constraint on the number of iterations is imposed.
-        var_x : float
-            minimal change of the iterate in every step in the infinity norm. If set
-            less or equal to 0 no constraint on the change is imposed.
+            next_res = compute_residual(next_x)
 
-    Returns
-    -------
-    str
-        reason of termination. Key of the respective termination parameter.
-    list (of numpy.ndarray of shape (N,) )
-        iterates of the algorithm. First entry is `x0`.
-    list (of float)
-        infinitiy norm of the residuals of the iterates
+            # Termination condition: change in iterate below threshold
+            if var_x > 0 and np.max(np.abs(next_x - current_x)) <= var_x:
+                return "var_x"
 
-    Raises
-    ------
-    ValueError
-        If no termination condition is active, i.e., `eps=0` and `max_iter=0`, etc.
-    """
+            iterates.append(next_x)
+            residuals.append(next_res)
 
+            iteration_count += 1
 
-def solve_cg(A, b, x0, params={"eps": 1e-8, "max_iter": 1000, "var_x": 1e-4}):
-    """Solves the linear system Ax = b via the conjugated gradient method.
+    termination_reason = sor_iteration_loop()
 
-    Parameters
-    ----------
-    A : scipy.sparse.csr_matrix
-        system matrix of the linear system
-    b : numpy.ndarray (of shape (N,) )
-        right-hand-side of the linear system
-    x0 : numpy.ndarray (of shape (N,) )
-        initial guess of the solution
-
-    params : dict, optional
-        dictionary containing termination conditions
-
-        eps : float
-            tolerance for the norm of the residual in the infinity norm. If set
-            less or equal to 0 no constraint on the norm of the residual is imposed.
-        max_iter : int
-            maximal number of iterations that the solver will perform. If set
-            less or equal to 0 no constraint on the number of iterations is imposed.
-        var_x : float
-            minimal change of the iterate in every step in the infinity norm. If set
-            less or equal to 0 no constraint on the change is imposed.
-
-    Returns
-    -------
-    str
-        reason of termination. Key of the respective termination parameter.
-    list (of numpy.ndarray of shape (N,) )
-        iterates of the algorithm. First entry is `x0`.
-    list (of float)
-        residuals of the iterates
-
-    Raises
-    ------
-    ValueError
-        If no termination condition is active, i.e., `eps=0` and `max_iter=0`, etc.
-    """
+    return termination_reason, iterates, residuals
