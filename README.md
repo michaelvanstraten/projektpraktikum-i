@@ -2,8 +2,8 @@
 
 ## Overview
 
-This repository provides resources and tools for working on Projektpraktikum I
-assignments. It includes code modules, experiment scripts, and LaTeX documents
+This repository contains resources and tools for completing the Projektpraktikum
+I assignments. It includes code modules, experiment scripts, and LaTeX documents
 for generating reports and presentations.
 
 ## Getting Started
@@ -24,7 +24,7 @@ for generating reports and presentations.
    - [uv (Python-based)](https://docs.astral.sh/uv/)
    - [Nix (System-wide reproducible builds)](https://nixos.org/)
 
-   Follow the setup instructions for your preferred method below.
+   Follow the setup instructions for your chosen method below.
 
 ## Setup with uv
 
@@ -42,24 +42,60 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ### Running Scripts
 
-To run scripts in this repository, activate a virtual environment with all
+To run scripts in this repository, first activate a virtual environment with all
 dependencies:
 
 ```sh
 uv venv && source .venv/bin/activate
 ```
 
-To view the available command-line interface (CLI) options for each module,
-append `--help` to the command:
+Most scripts in this repository are designed to be executed as command-line
+interfaces. To view the available options for a script, append `--help` to the
+command. For example, to display CLI options for the derivative approximation
+experiments, run:
+
+[!NOTE]
+
+> The following examples assume that you are in the root directory of the
+> repository and have activated the virtual environment.
 
 ```sh
-# Display CLI options for the experiments module
-derivative-approximation --help
+python src/projektpraktikum_i/derivative_approximation/experiments.py --help
 ```
 
-The above command runs the
-[`experiments.py`](./src/projektpraktikum_i/derivative_approximation/experiments.py)
-file located in this repository.
+Or use the module invocation syntax:
+
+```sh
+python -m projektpraktikum_i.derivative_approximation.experiments --help
+```
+
+### Discretization Experiments
+
+The discretization experiments module contains several scripts for running
+experiments and generating plots. To run an experiment script, use the following
+syntax:
+
+```sh
+python src/projektpraktikum_i/discretization/<script_name>.py <command> [options]
+```
+
+Or use the module invocation syntax:
+
+```sh
+python -m projektpraktikum_i.discretization.<script_name> <command> [options]
+```
+
+For example, to generate an error plot for the discretization experiments, run:
+
+```sh
+python src/projektpraktikum_i/discretization/experiments.py plot-error \
+    --n-start 1 \
+    --n-stop 7 \
+    --n-num 20 \
+    --eps 10e-6 \
+    --omega 1.5 \
+    --save-to error_plot.pdf
+```
 
 ## Setup with Nix
 
@@ -75,7 +111,7 @@ environments. To get started,
    ```
 
 2. **Run Scripts**: Once in the Nix environment, follow the same steps outlined
-   in the `uv` setup section to execute scripts.
+   in the uv setup section to execute scripts directly.
 
 ## Building Documents with Nix
 
