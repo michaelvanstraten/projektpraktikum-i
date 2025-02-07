@@ -148,11 +148,11 @@ Für eine genaue Herleitung des SOR-Verfahrens siehe \cite[p.~179-180]{SOR}.
     Sei \(A \in \mathbb{R}^n\) symmetrisch und positiv definit, dann gilt aufgrund der Symmetrie
     für die Zerlegung von \(A\), dass
     \[U = L^T.\]
-    Daraus folgt: Das SOR-Verfahren konvergiert für \(0 < \omega < 2\) für alle
+    Daraus folgt: Das SOR-Verfahren konvergiert nach \cite[p.~183-185]{SOR} für \(0 < \omega < 2\) für alle
     Startwerte \(x^{(0)} \in \mathbb{R}^n\). \\
-    Außerdem existiert ein optimaler Relaxationsfaktor \(\omega_{opt}\), der die Konvergenzrate optimiert mit
+    Außerdem existiert, wie in \cite[p.~4]{omega_opt} beschrieben, ein optimaler Relaxationsfaktor \(\omega_{opt}\), der die Konvergenzrate optimiert mit
     \[\omega_{opt}=\frac{2}{1+\sqrt{1-\beta^2}}\]
-    wobei \(\beta=\rho(I-D^{-1}A)\)\cite[p.~4]{omega_opt}.
+    wobei \(\beta=\rho(I-D^{-1}A)\).
 \end{theorem}
 
 
@@ -160,12 +160,13 @@ Für eine genaue Herleitung des SOR-Verfahrens siehe \cite[p.~179-180]{SOR}.
 Die Matrix \(A_p\), die sich durch Diskretisierung des Laplace-Operators ergibt, ist aufgrund ihrer Struktur trivialerweise symmetrisch. Ferner ist sie auch positiv definit\cite[p.~11]{PosDef}.
 Also konvergiert das SOR-Verfahren für \(\omega \in (0, 2)\) für diese Matrix.
 \\
-Ferner lässt sich der optimale Relaxationsfaktor, in Abhängigkeit der Feinheit \(h\) unserer Diskretisierung, für diese Matrix herleiten und es gilt \cite{omega_opt}
+Ferner lässt sich der optimale Relaxationsfaktor, in Abhängigkeit der Feinheit \(h\) unserer Diskretisierung, für diese Matrix herleiten und nach \cite{omega_opt} gilt
 \[\omega_{opt}=\frac{2}{1+\sin(\pi h)}.\] 
 
 
 \subsection{Computerarithmetik und Kondition einer Matrix}
-Aufgrund der Darstellung von Zahlen auf einem Computer mithilfe von Bits, ist die Menge an Zahlen, die dargestellt werden können beschränkt und es kann zu Rechenfehlern bei Operationen kommen.
+Wie in \cite[p.~3]{HandoutFiniteDifferenzen} beschrieben, werden Zahlen auf einem Computer mithilfe von Bits dargestellt, und deshalb ist die Menge
+an darstellbaren Zahlen beschränkt, weshalb es zu Ungenauigkeiten bei Rechenoperationen kommen kann.
 Dies kann dazu führen, dass unser exaktes Gleichungssystem auf dem Computer zu einem gestörten
 Gleichungssystem wird.
 Dazu zuerst folgende Definition
