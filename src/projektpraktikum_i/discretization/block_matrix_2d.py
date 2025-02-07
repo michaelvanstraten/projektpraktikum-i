@@ -16,9 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.sparse as sp
 
-# We need to import dill here first so we can hash lambda functions
-import dill as pickle  # pylint: disable=unused-import
-from joblib import Memory
+from projektpraktikum_i import utils
 
 
 __all__ = [
@@ -28,7 +26,6 @@ __all__ = [
     "plot_sparsity_lu",
 ]
 
-memory = Memory(location=".cache")
 
 
 class BlockMatrix:
@@ -55,8 +52,8 @@ class BlockMatrix:
         if n < 2:
             raise ValueError("The parameter `n` must be at least 2.")
         self.n = n
-        self.get_lu = memory.cache(self.get_lu)
-        self.eval_sparsity_lu = memory.cache(self.eval_sparsity_lu)
+        self.get_lu = utils.cache(self.get_lu)
+        self.eval_sparsity_lu = utils.cache(self.eval_sparsity_lu)
 
     def get_sparse(self):
         """Returns the block matrix as a sparse matrix.
