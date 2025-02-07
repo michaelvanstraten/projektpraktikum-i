@@ -10,11 +10,13 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{luatodonotes}
-% Provides additional symbols
-% Provides environments for typical math text structure
-
+\usepackage[newfloat]{minted}
+\usepackage{caption}
 
 \include{common.tex}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Source Code}
 
 \KOMAoptions{
   % Add vertical space between two paragraphs, without indent
@@ -24,9 +26,9 @@
 \subject{Bericht}
 \titlehead{%
   \begin{minipage}{.7\textwidth}%
-  Humboldt-Universit\"at zu Berlin\\
-  Mathematisch-Naturwissenschaftliche Fakult\"at\\
-  Institut f\"ur Mathematik
+  Humboldt-Universität zu Berlin\\
+  Mathematisch-Naturwissenschaftliche Fakultät\\
+  Institut für Mathematik
   \end{minipage}
 }
 \title{Lösen des Poisson-Problems mittels SOR-Verfahren}
@@ -41,14 +43,15 @@
 
 \begin{document}
 
-
 \maketitle
 \tableofcontents
 \cleardoublepage%
 
-%TODO ADD CITATIONS
+% [TODO] Add citations
+
 \section{Einleitung und Motivation}
-Im Laufe des Moduls "Projekt Praktikum I" haben wir uns zuerst mit dem Thema
+
+Im Laufe des Moduls ``Projekt Praktikum I'' haben wir uns zuerst mit dem Thema
 Finite Differenzen beschäftigt. Mit hilfe dieser haben wir das Poisson-Problem
 \begin{align}\label{Eq:Poisson}
     -\Delta u & = f \; \text{in} \; \Omega           \\
@@ -67,10 +70,15 @@ Lösens für das entstehende Gleichungssystem betrachten: Das SOR-Verfahren. Die
 \section{Theoretische Grundlagen}
 
 \subsection{Poisson-Problem (diskretisiert)}
+
 Durch Diskretisieren des Laplace-Operators und des Gebietes auf \((n-1)^2\)
-äquidistanten Gitterpunkten mit Feinheit \(h=\frac{1}{n}\) wird Gleichung \ref{Eq:Poisson} zu einem Gleichungssystem in \((n-1)^2\) Unbekannten. Für eine genaue Herleitung des Gleichungssystems sowie die Struktur der Koeffezientenmatrix siehe \cite{HandoutLU}.
+äquidistanten Gitterpunkten mit Feinheit \(h=\frac{1}{n}\) wird Gleichung
+\ref{Eq:Poisson} zu einem Gleichungssystem in \((n-1)^2\) Unbekannten. Für eine
+genaue Herleitung des Gleichungssystems sowie die Struktur der
+Koeffezientenmatrix siehe \cite{HandoutLU}.
 
 \subsection{Iterative Verfahren}
+
 Sei im folgenden immer ein lineares Gleichungssystem
 \[Ax=b\]
 mit \(A \in \R^{n \times n}\) regulär und \(b \in \R^n\) gegeben.
@@ -82,15 +90,16 @@ mit \(A \in \R^{n \times n}\) regulär und \(b \in \R^n\) gegeben.
     Das Iterationsverfahren heißt linear, falls \(B,C \in \R^{n \times n}\)
     existieren, sodass
     \[\phi(x,b)=Bx+Cb.\]
-    Das Iterationsverfahren heißt konsistent zur Matrix \(A\), falls die Lösung des linearen Gleichungssystems ein Fixpunkt des Iterationsverfahrens ist.
-    Das Iterationsverfahren heißt konvergent, falls für alle \(x^{(0)} \in \R^n\) der Grenzwert
+    Das Iterationsverfahren heißt konsistent zur Matrix \(A\), falls die Lösung
+    des linearen Gleichungssystems ein Fixpunkt des Iterationsverfahrens ist.
+    Das Iterationsverfahren heißt konvergent, falls für alle \(x^{(0)} \in
+    \R^n\) der Grenzwert
     \[\tilde{x} = \lim_{k \to \infty} \phi(x^{(k)},b)\] existiert.
 \end{definition}
 Für mehr Informationen zur Konsistenz und Konvergenz, siehe \cite[p.~71-72]{Iterative}.
 
-
-
 \subsection{Splitting-Verfahren}
+
 Splitting-Verfahren basieren auf dem Zerlegen der Koeffizientenmatrix \(A\) in
 zwei Matrizen \(M, N \in \R^{n \times n}\), mit \(M\) invertierbar, sodass
 \[A = M-N\]
@@ -105,10 +114,14 @@ Das dazugehörige Iterationsverfahren lautet\cite[p.~165]{SOR}
 \[x^{(k+1)}= M^{-1}Nx^{(k)} + M^{-1}b.\]
 Falls für den Spektralradius von \(M^{-1}N\) zusätzlich noch
 \[\rho(M^{-1}N)<1\]
-gilt, so konvergiert das Verfahren gegen die Lösung des linearen Gleichungssystems\cite[p.~73-74]{Iterative}.
+gilt, so konvergiert das Verfahren gegen die Lösung des linearen
+  Gleichungssystems\cite[p.~73-74]{Iterative}.
 
 \subsection{SOR-Verfahren}
-Das SOR-Verfahren (Successive Over-Relaxation-Verfahren) ist ein solches Splitting-Verfahren. Um dieses herzuleiten, teilt man die Koeffizientenmatrix in eine Diagonalmatrix \(D\), eine strikte untere Matrix \(L\) und eine strikte obere Matrix \(U\) auf, sodass \(A=D-L-U\) mit 
+Das SOR-Verfahren (Successive Over-Relaxation-Verfahren) ist ein solches
+Splitting-Verfahren. Um dieses herzuleiten, teilt man die Koeffizientenmatrix
+in eine Diagonalmatrix \(D\), eine strikte untere Matrix \(L\) und eine strikte
+obere Matrix \(U\) auf, sodass \(A=D-L-U\) mit
 \[
     D = \begin{pmatrix}
         a_{11} & 0      & \cdots & 0      \\
@@ -128,9 +141,9 @@ Das SOR-Verfahren (Successive Over-Relaxation-Verfahren) ist ein solches Splitti
         \vdots & \vdots  & \ddots & \vdots  \\
         0      & 0       & \cdots & 0
     \end{pmatrix}
-.\]
-Wählt man nun einen Relaxationsfaktor \(\omega \neq 0\), so lautet die
-die Iterationsvorschrift für das SOR-Verfahren zur Matrix \(A\)
+    .\]
+Wählt man nun einen Relaxationsfaktor \(\omega \neq 0\), so lautet die die
+  Iterationsvorschrift für das SOR-Verfahren zur Matrix \(A\)
 \[x^{(k+1)}=(D - \omega L)^{-1}[(1- \omega)D + \omega U]x^{(k)} + \omega (D-\omega U)^{-1}b\]
 
 Nutzt man die untere Dreiecksstruktur von \(D - \omega L\) aus, kann man
@@ -154,7 +167,6 @@ Für eine genaue Herleitung des SOR-Verfahrens siehe \cite[p.~179-180]{SOR}.
     \[\omega_{opt}=\frac{2}{1+\sqrt{1-\beta^2}}\]
     wobei \(\beta=\rho(I-D^{-1}A)\).
 \end{theorem}
-
 
 \subsubsection{Anwendung auf die Matrix \(A_{p}\)}
 Die Matrix \(A_p\), die sich durch Diskretisierung des Laplace-Operators ergibt, ist aufgrund ihrer Struktur trivialerweise symmetrisch. Ferner ist sie auch positiv definit\cite[p.~11]{PosDef}.
@@ -188,13 +200,16 @@ Die Kondition einer Matrix ist sehr wichtig, für das Lösen von Gleichungssyste
 Das heißt wenn unsere Matrix schlecht konditioniert ist, also die Kondition von \(A\) sehr groß ist, dass auch mit kleiner werdendem Residuum, eine deutlich große Fehlernorm vorliegen kann.
 
 \subsection{Sparsity}
-Eine Matrix \(A \in \R^n \), heißt dünnbesetzt, falls sie zum Großteil aus Nulleinträgen besteht.
-Eine Konsequenz dessen ist, dass man für das Speichern solcher Matrizen auf dem Computer nach effizienten Methoden sucht, oder geeigneten Algorithmen für Probleme, in denen dünnbesetzte Matrizen auftauchen, entwickelt. Dabei wird das Verhältnis von Anzahl der Nulleinträge zu Anzahl der Gesamteinträge Sparsity genannt. Solche Matrizen kommen beispielsweise beim Diskretisieren von partiellen Differentialgleichungen in der Numerik hervor \cite{dewiki:233309191}.
-Ein konkretes Beispiel wäre die Diskretisierung des Poisson-Problems in zwei Dimensionen mit gegeben Randbedingungen, siehe \cite{HandoutLU}.
-
-
-
-
+Eine Matrix \(A \in \R^n \), heißt dünnbesetzt, falls sie zum Großteil aus
+Nulleinträgen besteht. Eine Konsequenz dessen ist, dass man für das Speichern
+solcher Matrizen auf dem Computer nach effizienten Methoden sucht, oder
+geeigneten Algorithmen für Probleme, in denen dünnbesetzte Matrizen auftauchen,
+entwickelt. Dabei wird das Verhältnis von Anzahl der Nulleinträge zu Anzahl der
+Gesamteinträge Sparsity genannt. Solche Matrizen kommen beispielsweise beim
+Diskretisieren von partiellen Differentialgleichungen in der Numerik hervor
+\cite{dewiki:233309191}. Ein konkretes Beispiel wäre die Diskretisierung des
+Poisson-Problems in zwei Dimensionen mit gegeben Randbedingungen, siehe
+\cite{HandoutLU}.
 
 \section{Experimentelle Untersuchungen}
 
@@ -207,136 +222,265 @@ ist.
 
 \subsection{Lösung des Poisson-Problems}
 
-Ähnlich wie zur Lösung der Poisson-Gleichung via LU-Zerlegung wollen wir
-untersuchen, ob und wie sich der maximalen absoluten Fehler entwickelt.
-Hierfür wollen wir diesen Grafisch darstellen, was wir mit dem folgenden code
-Snippet erreicht haben.
-
-% [TODO] Add code snippet
+In diesem Abschnitt untersuchen wir die Entwicklung des maximalen absoluten
+Fehlers beim Anwenden des SOR-Verfahrens auf das Poisson-Problem. Dabei
+variieren wir sowohl die Gitterfeinheit \(n\) als auch das Abbruchkriterium
+\(\epsilon\). Im Folgenden werden zunächst die Ergebnisse für \(\epsilon =
+10^{-6}\) und anschließend für \(\epsilon = 10^{-10}\) dargestellt und
+diskutiert.
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{error_plot_eps1}
+    \includegraphics[width=0.8\textwidth]{error_plot}
     \caption{Maximaler absoluter Fehler in Abhängigkeit der Iterationen für
         $\epsilon = 10^{-6}$}
-    \label{fig:error_plot_eps1}
+    \label{fig:error_plot}
 \end{figure}
 
-Wir sehen das der maximale Fehler für größere \(n\) schneller gegen 0 zu
-konvergieren scheint dann allerdings für \(n = \todo{Wert ergänzen}\) wieder
-ansteigt. Dies könnte an der Wahl des Abbruchkriteriums liegen, welches wir auf
-\(\epsilon = 10^{\todo{Wert ergänzen}}\) gesetzt haben. Für größere \(n\)
-könnte es sein das dieses Kriterium zu streng ist und das Verfahren deshalb
-abbricht bevor es konvergiert.
+\begin{code}
+    \captionof{listing}{Code Snippet zum Generieren von \autoref{fig:error_plot}}
+    \label{code:error_plot}
+    \inputminted[firstline=3, lastline=9]{bash}{figures/generate.sh}
+\end{code}
 
-Um dies zu überprüfen haben wir dieselbe Untersuchung für \(\epsilon =
-10^{\todo{Wert ergänzen}}\)erneut durchgeführt.
+\textbf{Beobachtung:}
+
+Für \(\epsilon = 10^{-6}\) nimmt der maximale Fehler bei kleineren und
+mittleren Werten von \(n\) stetig ab, während für \(n \approx 6000\) ein
+erneutes Ansteigen sichtbar wird. Dies legt den Verdacht nahe, dass bei größer
+werdenden Systemen das Abbruchkriterium zu früh erfüllt ist, sodass das
+SOR-Verfahren vorzeitig beendet wird.
+
+Um diesen Effekt zu überprüfen, betrachten wir im nächsten Schritt \(\epsilon =
+10^{-10}\).
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{error_plot_eps2}
+    \includegraphics[width=0.8\textwidth]{error_plot_better_eps}
     \caption{Maximaler absoluter Fehler in Abhängigkeit der Iterationen für
-        $\epsilon = 10^{-8}$}
-    \label{fig:error_plot_eps2}
+        $\epsilon = 10^{-10}$}
+    \label{fig:error_plot_better_eps}
 \end{figure}
+
+\textbf{Beobachtung:}
+
+Wie erwartet sinkt der maximale Fehler für \(\epsilon = 10^{-10}\) auch bei
+großen Diskretisierungen weiter. Zusätzlich fällt auf, dass für \(n = 4\) ein
+im Vergleich zu benachbarten Werten von \(n\) deutlich geringerer Fehler
+auftritt. Ein möglicher Grund könnte sein, dass die zugrunde liegende Funktion
+in diesem Bereich nahezu linear verläuft und so trotz weniger
+Diskretisierungspunkte eine relativ genaue Lösung erzielt werden kann.
+
+\textbf{Auswertung:}
+
+Die Ergebnisse belegen, dass eine strengere Wahl von \(\epsilon\) (hier
+\(\epsilon = 10^{-10}\)) zwar rechnerisch aufwendiger ist, jedoch eine
+verlässlichere Konvergenz ermöglicht. Bei einem zu großen \(\epsilon\) kann das
+Verfahren frühzeitig stoppen, bevor eine hinreichende Genauigkeit erreicht
+wird. Die Auffälligkeit für \(n = 4\) zeigt, dass bestimmte Gitterfeinheiten
+unerwartet genaue Resultate liefern können. Insgesamt motiviert dies eine
+weiterführende Untersuchung, um eine optimale Wahl von \(\epsilon\) zu
+bestimmen.
 
 \subsection{Optimale Wahl von \(\epsilon\)}\label{sec:optimal_epsilon}
 
-Wie wir in den vorherigen Experimenten gesehen haben, hat die Wahl von
-\(\epsilon\) einen großen Einfluss auf die Konvergenz des SOR-Verfahrens.
-Deshalb wollen wir nun untersuchen wie sich der maximale absolute Fehler in
-Abhängigkeit von \(\epsilon\) entwickelt.
-
-Hierfür haben wir uns den maximalen absoluten Fehler für
+In den vorangegangenen Experimenten zeigte sich, dass die Wahl von \(\epsilon\)
+einen erheblichen Einfluss auf die Konvergenz des SOR-Verfahrens ausübt. Um den
+Einfluss dieser Größe weiter zu untersuchen, betrachten wir nun, wie sich der
+maximale absolute Fehler bei unterschiedlicher Skalierung von \(\epsilon\)
+entwickelt. Hierzu setzen wir
 \[
-    \epsilon = h^k \quad \text{mit} \quad
-    k \in \set{-2, 0, 2, 4, 6}
+    \epsilon = h^k \quad \text{mit} \quad k \in \{ -2, 0, 2, 4, 6 \}.
 \]
-angesehen.
-
-Der code Snippet um dies zu erreichen sieht wie folgt aus:
-
-% [TODO] Add code snippet
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{optimal_epsilon}
+    \includegraphics[width=0.8\textwidth]{optimal_eps_plot}
     \caption{Maximaler absoluter Fehler für verschiedene \(\epsilon\)}
     \label{fig:optimal_epsilon}
 \end{figure}
 
-Wir sehen das mit steigendem \(k\) der maximale Fehler abnimmt. Für \(k = 4\)
-und \(k = 6\) scheint der Graph allerdings nahezu identisch zu sein.
+\begin{code}
+    \captionof{listing}{Code Snippet zum Generieren von \autoref{fig:optimal_epsilon}}
+    \label{code:optimal_epsilon}
+    \inputminted[firstline=19, lastline=24]{bash}{figures/generate.sh}
+\end{code}
 
-Dies ist auch zu erwarten, da für kleinere \(\epsilon\) das Verfahren zu früh
-abbricht und für größere \(\epsilon\) das Verfahren zu lange läuft. Der Fakt,
-dass der Graph für \(\epsilon = h^{-6}\) gleich zu dem für \(\epsilon =
-h^{-4}\) ist, lässt folgern das \(\epsilon = h^{-4}\) die optimale Wahl ist da
-weitere Iterationen keinen zusätzlichen Nutzen bringen.
+\textbf{Beobachtung:}
+
+Mit wachsendem Exponenten \(k\) nimmt der maximale Fehler systematisch ab. Bei
+\(k \in \{-2, 0\}\) zeigt sich ein ähnlicher Verlauf: Der Fehler sinkt bis etwa
+\(n \approx 100\), steigt anschließend jedoch erneut an. Für \(k = 2\) verläuft
+die Kurve insgesamt niedriger, flacht aber etwa ab \(n \approx 400\) ab. Für
+\(k = 4\) und \(k = 6\) sind indes kaum noch Unterschiede erkennbar, da beide
+Verläufe nahezu identisch sind.
+
+\textbf{Auswertung:}
+
+Diese Ergebnisse legen nahe, dass ein zu kleines \(\epsilon\) ein vorzeitiges
+Abbrechen der Iterationen bewirkt, während ein zu großes \(\epsilon\) zu
+unnötig vielen Iterationen führt. Der Umstand, dass die Verläufe für \(\epsilon
+= h^{-4}\) und \(\epsilon = h^{-6}\) praktisch übereinstimmen, deutet darauf
+hin, dass \(\epsilon = h^{-4}\) eine sinnvolle Wahl darstellt: Eine weitere
+Absenkung von \(\epsilon\) bringt keinen zusätzlichen Gewinn an Genauigkeit.
 
 \subsection{Optimaler Relaxationsparameter \(\omega\)}
 
-% [TODO]
+In den vorangegangenen Experimenten wurde der Einfluss des
+Relaxationsparameters \(\omega\) weitgehend vernachlässigt, indem sein Wert
+konstant auf 1.5 festgelegt wurde. In diesem Abschnitt untersuchen wir nun
+gezielt, wie sich unterschiedliche Werte von \(\omega\) auf die Konvergenz des
+SOR-Verfahrens auswirken.
 
-\subsection{Vergleich mit dem LU-Verfahren}
-
-Da wir bereits das LU-Verfahren zu Lösung des Poisson-Problems untersucht haben
-scheint es sinnvoll die beiden Verfahren miteinander zu vergleichen.
-
-\subsubsection{Konvergenz verhalten}
-
-Hierfür betrachten wir zunächst inwiefern beide Verfahren in der Lage sind, die
-exakte Lösung zu approximieren. Hierfür haben wir wiederum den maximalen
-absoluten Fehler in Abhängigkeit der Iterationen betrachtet. Für das
-SOR-Verfahren haben wir \(\epsilon = 10^{-8}\) fest sowie optimal wie in
-\autoref{sec:optimal_epsilon} bestimmt.
-
-Um den folgenden Graphen zu erstellen haben wir den folgenden code Snippet
-verwendet:
-
-% [TODO] Add code snippet
+Um den optimalen Wert für \(\omega\) experimentel zu bestimmen, haben wir das
+SOR-Verfahren bei verschiedenen Gitterfeinheiten \(n\) und
+Relaxationsparametern \(\omega\) angewendet. Die Abbildung
+\autoref{fig:optimal_omega} zeigt den daraus resultierenden Fehler in
+Abhängigkeit von \(\omega\) und \(n\).
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{convergence-comparison}
+    \includegraphics[width=\textwidth]{optimal_omega_plot}
+    \caption{Fehler in Abhängigkeit von \(\omega\) und der Gitterfeinheit \(n\)}
+    \label{fig:optimal_omega}
+\end{figure}
+
+\begin{code}
+    \captionof{listing}{Code Snippet zum Generieren von \autoref{fig:optimal_omega}}
+    \label{code:optimal_omega}
+    \inputminted[firstline=26, lastline=30]{bash}{figures/generate.sh}
+\end{code}
+
+\textbf{Beobachtung:}
+
+Der 3D-Oberflächenplot in \autoref{fig:optimal_omega} illustriert deutlich,
+dass der logarithmische Fehler bei variierenden Werten von \(\omega\) und \(n\)
+stark schwankt. Zusätzlich verdeutlicht der 2D-Plot auf der rechten Seite,
+welche \(\omega\)-Werte für die jeweiligen Gitterfeinheiten empirisch als
+optimal ermittelt wurden. Diese empirischen Werte (rote Punkte) stehen im engen
+Zusammenhang mit den theoretisch hergeleiteten optimalen Werten omegas
+(\(\omega_{opt}\) aus \autoref{eq:omega_opt}), was durch die blaue gestrichelte
+Linie im Diagramm dargestellt ist.
+
+\textbf{Auswertung:}
+
+Die Analyse verdeutlicht, dass \(\omega\) maßgeblich an der
+Konvergenzgeschwindigkeit des SOR-Verfahrens beteiligt ist. Insbesondere hängt
+der optimale Wert von \(\omega\) wesentlich von der Größe des Gitters ab: Für
+kleinere Gitterfeinheiten (d.\,h. größere Werte von \(n\)) nähert sich der
+empirische Optimumswert dem theoretischen \(\omega_{opt}\). Somit bestätigen
+die Messdaten die theoretischen Vorhersagen.
+
+Die Wahl des optimalen Relaxationsparameters \(\omega_{opt}\) stellt sich somit
+als hocheffiziente Strategie heraus, um sowohl die Konvergenzrate als auch den
+Rechenaufwand zu optimieren. Dieser Aspekt gewinnt insbesondere für große
+Gitterfeinheiten an Bedeutung, da hier die Anzahl erforderlicher Iterationen
+und damit die Gesamtrechenzeit erheblich reduziert werden können.
+
+In diesem bericht werden ab sofort alle nachfolgenden Experimente unter
+Verwendung des optimalen Relaxationsparameters \(\omega_{opt}\) durchgeführt.
+
+\subsection{Vergleich mit dem LU-Verfahren}
+
+Da wir bereits das LU-Verfahren zu Lösung des Poisson-Problems untersucht
+haben, scheint es sinnvoll, die beiden Verfahren miteinander zu vergleichen.
+
+\subsubsection{Konvergenzverhalten}
+
+In diesem Abschnitt betrachten wir, inwiefern beide Verfahren in der Lage sind,
+die exakte Lösung zu approximieren. Zu diesem Zweck wurde erneut der maximale
+absolute Fehler in Abhängigkeit der Iterationen analysiert. Für das
+SOR-Verfahren haben wir sowohl $\epsilon = 10^{-3}$ als auch den im Abschnitt
+\ref{sec:optimal_epsilon} ermittelten optimalen Wert von \(\epsilon\)
+verwendet.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{comparison_plot}
     \caption{Vergleich des maximalen absoluten Fehlers für das LU- und
         SOR-Verfahren}
     \label{fig:convergence-comparison}
 \end{figure}
 
-Wir beobachten das beide Verfahren bis \(n = \todo{Wert ergänzen}\) sehr
-ähnlich konvergieren. Ab diesem Punkt steigt der maximale Fehler für das
-SOR-Verfahren mit \(\epsilon = 10^{-8}\) wieder an. Ab \(n = \todo{Wert
-ergänzen}\) geschieht für das SOR-Verfahren mit optimalen \(\epsilon\)
-dasselbe.
+\begin{code}
+    \captionof{listing}{Code Snippet zum Generieren von \autoref{fig:convergence-comparison}}
+    \label{code:covnergence-comparison}
+    \inputminted[firstline=32, lastline=36]{bash}{figures/generate.sh}
+\end{code}
+
+Wie in Abbildung \ref{fig:convergence-comparison} ersichtlich, ähneln sich die
+Verläufe beider Verfahren bis etwa \(n \approx 3000\). Ab diesem Punkt steigt
+der maximale Fehler beim SOR-Verfahren mit \(\epsilon = 10^{-3}\) wieder an.
+Der für das LU-Verfahren und das SOR-Verfahren mit optimalem \(\epsilon\)
+ermittelte Fehler bleibt hingegen konstant konvergent. Hierbei ist zu beachten,
+dass die Rechnungen mit dem LU-Verfahren aufgrund hoher Rechenzeit nur bis \(n
+= 128\) durchgeführt wurden.
+
+\textbf{Auswertung:}
+Die Ergebnisse zeigen, dass das LU-Verfahren für moderate Problemgrößen (bis
+etwa \(n = 3000\)) gut mit dem SOR-Verfahren konkurrieren kann. Allerdings
+erfüllt das SOR-Verfahren bei zu groß gewähltem Abbruchkriterium \(\epsilon\)
+die Konvergenzanforderungen nicht mehr zuverlässig. Bei Verwendung eines
+sensibler gewählten (optimalen) \(\epsilon\) beweist sich das SOR-Verfahren
+hingegen auch für größere Gitter als stabil und konvergent.
 
 \subsubsection{Laufzeitverhalten}
 
 Ein wesentlicher Faktor bei der Wahl des Verfahrens ist dessen Laufzeit. Um
-dies zu untersuchen haben wir die Laufzeit beider Verfahren in Abhängigkeit der
-Diskretisierung Feinheit \(n\) betrachtet. Das SOR-Verfahren haben wir dabei
-mit optimalen \(\epsilon\) optimalem \(\omega\) betrachtet. Die dargestellten
-Laufzeiten sind dabei gemittelt über \(\todo{Wert ergänzen}\) Durchläufe, um
-Beeinflussungen durch andere Prozesse zu minimieren.
-
-Der code Snippet um dies zu erreichen sieht wie folgt aus:
-
-% [TODO] Add code snippet
+dies zu untersuchen, wurde die Ausführungszeit beider Verfahren in Abhängigkeit
+der Gitterfeinheit \(n\) gemessen. Das SOR-Verfahren kam dabei mit optimalem
+\(\epsilon\) sowie optimalem \(\omega\) zum Einsatz. Die Messwerte stellen
+Mittelwerte mehrerer Durchläufe dar, um zufällige Schwankungen zu glätten.
+Sowohl bei der LU-Zerlegung (mittels \texttt{lu\_factor} aus \texttt{scipy})
+als auch beim SOR-Verfahren (Sparse Forward-/Backward-Solve) wurde auf eine
+möglichst effiziente Implementierung geachtet.
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{runtime-comparison}
+    \includegraphics[width=0.8\textwidth]{runtime_comparison_plot}
     \caption{Vergleich der Laufzeiten des LU- und SOR-Verfahrens}
     \label{fig:runtime-comparison}
 \end{figure}
 
-\section{Auswertung}
+\begin{code}
+    \captionof{listing}{Code Snippet zum Generieren von \autoref{fig:runtime-comparison}}
+    \label{code:runtime-comparison}
+    \inputminted[firstline=38, lastline=42]{bash}{figures/generate.sh}
+\end{code}
 
-% [TODO]
+Für kleine Gitterfeinheiten \(n\) zeigt sich, dass die LU-Zerlegung anfangs
+geringere Laufzeiten aufweist als das SOR-Verfahren. Ab etwa \(n \approx 35\)
+steigt die Laufzeit der LU-Zerlegung jedoch stark an und übertrifft von da an
+klar diejenige des SOR-Verfahrens.
+
+\textbf{Auswertung:}
+Die Untersuchungen deuten darauf hin, dass das LU-Verfahren sich für kleine
+Systemgrößen (z.\,B.\ bis \(n\sim 30\)) lohnt, da hier die direkte
+Faktorisierung vergleichsweise schnelle Resultate liefert. Für größere
+Problemgrößen wächst der Rechenaufwand jedoch massiv, was das iterativ
+arbeitende SOR-Verfahren (mit optimierten Parametern) klar bevorzugt erscheinen
+lässt. Gerade bei hoch aufgelösten Gittern erweist sich die Sparsity der
+Matrix \(A\) als vorteilhaft für SOR, während die LU-Zerlegung in solchen
+Fällen typischerweise teure und dichte Faktoren erzeugt.
 
 \section{Zusammenfassung}
 
-% [TODO]
+In diesem Bericht wurde das Poisson-Problem unter Verwendung des
+Successive-Over-Relaxation-Verfahrens (SOR) untersucht und mit einer
+LU-Faktorisierung verglichen. Die Experimente zeigen, dass das SOR-Verfahren
+insbesondere für größere Gittergrößen klar im Vorteil ist, da es stark von der
+Sparsity der Matrix profitiert. Der optimale Relaxationsparameter \(\omega\)
+und ein geschicktes Abbruchkriterium \(\epsilon\) (etwa \(\epsilon = h^{-4}\))
+erweisen sich dabei als entscheidende Faktoren für eine effiziente und stabile
+Konvergenz. Im Gegensatz dazu wird die LU-Zerlegung mit steigender Problemgröße
+schnell rechenaufwendig, da bei dichter Faktorstruktur die Speicher- und
+Rechenkosten stark ansteigen.
+
+Die Ergebnisse unterstreichen die Bedeutung gut abgestimmter iterativer
+Verfahren bei der Lösung dünnbesetzter linearer Systeme aus der Diskretisierung
+partieller Differentialgleichungen. Während ein direkter Löser wie LU für
+kleinere Probleme vorteilhaft sein kann, dominiert das iterative SOR-Verfahren
+ab mittleren bis großen Gittergrößen hinsichtlich Ress
 
 \printbibliography
 
