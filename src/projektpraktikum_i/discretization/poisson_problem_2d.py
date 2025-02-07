@@ -14,8 +14,10 @@ main function.
 """
 
 import functools
+
 import matplotlib.pyplot as plt
 import numpy as np
+import click
 
 from projektpraktikum_i import utils
 from projektpraktikum_i.discretization import linear_solvers
@@ -170,8 +172,10 @@ def solve_discrete(n, f, equation_solver):
     b = rhs(n, f)
 
     return equation_solver(discretization_matrix, b)
+
+
 @utils.cache
-def solve_via_lu_decomposition(n, f, fast=False):
+def solve_via_lu_decomposition(n, f):
     """Solves the Poisson problem using LU decomposition.
 
     Parameters
@@ -283,23 +287,40 @@ def example_u(x, k=3):
     return (x[0] * np.sin(k * np.pi * x[0])) * (x[1] * np.sin(k * np.pi * x[1]))
 
 
-# pylint: disable=too-many-arguments,too-many-positional-arguments
-def plot_error(f, analytic_u, solver, interval, save_to=None, fast=False):
-    """Plots the error of the numerical solution for different values of n.
+class Solver(click.Choice):
+    def __init__(self, available_solvers) -> None:
+        self.solvers = available_solvers
 
-    Parameters
-    ----------
-    f : callable
-        Function to be used as the right-hand side of the Poisson problem.
-    solver : callable
-        Solver function that takes `n` and `f` and returns the approximate solution `hat_u`.
-    interval : tuple
-        Interval of values for n, defined as (start, end, num_points).
-    """
-    start, end, num_points = interval
-    values_for_n = np.logspace(start, end, num=num_points, base=2, dtype=int)
-    errors = [compute_error(n, solver(n, f, fast), analytic_u) for n in values_for_n]
-    number_of_discretization_points = (values_for_n - 1) ** 2
+        super().__init__(available_solvers.keys(), case_sensitive=False)
+
+    def convert(self, value, param, ctx):
+        choice = super().convert(value, param, ctx)
+        return self.solvers[choice]
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@utils.interval_option("n", start_default=1, stop_default=6, num_default=20, log=True)
+@click.option(
+    "--solver",
+    type=Solver(
+        available_solvers={
+            "sor": solve_via_sor,
+            "lu": solve_via_lu_decomposition,
+            "lu-fast": solve_via_lu_decomposition_fast,
+        },
+    ),
+)
+@utils.display_or_save
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+def plot_error(solver, interval):
+    """Plots the error of the numerical solution for different values of n."""
+    errors = [compute_error(n, solver(n, example_f), example_u) for n in interval]
+    number_of_discretization_points = (interval - 1) ** 2
 
     # Plotting the error vs n
     plt.figure(figsize=(10, 6))
@@ -324,18 +345,6 @@ def plot_error(f, analytic_u, solver, interval, save_to=None, fast=False):
     plt.grid(True, ls="--")
     plt.legend()
 
-    # Save or display plot
-    if save_to:
-        plt.savefig(save_to)
-    else:
-        plt.show()
-
-
-def main():
-    "Example usage of module"
-
-    plot_error(example_f, example_u, solve_via_lu_decomposition, (2, 20, 10))
-
 
 if __name__ == "__main__":
-    main()
+    cli()

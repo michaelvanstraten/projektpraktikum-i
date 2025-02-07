@@ -3,7 +3,8 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
+
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
 
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
@@ -189,6 +190,68 @@
             ];
           };
 
+          "discretization/figures-report" =
+            pkgs.runCommand "discretization-figures-report"
+              {
+                buildInputs = [ self.packages.${system}.default ];
+              }
+              ''
+                mkdir -p $out/figures
+                export MPLBACKEND=PDF
+                cd $out/figures
+                ${./tex/discretization/figures/generate.sh}
+              '';
+
+          "discretization/report" = buildLatexmkProject {
+            name = "discretization-report";
+            filename = "report.tex";
+            SOURCE_DATE_EPOCH = toString self.lastModified;
+            extraOptions = [ "--shell-escape" ];
+            src = pkgs.buildEnv {
+              name = "discretization-report-source";
+              paths = [
+                ./tex/discretization
+                self.packages.${system}."discretization/figures-report"
+              ];
+            };
+            rcFile = pkgs.writeText "latexmkrc" ''
+              add_cus_dep('pytxcode', 'tex', 0, 'pythontex');
+              sub pythontex { return system("pythontex \"$_[0]\""); }
+            '';
+            buildInputs = [
+              self.packages.${system}.default
+              pkgs.biber
+              (pkgs.texlive.combine {
+                inherit (pkgs.texlive)
+                  scheme-basic
+
+                  babel-german
+                  beamer
+                  biblatex
+                  caption
+                  csquotes
+                  extsizes
+                  float
+                  ifoddpage
+                  koma-script
+                  luacode
+                  luatexbase
+                  luatodonotes
+                  mathtools
+                  soul
+                  soulpos
+                  xkeyval
+                  xstring
+                  zref
+
+                  minted
+                  upquote
+                  lineno
+                  ;
+              })
+            ];
+          };
+
           docs = pkgs.stdenvNoCC.mkDerivation {
             name = "projektpraktikum-i-docs";
             src =
@@ -286,18 +349,45 @@
                 root = "$REPO_ROOT";
               };
 
-              editablePythonSet = pythonSet.overrideScope editableOverlay;
+              editablePythonSet = pythonSet.overrideScope (
+                lib.composeManyExtensions [
+                  editableOverlay
 
-              virtualEnv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
+                  (final: prev: {
+                    projektpraktikum-i = prev.projektpraktikum-i.overrideAttrs (old: {
+                      nativeBuildInputs =
+                        old.nativeBuildInputs
+                        ++ final.resolveBuildSystem {
+                          editables = [ ];
+                        };
+                    });
+                  })
+                ]
+              );
+
+              virtualenv = editablePythonSet.mkVirtualEnv "projektpraktikum-i-dev-env" workspace.deps.all;
 
               preCommitHooks = self.checks.${system}.pre-commit-hooks;
+
             in
             pkgs.mkShell {
               inputsFrom = [ self.packages.${system}.docs ];
               packages = [
-                virtualEnv
+                virtualenv
                 pkgs.uv
               ] ++ preCommitHooks.enabledPackages;
+
+              env = {
+                # Don't create venv using uv
+                UV_NO_SYNC = "1";
+
+                # Force uv to use Python interpreter from venv
+                UV_PYTHON = "${virtualenv}/bin/python";
+
+                # Prevent uv from downloading managed Python's
+                UV_PYTHON_DOWNLOADS = "never";
+              };
+
               shellHook =
                 preCommitHooks.shellHook
                 +
