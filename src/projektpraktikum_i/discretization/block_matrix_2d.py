@@ -15,6 +15,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.sparse as sp
+import click
 
 from projektpraktikum_i import utils
 
@@ -25,7 +26,6 @@ __all__ = [
     "plot_sparsity",
     "plot_sparsity_lu",
 ]
-
 
 
 class BlockMatrix:
@@ -160,32 +160,32 @@ def generate_label_for_polynomial(coeffs, var="n"):
     return " + ".join(terms).replace("+ -", "- ")
 
 
-def plot_theoretical_memory_usage(interval, save_to=None):
+@click.group(invoke_without_command=True)
+@click.pass_context
+def cli(ctx):
+    if ctx.invoked_subcommand is None:
+        example()
+
+
+@cli.command()
+@utils.interval_option("n", start_default=1, stop_default=6, num_default=10, log=True)
+@utils.display_or_save
+def plot_theoretical_memory_usage(n_interval):
     """Plots the theoretical memory usage comparison between raw format and CRS
     format.
-
-    Parameters
-    ----------
-    interval : tuple
-        Interval of values for n, defined as (start, end, num_points).
-    save_to : str, optional
-        File path to save the plot. If None, the plot is displayed.
     """
-    start, end, num_points = interval
-    values_for_n = np.logspace(start, end, num=num_points, base=2, dtype=int)
-
-    number_of_discretization_points = (values_for_n - 1) ** 2
+    number_of_discretization_points = (n_interval - 1) ** 2
 
     # Calculate memory usage for raw and CRS formats
-    raw_memory = (values_for_n - 1) ** 4
-    crs_memory = [BlockMatrix(n).eval_sparsity()[0] * 3 + 1 for n in values_for_n]
-    crs_ref_line = np.round(np.polyfit(values_for_n, crs_memory, 2))
+    raw_memory = (n_interval - 1) ** 4
+    crs_memory = [BlockMatrix(n).eval_sparsity()[0] * 3 + 1 for n in n_interval]
+    crs_ref_line = np.round(np.polyfit(n_interval, crs_memory, 2))
 
     plt.loglog(number_of_discretization_points, raw_memory, label="Raw format")
     plt.loglog(number_of_discretization_points, crs_memory, label="CRS format")
     plt.loglog(
         number_of_discretization_points,
-        np.poly1d(crs_ref_line)(values_for_n),
+        np.poly1d(crs_ref_line)(n_interval),
         label=f"${generate_label_for_polynomial(crs_ref_line)}$",
         linestyle="--",
         color="gray",
@@ -196,39 +196,26 @@ def plot_theoretical_memory_usage(interval, save_to=None):
     plt.grid(True, ls="--")
     plt.legend()
 
-    # Save or display plot
-    if save_to:
-        plt.savefig(save_to)
-    else:
-        plt.show()
 
-
-def plot_sparsity(interval, save_to=None):
+@cli.command()
+@utils.interval_option("n", start_default=1, stop_default=6, num_default=10, log=True)
+@utils.display_or_save
+def plot_sparsity(n_interval):
     """Plots the number of non-zero entries in $A$ as a function of $n$ and $N$,
     and compares it with the number of entries in a fully populated matrix.
-
-    Parameters
-    ----------
-    interval : tuple
-        Interval of values for n, defined as (start, end, num_points).
-    save_to : str, optional
-        File path to save the plot. If None, the plot is displayed.
     """
-    start, end, num_points = interval
-    values_for_n = np.logspace(start, end, num=num_points, base=2, dtype=int)
-
     _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
 
-    number_of_discretization_points = (values_for_n - 1) ** 2
+    number_of_discretization_points = (n_interval - 1) ** 2
 
-    nnz, rel_nnz = zip(*[BlockMatrix(n).eval_sparsity() for n in values_for_n])
-    nnz_ref_line = np.round(np.polyfit(values_for_n, nnz, 2))
+    nnz, rel_nnz = zip(*[BlockMatrix(n).eval_sparsity() for n in n_interval])
+    nnz_ref_line = np.round(np.polyfit(n_interval, nnz, 2))
     nnz_ref_line_label = generate_label_for_polynomial(nnz_ref_line)
 
     # Plot for non-zero entries vs discretization points
     ax1.loglog(
         number_of_discretization_points,
-        (values_for_n - 1) ** 4,
+        (n_interval - 1) ** 4,
         label="Number of entries in $A$",
         color="orange",
         linestyle="--",
@@ -241,7 +228,7 @@ def plot_sparsity(interval, save_to=None):
     )
     ax1.loglog(
         number_of_discretization_points,
-        np.poly1d(nnz_ref_line)(values_for_n),
+        np.poly1d(nnz_ref_line)(n_interval),
         linestyle="--",
         color="gray",
         label=f"${nnz_ref_line_label}$",
@@ -261,7 +248,7 @@ def plot_sparsity(interval, save_to=None):
     )
     ax2.loglog(
         number_of_discretization_points,
-        np.poly1d(nnz_ref_line)(values_for_n) / number_of_discretization_points**2,
+        np.poly1d(nnz_ref_line)(n_interval) / number_of_discretization_points**2,
         linestyle="--",
         color="gray",
         label=f"$\\frac{{({nnz_ref_line_label})}}{{N^2}}$",
@@ -272,45 +259,36 @@ def plot_sparsity(interval, save_to=None):
     ax2.grid(True, ls="--")
     ax2.legend()
 
-    # Save or display plot
-    if save_to:
-        plt.savefig(save_to)
-    else:
-        plt.show()
 
-
+@cli.command()
+@utils.interval_option("n", start_default=1, stop_default=6, num_default=10, log=True)
+@click.option(
+    "--epsilon",
+    default=1e-3,
+    type=click.FLOAT,
+    help="Set the threshold epsilon for filtering entries in the LU decomposition.",
+)
+@utils.display_or_save
 # pylint: disable=too-many-locals
-def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
+def plot_sparsity_lu(n_interval, epsilon=1e-3):
     """Plots the number of non-zero entries in the matrix $A$ and its LU
     decomposition as a function of $N$.
-
-    Parameters
-    ----------
-    interval : tuple
-        Interval of values for n, defined as (start, end, num_points).
-    epsilon : float, optional
-        Threshold for considering an entry as non-zero in the LU decomposition.
-    save_to : str, optional
-        File path to save the plot. If None, the plot is displayed.
     """
-    start, end, num_points = interval
-    values_for_n = np.logspace(start, end, num=num_points, base=2, dtype=int)
-
     _, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7))
 
-    number_of_discretization_points = (values_for_n - 1) ** 2
+    number_of_discretization_points = (n_interval - 1) ** 2
 
-    nnz_lu, rel_nnz_lu = zip(*[BlockMatrix(n).eval_sparsity_lu() for n in values_for_n])
+    nnz_lu, rel_nnz_lu = zip(*[BlockMatrix(n).eval_sparsity_lu() for n in n_interval])
     nnz_ge_eps_lu, rel_nnz_ge_eps_lu = zip(
-        *[BlockMatrix(n).eval_sparsity_lu(epsilon) for n in values_for_n]
+        *[BlockMatrix(n).eval_sparsity_lu(epsilon) for n in n_interval]
     )
-    nnz_lu_ref_line = np.round(np.polyfit(values_for_n, nnz_lu, 3))
+    nnz_lu_ref_line = np.round(np.polyfit(n_interval, nnz_lu, 3))
     nnz_lu_ref_line_label = generate_label_for_polynomial(nnz_lu_ref_line)
 
     # Plot for non-zero entries vs discretization points
     ax1.loglog(
         number_of_discretization_points,
-        (values_for_n - 1) ** 4,
+        (n_interval - 1) ** 4,
         label="Number of entries in LU-Decomposition",
         linestyle="--",
         color="orange",
@@ -323,7 +301,7 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     )
     ax1.loglog(
         number_of_discretization_points,
-        np.poly1d(nnz_lu_ref_line)(values_for_n),
+        np.poly1d(nnz_lu_ref_line)(n_interval),
         linestyle="--",
         color="gray",
         label=f"${nnz_lu_ref_line_label}$",
@@ -350,7 +328,7 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     )
     ax2.loglog(
         number_of_discretization_points,
-        np.poly1d(nnz_lu_ref_line)(values_for_n) / number_of_discretization_points**2,
+        np.poly1d(nnz_lu_ref_line)(n_interval) / number_of_discretization_points**2,
         linestyle="--",
         color="gray",
         label=f"$\\frac{{({nnz_lu_ref_line_label})}}{{N^2}}$",
@@ -367,14 +345,9 @@ def plot_sparsity_lu(interval, epsilon=1e-3, save_to=None):
     ax2.grid(True, ls="--")
     ax2.legend()
 
-    # Save or display plot
-    if save_to:
-        plt.savefig(save_to)
-    else:
-        plt.show()
 
-
-def main():
+# pylint: disable=no-value-for-parameter
+def example():
     """Show example plots for various functions and analyses of this module"""
     print("Demonstrating block_matrix_2d.py ...")
 
@@ -412,16 +385,18 @@ def main():
     cond = bm.get_cond()
     print(f"Condition number of the matrix: {cond}")
 
+    interval_opts = {"start": 1, "end": 6, "num_points": 10}
+
     # Plotting functions
     print("\nPlotting theoretical memory usage comparison...")
-    plot_theoretical_memory_usage((1, 5, 10))
+    plot_theoretical_memory_usage(standalone_mode=False)
 
     print("\nPlotting non-zero entries in matrix A...")
-    plot_sparsity((1, 5, 10))
+    plot_sparsity(standalone_mode=False)
 
     print("\nPlotting non-zero entries in LU decomposition...")
-    plot_sparsity_lu((1, 5, 10))
+    plot_sparsity_lu(standalone_mode=False)
 
 
 if __name__ == "__main__":
-    main()
+    cli()

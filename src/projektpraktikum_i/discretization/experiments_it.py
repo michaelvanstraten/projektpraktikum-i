@@ -58,7 +58,7 @@ omega_option = click.option(
 
 @click.group(context_settings={"show_default": True})
 def cli():
-    pass
+    """Experiments for the Poisson problem."""
 
 
 @cli.command()
@@ -258,6 +258,7 @@ def plot_compare(n_interval, fixed_eps):
 @utils.interval_option("n", 2, 6, 20, log=True)
 @click.option("--num-runs", default=10, help="Number of runs to average timing.")
 @utils.display_or_save
+# pylint: disable=unnecessary-lambda-assignment
 def plot_time_comparison(n_interval, num_runs):
     """Plots the runtime comparison between LU and SOR for different values of n."""
 
