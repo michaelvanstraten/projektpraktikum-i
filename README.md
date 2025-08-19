@@ -1,3 +1,5 @@
+{{REWRITTEN_CODE}}
+
 # Projektpraktikum I (WiSe2024)
 
 ## Overview
