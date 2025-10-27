@@ -32,7 +32,7 @@ jobs:
         run: nix build .#${{ matrix.targets.attr }} --print-build-logs
 
       - name: Upload ${{ matrix.targets.name }} artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.targets.name }}
           path: result
